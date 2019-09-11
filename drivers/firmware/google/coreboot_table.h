@@ -59,6 +59,29 @@ struct lb_framebuffer {
 	u8  reserved_mask_size;
 };
 
+struct lb_boot_media_params2 {
+	u32 tag;
+	u32 size;
+
+	/* keep compatible to lb_boot_media_params start */
+
+	/* offsets are relative to start of boot media */
+	u64 fmap_offset;
+	u64 cbfs_offset;
+	u64 cbfs_size;
+	u64 boot_media_size;
+	/* keep compatible to lb_boot_media_params end */
+
+	/* offsets are relative to start of boot media */
+	u64 cbfs_ro_offset;
+	u64 mmap_offset;
+	/* Size is in bytes */
+	u64 cbfs_ro_size;
+	u64 mmap_size;
+	/* MMIO address of MMAPed boot media, ~0ULL if not MMAPed.*/
+	u64 mmap_mmio_address;
+};
+
 /* A device, additionally with information from coreboot. */
 struct coreboot_device {
 	struct device dev;
@@ -66,6 +89,7 @@ struct coreboot_device {
 		struct coreboot_table_entry entry;
 		struct lb_cbmem_ref cbmem_ref;
 		struct lb_framebuffer framebuffer;
+		struct lb_boot_media_params2 bmp;
 	};
 };
 
