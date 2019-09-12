@@ -74,4 +74,12 @@ config GOOGLE_VPD
 	  This option enables the kernel to expose the content of Google VPD
 	  under /sys/firmware/vpd.
 
+config GOOGLE_FMAP
+	tristate "Coreboot FMAP access"
+	depends on GOOGLE_COREBOOT_TABLE
+	help
+	  This option enables the kernel to search for a Google FMAP in
+	  the coreboot table.  If found, this binary file is exported to userland
+	  in the file /sys/firmware/fmap.
+
 endif # GOOGLE_FIRMWARE
