@@ -82,4 +82,14 @@ config GOOGLE_FMAP
 	  the coreboot table.  If found, this binary file is exported to userland
 	  in the file /sys/firmware/fmap.
 
+config GOOGLE_BOOTMEDIA
+	tristate "Coreboot bootmedia params access"
+	depends on GOOGLE_COREBOOT_TABLE
+	depends on GOOGLE_FMAP
+	help
+	  This option enables the kernel to search for a boot media params
+	  table, providing the active CBFS partition.  If found, the name of
+	  the partition is exported to userland in the file
+	  /sys/firmware/cbfs_active_partition.
+
 endif # GOOGLE_FIRMWARE

@@ -59,6 +59,18 @@ struct lb_framebuffer {
 	u8  reserved_mask_size;
 };
 
+/* coreboot table with TAG 0x30 */
+struct lb_boot_media_params {
+	u32 tag;
+	u32 size;
+
+	/* offsets are relative to start of boot media */
+	u64 fmap_offset;
+	u64 cbfs_offset;
+	u64 cbfs_size;
+	u64 boot_media_size;
+};
+
 /* A device, additionally with information from coreboot. */
 struct coreboot_device {
 	struct device dev;
@@ -66,6 +78,7 @@ struct coreboot_device {
 		struct coreboot_table_entry entry;
 		struct lb_cbmem_ref cbmem_ref;
 		struct lb_framebuffer framebuffer;
+		struct lb_boot_media_params bmp;
 	};
 };
 
