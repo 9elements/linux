@@ -3,9 +3,11 @@
  * coreboot_table.c
  *
  * Module providing coreboot table access.
+ * Exports coreboot tables as attributes in sysfs.
  *
  * Copyright 2017 Google Inc.
  * Copyright 2017 Samuel Holland <samuel@sholland.org>
+ * Copyright 2019 9elements Agency GmbH
  */
 
 #include <linux/acpi.h>
@@ -84,6 +86,60 @@ void coreboot_driver_unregister(struct coreboot_driver *driver)
 }
 EXPORT_SYMBOL(coreboot_driver_unregister);
 
+static ssize_t id_show(struct device *dev,
+		       struct device_attribute *attr, char *buffer)
+{
+	struct coreboot_device *device = CB_DEV(dev);
+
+	return sprintf(buffer, "0x%08x\n", device->entry.tag);
+}
+
+static ssize_t size_show(struct device *dev,
+			 struct device_attribute *attr, char *buffer)
+{
+	struct coreboot_device *device = CB_DEV(dev);
+
+	return sprintf(buffer, "%u\n", device->entry.size);
+}
+
+static DEVICE_ATTR_RO(id);
+static DEVICE_ATTR_RO(size);
+
+static struct attribute *cb_dev_attrs[] = {
+	&dev_attr_id.attr,
+	&dev_attr_size.attr,
+	NULL
+};
+
+static ssize_t data_read(struct file *filp, struct kobject *kobj,
+			 struct bin_attribute *bin_attr,
+			 char *buffer, loff_t offset, size_t count)
+{
+	struct device *dev = kobj_to_dev(kobj);
+	struct coreboot_device *device = CB_DEV(dev);
+
+	return memory_read_from_buffer(buffer, count, &offset,
+				       &device->entry, device->entry.size);
+}
+
+static BIN_ATTR_RO(data, 0);
+
+static struct bin_attribute *cb_dev_bin_attrs[] = {
+	&bin_attr_data,
+	NULL
+};
+
+static const struct attribute_group cb_dev_attr_group = {
+	.name = "attributes",
+	.attrs = cb_dev_attrs,
+	.bin_attrs = cb_dev_bin_attrs,
+};
+
+static const struct attribute_group *cb_dev_attr_groups[] = {
+	&cb_dev_attr_group,
+	NULL
+};
+
 static int coreboot_table_populate(struct device *dev, void *ptr)
 {
 	int i, ret;
@@ -104,6 +160,8 @@ static int coreboot_table_populate(struct device *dev, void *ptr)
 		device->dev.parent = dev;
 		device->dev.bus = &coreboot_bus_type;
 		device->dev.release = coreboot_device_release;
+		device->dev.groups = cb_dev_attr_groups;
+
 		memcpy(&device->entry, ptr_entry, entry->size);
 
 		ret = device_register(&device->dev);

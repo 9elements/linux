@@ -42,3 +42,33 @@ Description:
 		buffer.
 		The file holds a read-only binary representation of the CBMEM
 		buffer.
+
+What:		/sys/bus/coreboot/devices/.../attributes/id
+Date:		Apr 2020
+KernelVersion:	5.6
+Contact:	Patrick Rudolph <patrick.rudolph@9elements.com>
+Description:
+		coreboot device directory can contain a file named attributes/id.
+		The file holds an ASCII representation of the coreboot table ID
+		in hex (e.g. 0x000000ef). On coreboot enabled platforms the ID is
+		usually called TAG.
+
+What:		/sys/bus/coreboot/devices/.../attributes/size
+Date:		Apr 2020
+KernelVersion:	5.6
+Contact:	Patrick Rudolph <patrick.rudolph@9elements.com>
+Description:
+		coreboot device directory can contain a file named
+		attributes/size.
+		The file holds an ASCII representation as decimal number of the
+		coreboot table size (e.g. 64).
+
+What:		/sys/bus/coreboot/devices/.../attributes/data
+Date:		Apr 2020
+KernelVersion:	5.6
+Contact:	Patrick Rudolph <patrick.rudolph@9elements.com>
+Description:
+		coreboot device directory can contain a file named
+		attributes/data.
+		The file holds a read-only binary representation of the coreboot
+		table.
