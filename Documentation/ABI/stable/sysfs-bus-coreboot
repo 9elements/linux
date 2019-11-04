@@ -1,0 +1,44 @@
+What:		/sys/bus/coreboot/devices/.../cbmem_attributes/id
+Date:		Apr 2020
+KernelVersion:	5.6
+Contact:	Patrick Rudolph <patrick.rudolph@9elements.com>
+Description:
+		coreboot device directory can contain a file named
+		cbmem_attributes/id if the device corresponds to a CBMEM
+		buffer.
+		The file holds an ASCII representation of the CBMEM ID in hex
+		(e.g. 0xdeadbeef).
+
+What:		/sys/bus/coreboot/devices/.../cbmem_attributes/size
+Date:		Apr 2020
+KernelVersion:	5.6
+Contact:	Patrick Rudolph <patrick.rudolph@9elements.com>
+Description:
+		coreboot device directory can contain a file named
+		cbmem_attributes/size if the device corresponds to a CBMEM
+		buffer.
+		The file holds an representation as decimal number of the
+		CBMEM buffer size (e.g. 64).
+
+What:		/sys/bus/coreboot/devices/.../cbmem_attributes/address
+Date:		Apr 2020
+KernelVersion:	5.6
+Contact:	Patrick Rudolph <patrick.rudolph@9elements.com>
+Description:
+		coreboot device directory can contain a file named
+		cbmem_attributes/address if the device corresponds to a CBMEM
+		buffer.
+		The file holds an ASCII representation of the physical address
+		of the CBMEM buffer in hex (e.g. 0x000000008000d000) and should
+		be used for debugging only.
+
+What:		/sys/bus/coreboot/devices/.../cbmem_attributes/data
+Date:		Apr 2020
+KernelVersion:	5.6
+Contact:	Patrick Rudolph <patrick.rudolph@9elements.com>
+Description:
+		coreboot device directory can contain a file named
+		cbmem_attributes/data if the device corresponds to a CBMEM
+		buffer.
+		The file holds a read-only binary representation of the CBMEM
+		buffer.

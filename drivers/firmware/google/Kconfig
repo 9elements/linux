@@ -58,6 +58,15 @@ config GOOGLE_FRAMEBUFFER_COREBOOT
 	  This option enables the kernel to search for a framebuffer in
 	  the coreboot table.  If found, it is registered with simplefb.
 
+config GOOGLE_CBMEM_COREBOOT
+	tristate "Coreboot CBMEM access"
+	depends on GOOGLE_COREBOOT_TABLE
+	help
+	  This option exposes all available CBMEM buffers to userland.
+	  The CBMEM id, size and address as well as the raw table data
+	  are exported as sysfs attributes of the corresponding coreboot
+	  table.
+
 config GOOGLE_MEMCONSOLE_COREBOOT
 	tristate "Firmware Memory Console"
 	depends on GOOGLE_COREBOOT_TABLE

@@ -59,6 +59,19 @@ struct lb_framebuffer {
 	u8  reserved_mask_size;
 };
 
+/*
+ * There can be more than one of these records as there is one per cbmem entry.
+ * Describes a buffer in memory containing runtime data.
+ */
+struct lb_cbmem_entry {
+	u32 tag;
+	u32 size;
+
+	u64 address;
+	u32 entry_size;
+	u32 id;
+};
+
 /* A device, additionally with information from coreboot. */
 struct coreboot_device {
 	struct device dev;
@@ -66,6 +79,7 @@ struct coreboot_device {
 		struct coreboot_table_entry entry;
 		struct lb_cbmem_ref cbmem_ref;
 		struct lb_framebuffer framebuffer;
+		struct lb_cbmem_entry cbmem_entry;
 	};
 };
 
