@@ -1,10 +1,13 @@
 * NXP PCA954x I2C bus switch
 
-The driver supports NXP PCA954x and PCA984x I2C mux/switch devices.
+The driver supports NXP PCA954x, PCA984x and MAXIM MAX735x I2C mux/switch devices.
 
 Required Properties:
 
   - compatible: Must contain one of the following.
+    "maxim,max7356"
+    "maxim,max7357"
+    "maxim,max7358"
     "nxp,pca9540",
     "nxp,pca9542",
     "nxp,pca9543",
