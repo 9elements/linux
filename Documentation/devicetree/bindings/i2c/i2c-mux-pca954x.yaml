@@ -11,6 +11,7 @@ maintainers:
 
 description:
   The binding supports NXP PCA954x and PCA984x I2C mux/switch devices.
+  Compatible with Maxim MAX7356 - MAX7358 I2C mux/switch devices.
 
 allOf:
   - $ref: /schemas/i2c/i2c-mux.yaml#
@@ -19,6 +20,9 @@ properties:
   compatible:
     oneOf:
       - enum:
+          - maxim,max7356
+          - maxim,max7357
+          - maxim,max7358
           - nxp,pca9540
           - nxp,pca9542
           - nxp,pca9543
