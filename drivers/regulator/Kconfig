@@ -546,6 +546,12 @@ config REGULATOR_MAX1586
 	  regulator via I2C bus. The provided regulator is suitable
 	  for PXA27x chips to control VCC_CORE and VCC_USIM voltages.
 
+config REGULATOR_MAX5970
+	tristate "Maxim 5970 dual channel switch and monitor"
+	depends on I2C
+	help
+	  This driver controls a Maxim 5970 switch via I2C bus.
+
 config REGULATOR_MAX77620
 	tristate "Maxim 77620/MAX20024 voltage regulator"
 	depends on MFD_MAX77620 || COMPILE_TEST
