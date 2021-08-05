@@ -64,8 +64,9 @@
 						#gpio-cells = <2>;
 						#interrupt-cells=<2>;
 						interrupt-parent = <&gpio>;
-						interrupts = <4 2>;
+						interrupts = <20 1>;
 						interrupt-controller;
+						status = "okay";
 					};
 				};
 			};
@@ -76,8 +77,9 @@
 		target = <&gpio>;
 		__overlay__ {
 			gpioexpander_pins: gpioexpander_pins {
-				brcm,pins = <4>;
+				brcm,pins = <20>;
 				brcm,function = <0>;
+				brcm,pull = <0>; /* none */
 			};
 		};
 	};

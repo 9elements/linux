@@ -7,7 +7,6 @@
  *  Derived from drivers/i2c/chips/pca953x.c
  */
 
-#include <linux/acpi.h>
 #include <linux/bitmap.h>
 #include <linux/gpio/driver.h>
 #include <linux/gpio/consumer.h>
@@ -68,29 +67,6 @@ static const struct i2c_device_id cy8c95x0_id[] = {
 	{ }
 };
 MODULE_DEVICE_TABLE(i2c, cy8c95x0_id);
-
-static const struct acpi_gpio_params cy8c95x0_irq_gpios = { 0, 0, true };
-
-static const struct acpi_gpio_mapping cy8c95x0_acpi_irq_gpios[] = {
-	{ "irq-gpios", &cy8c95x0_irq_gpios, 1, ACPI_GPIO_QUIRK_ABSOLUTE_NUMBER },
-	{ }
-};
-
-static int cy8c95x0_acpi_get_irq(struct device *dev)
-{
-	int ret;
-
-	ret = devm_acpi_dev_add_driver_gpios(dev, cy8c95x0_acpi_irq_gpios);
-	if (ret)
-		dev_warn(dev, "can't add GPIO ACPI mapping\n");
-
-	ret = acpi_dev_gpio_irq_get_by(ACPI_COMPANION(dev), "irq-gpios", 0);
-	if (ret < 0)
-		return ret;
-
-	dev_info(dev, "ACPI interrupt quirk (IRQ %d)\n", ret);
-	return ret;
-}
 
 #define MAX_BANK 8
 #define BANK_SZ 8
@@ -491,7 +467,7 @@ static void cy8c95x0_irq_mask(struct irq_data *d)
 	struct cy8c95x0_chip *chip = gpiochip_get_data(gc);
 	irq_hw_number_t hwirq = irqd_to_hwirq(d);
 
-	clear_bit(hwirq, chip->irq_mask);
+	set_bit(hwirq, chip->irq_mask);
 }
 
 static void cy8c95x0_irq_unmask(struct irq_data *d)
@@ -500,7 +476,7 @@ static void cy8c95x0_irq_unmask(struct irq_data *d)
 	struct cy8c95x0_chip *chip = gpiochip_get_data(gc);
 	irq_hw_number_t hwirq = irqd_to_hwirq(d);
 
-	set_bit(hwirq, chip->irq_mask);
+	clear_bit(hwirq, chip->irq_mask);
 }
 
 static int cy8c95x0_irq_set_wake(struct irq_data *d, unsigned int on)
@@ -619,8 +595,8 @@ static irqreturn_t cy8c95x0_irq_handler(int irq, void *devid)
 
 	if (ret) {
 		ret = 0;
-
 		for_each_set_bit(level, pending, gc->ngpio) {
+
 			int nested_irq = irq_find_mapping(gc->irq.domain, level);
 
 			if (unlikely(nested_irq <= 0)) {
@@ -644,15 +620,16 @@ static int cy8c95x0_irq_setup(struct cy8c95x0_chip *chip, int irq_base)
 	DECLARE_BITMAP(pending_irqs, MAX_LINE);
 	int ret;
 
-	ret = cy8c95x0_acpi_get_irq(&client->dev);
-	if (ret > 0)
-		client->irq = ret;
-
-	if (!client->irq)
+	if (!client->irq) {
+		dev_warn(&client->dev, "No interrupt support enabled\n");
 		return 0;
+	}
 
-	if (irq_base == -1)
+	if (irq_base == -1) {
+		dev_warn(&client->dev, "Invalid IRQ base\n");
 		return 0;
+	}
+	dev_info(&client->dev, "client->irq: %d, irq_base: %d\n", client->irq, irq_base);
 
 	mutex_init(&chip->irq_lock);
 
@@ -666,6 +643,9 @@ static int cy8c95x0_irq_setup(struct cy8c95x0_chip *chip, int irq_base)
 		dev_err(&client->dev, "failed to clear irq status register\n");
 		return ret;
 	}
+
+	/* Mask all interrupts */
+	bitmap_fill(chip->irq_mask, MAX_LINE);
 
 	irq_chip->name = dev_name(&client->dev);
 	irq_chip->irq_mask = cy8c95x0_irq_mask;
@@ -689,13 +669,14 @@ static int cy8c95x0_irq_setup(struct cy8c95x0_chip *chip, int irq_base)
 
 	ret = devm_request_threaded_irq(&client->dev, client->irq,
 					NULL, cy8c95x0_irq_handler,
-					IRQF_ONESHOT | IRQF_SHARED,
+					IRQF_ONESHOT | IRQF_SHARED | IRQF_TRIGGER_RISING,
 					dev_name(&client->dev), chip);
 	if (ret) {
 		dev_err(&client->dev, "failed to request irq %d\n",
 			client->irq);
 		return ret;
 	}
+	dev_info(&client->dev, "Registered threaded IRQ\n");
 
 	return 0;
 }
