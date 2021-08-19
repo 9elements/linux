@@ -47,6 +47,8 @@
 #define CY8C95X0_DEVID		0x2E
 #define CY8C95X0_DEVID_(x)	(((x) >> 4) & 0xF)
 
+#define CY8C95X0_PIN_TO_OFFSET(x) (((x) >= 20) ? ((x) + 4) : (x))
+
 struct cy8c95x0_platform_data {
 	/* number of the first GPIO */
 	unsigned	int gpio_base;
@@ -114,24 +116,24 @@ static bool cy8c95x0_writeable_register(struct device *dev, unsigned int reg)
 
 static bool cy8c95x0_volatile_register(struct device *dev, unsigned int reg)
 {
-        switch (reg) {
-        case CY8C95X0_INPUT_(0) ... CY8C95X0_INPUT_(7):
-        case CY8C95X0_INTSTATUS_(0) ... CY8C95X0_INTSTATUS_(7):
-        case CY8C95X0_INTMASK:
-        case CY8C95X0_INVERT:
-        case CY8C95X0_DIRECTION:
-        case CY8C95X0_DRV_PU:
-        case CY8C95X0_DRV_PD:
-        case CY8C95X0_DRV_ODH:
-        case CY8C95X0_DRV_ODL:
-        case CY8C95X0_DRV_PP_FAST:
-        case CY8C95X0_DRV_PP_SLOW:
-        case CY8C95X0_DRV_HIZ:
+	switch (reg) {
+	case CY8C95X0_INPUT_(0) ... CY8C95X0_INPUT_(7):
+	case CY8C95X0_INTSTATUS_(0) ... CY8C95X0_INTSTATUS_(7):
+	case CY8C95X0_INTMASK:
+	case CY8C95X0_INVERT:
+	case CY8C95X0_DIRECTION:
+	case CY8C95X0_DRV_PU:
+	case CY8C95X0_DRV_PD:
+	case CY8C95X0_DRV_ODH:
+	case CY8C95X0_DRV_ODL:
+	case CY8C95X0_DRV_PP_FAST:
+	case CY8C95X0_DRV_PP_SLOW:
+	case CY8C95X0_DRV_HIZ:
 
-                return true;
-        }
+		return true;
+	}
 
-        return false;
+	return false;
 }
 
 static const struct regmap_config cy8c95x0_i2c_regmap = {
@@ -146,6 +148,12 @@ static const struct regmap_config cy8c95x0_i2c_regmap = {
 	.cache_type = REGCACHE_RBTREE,
 	.max_register = 0x30,
 };
+
+static int cy8c95x0_offset_to_gport(unsigned int off)
+{
+	/* Gport2 only has 4 bits, so skip over them */
+	return CY8C95X0_PIN_TO_OFFSET(off) / BANK_SZ;
+}
 
 static int cy8c95x0_write_regs(struct cy8c95x0_chip *chip, int reg, unsigned long *val)
 {
@@ -224,7 +232,7 @@ out:
 static int cy8c95x0_gpio_direction_input(struct gpio_chip *gc, unsigned int off)
 {
 	struct cy8c95x0_chip *chip = gpiochip_get_data(gc);
-	u8 port = off / BANK_SZ;
+	u8 port = cy8c95x0_offset_to_gport(off);
 	u8 bit = BIT(off % BANK_SZ);
 	int ret;
 
@@ -249,7 +257,7 @@ static int cy8c95x0_gpio_direction_output(struct gpio_chip *gc,
 					  unsigned int off, int val)
 {
 	struct cy8c95x0_chip *chip = gpiochip_get_data(gc);
-	u8 port = off / BANK_SZ;
+	u8 port = cy8c95x0_offset_to_gport(off);
 	u8 outreg = CY8C95X0_OUTPUT_(port);
 	u8 bit = BIT(off % BANK_SZ);
 	int ret;
@@ -275,7 +283,7 @@ exit:
 static int cy8c95x0_gpio_get_value(struct gpio_chip *gc, unsigned int off)
 {
 	struct cy8c95x0_chip *chip = gpiochip_get_data(gc);
-	u8 inreg = CY8C95X0_INPUT_(off / BANK_SZ);
+	u8 inreg = CY8C95X0_INPUT_(cy8c95x0_offset_to_gport(off));
 	u8 bit = BIT(off % BANK_SZ);
 	u32 reg_val;
 	int ret;
@@ -300,7 +308,7 @@ static void cy8c95x0_gpio_set_value(struct gpio_chip *gc, unsigned int off,
 				    int val)
 {
 	struct cy8c95x0_chip *chip = gpiochip_get_data(gc);
-	u8 outreg = CY8C95X0_OUTPUT_(off / BANK_SZ);
+	u8 outreg = CY8C95X0_OUTPUT_(cy8c95x0_offset_to_gport(off));
 	u8 bit = BIT(off % BANK_SZ);
 
 	mutex_lock(&chip->i2c_lock);
@@ -311,7 +319,7 @@ static void cy8c95x0_gpio_set_value(struct gpio_chip *gc, unsigned int off,
 static int cy8c95x0_gpio_get_direction(struct gpio_chip *gc, unsigned int off)
 {
 	struct cy8c95x0_chip *chip = gpiochip_get_data(gc);
-	u8 port = off / BANK_SZ;
+	u8 port = cy8c95x0_offset_to_gport(off);
 	u8 bit = BIT(off % BANK_SZ);
 	u32 reg_val;
 	int ret;
@@ -339,11 +347,11 @@ static int cy8c95x0_gpio_get_direction(struct gpio_chip *gc, unsigned int off)
 }
 
 static int cy8c95x0_gpio_set_pincfg(struct cy8c95x0_chip *chip,
-				    unsigned int offset,
+				    unsigned int off,
 				    unsigned long config)
 {
-	u8 port = offset / BANK_SZ;
-	u8 bit = BIT(offset % BANK_SZ);
+	u8 port = cy8c95x0_offset_to_gport(off);
+	u8 bit = BIT(off % BANK_SZ);
 	unsigned int reg;
 	int ret;
 
@@ -406,15 +414,21 @@ static int cy8c95x0_gpio_get_multiple(struct gpio_chip *gc,
 {
 	struct cy8c95x0_chip *chip = gpiochip_get_data(gc);
 	DECLARE_BITMAP(reg_val, MAX_LINE);
+	DECLARE_BITMAP(tmp, MAX_LINE);
 	int ret;
 
 	mutex_lock(&chip->i2c_lock);
-	ret = cy8c95x0_read_regs(chip,  CY8C95X0_INPUT, reg_val);
+	ret = cy8c95x0_read_regs(chip, CY8C95X0_INPUT, reg_val);
 	mutex_unlock(&chip->i2c_lock);
 	if (ret)
 		return ret;
 
-	bitmap_replace(bits, bits, reg_val, mask, gc->ngpio);
+	/* Fill the 4 bit gap of Gport2 */
+	bitmap_shift_right(tmp, reg_val, 4, gc->ngpio);
+	bitmap_copy(tmp, reg_val, 20);
+
+	bitmap_replace(bits, bits, tmp, mask, gc->ngpio);
+
 	return 0;
 }
 
@@ -423,14 +437,16 @@ static void cy8c95x0_gpio_set_multiple(struct gpio_chip *gc,
 {
 	struct cy8c95x0_chip *chip = gpiochip_get_data(gc);
 	DECLARE_BITMAP(reg_val, MAX_LINE);
-	int ret;
+	int ret, level;
 
 	mutex_lock(&chip->i2c_lock);
 	ret = cy8c95x0_read_regs(chip, CY8C95X0_OUTPUT, reg_val);
 	if (ret)
 		goto exit;
 
-	bitmap_replace(reg_val, reg_val, bits, mask, gc->ngpio);
+	for_each_set_bit(level, bits, gc->ngpio) {
+		bitmap_set(reg_val, CY8C95X0_PIN_TO_OFFSET(level), 1);
+	}
 
 	cy8c95x0_write_regs(chip, CY8C95X0_OUTPUT, reg_val);
 exit:
@@ -465,7 +481,7 @@ static void cy8c95x0_irq_mask(struct irq_data *d)
 {
 	struct gpio_chip *gc = irq_data_get_irq_chip_data(d);
 	struct cy8c95x0_chip *chip = gpiochip_get_data(gc);
-	irq_hw_number_t hwirq = irqd_to_hwirq(d);
+	irq_hw_number_t hwirq = CY8C95X0_PIN_TO_OFFSET(irqd_to_hwirq(d));
 
 	set_bit(hwirq, chip->irq_mask);
 }
@@ -474,7 +490,7 @@ static void cy8c95x0_irq_unmask(struct irq_data *d)
 {
 	struct gpio_chip *gc = irq_data_get_irq_chip_data(d);
 	struct cy8c95x0_chip *chip = gpiochip_get_data(gc);
-	irq_hw_number_t hwirq = irqd_to_hwirq(d);
+	irq_hw_number_t hwirq = CY8C95X0_PIN_TO_OFFSET(irqd_to_hwirq(d));
 
 	clear_bit(hwirq, chip->irq_mask);
 }
@@ -529,7 +545,7 @@ static int cy8c95x0_irq_set_type(struct irq_data *d, unsigned int type)
 {
 	struct gpio_chip *gc = irq_data_get_irq_chip_data(d);
 	struct cy8c95x0_chip *chip = gpiochip_get_data(gc);
-	irq_hw_number_t hwirq = irqd_to_hwirq(d);
+	irq_hw_number_t hwirq = CY8C95X0_PIN_TO_OFFSET(irqd_to_hwirq(d));
 
 	if ((type & ~IRQ_TYPE_EDGE_BOTH)) {
 		dev_err(&chip->client->dev, "irq %d: unsupported type %d\n",
@@ -547,7 +563,7 @@ static void cy8c95x0_irq_shutdown(struct irq_data *d)
 {
 	struct gpio_chip *gc = irq_data_get_irq_chip_data(d);
 	struct cy8c95x0_chip *chip = gpiochip_get_data(gc);
-	irq_hw_number_t hwirq = irqd_to_hwirq(d);
+	irq_hw_number_t hwirq = CY8C95X0_PIN_TO_OFFSET(irqd_to_hwirq(d));
 
 	clear_bit(hwirq, chip->irq_trig_raise);
 	clear_bit(hwirq, chip->irq_trig_fall);

@@ -963,6 +963,9 @@ config GPIO_CYPRESS_CY8C95X0
 	tristate "Cypress CY8C95X0 I2C GPIO expander"
 	depends on OF_GPIO
 	select GPIOLIB_IRQCHIP
+	select GPIO_REGMAP
+	select REGMAP_I2C
+	select REGMAP
 	help
 	  Support for 20/40/60 pin Cypress Cy8C95x0 GPIO I2C expander.
 
