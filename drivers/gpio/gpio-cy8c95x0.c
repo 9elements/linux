@@ -234,7 +234,8 @@ static int cy8c95x0_gpio_direction_input(struct gpio_chip *gc, unsigned int off)
 	struct cy8c95x0_chip *chip = gpiochip_get_data(gc);
 	u8 port = cy8c95x0_offset_to_gport(off);
 	u8 bit = BIT(off % BANK_SZ);
-	int ret;
+	u32 reg_val;
+	int ret, bias_enabled;
 
 	mutex_lock(&chip->i2c_lock);
 	/* select bank */
@@ -242,12 +243,32 @@ static int cy8c95x0_gpio_direction_input(struct gpio_chip *gc, unsigned int off)
 	if (ret)
 		goto exit;
 
-	ret = regmap_write_bits(chip->regmap, CY8C95X0_DIRECTION, bit, bit);
+	bias_enabled = 0;
+	/* Check BIAS registers */
+	ret = regmap_read(chip->regmap, CY8C95X0_DRV_PU, &reg_val);
 	if (ret)
 		goto exit;
+	if (reg_val & bit) {
+		/* Set output high */
+		regmap_write_bits(chip->regmap, CY8C95X0_OUTPUT_(port), bit, bit);
 
-	/* set output to 1 */
-	ret = regmap_write_bits(chip->regmap, CY8C95X0_OUTPUT_(port), bit, bit);
+		bias_enabled = 1;
+	}
+
+	ret = regmap_read(chip->regmap, CY8C95X0_DRV_PD, &reg_val);
+	if (ret)
+		goto exit;
+	if (reg_val & bit) {
+		/* Set output low */
+		regmap_write_bits(chip->regmap, CY8C95X0_OUTPUT_(port), bit, 0);
+
+		bias_enabled = 1;
+	}
+
+	/* Set direction to output if BIAS is enabled, else input */
+	ret = regmap_write_bits(chip->regmap, CY8C95X0_DIRECTION, bit, bias_enabled ? 0 : bit);
+	if (ret)
+		goto exit;
 exit:
 	mutex_unlock(&chip->i2c_lock);
 	return ret;
