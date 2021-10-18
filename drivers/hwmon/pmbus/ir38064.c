@@ -42,10 +42,20 @@ static int ir38064_probe(struct i2c_client *client)
 
 static const struct i2c_device_id ir38064_id[] = {
 	{"ir38064", 0},
+	{"ir38263", 0},
 	{}
 };
 
 MODULE_DEVICE_TABLE(i2c, ir38064_id);
+
+#ifdef CONFIG_OF
+static const struct of_device_id ir38064_of_match[] = {
+	{ .compatible = "infineon,ir38064" },
+	{ .compatible = "infineon,ir38263" },
+	{ },
+};
+MODULE_DEVICE_TABLE(of, ir38064_of_match);
+#endif
 
 /* This is the driver that will be inserted */
 static struct i2c_driver ir38064_driver = {
@@ -59,6 +69,6 @@ static struct i2c_driver ir38064_driver = {
 module_i2c_driver(ir38064_driver);
 
 MODULE_AUTHOR("Maxim Sloyko <maxims@google.com>");
-MODULE_DESCRIPTION("PMBus driver for Infineon IR38064");
+MODULE_DESCRIPTION("PMBus driver for Infineon IR38x6x");
 MODULE_LICENSE("GPL");
 MODULE_IMPORT_NS(PMBUS);
