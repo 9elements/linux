@@ -47,6 +47,7 @@ static struct pmbus_driver_info ir38064_info = {
 #endif
 };
 
+
 static int ir38064_probe(struct i2c_client *client)
 {
 	return pmbus_do_probe(client, &ir38064_info);
