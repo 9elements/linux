@@ -16,7 +16,14 @@
 #include <linux/init.h>
 #include <linux/kernel.h>
 #include <linux/module.h>
+#include <linux/regulator/driver.h>
 #include "pmbus.h"
+
+#if IS_ENABLED(CONFIG_SENSORS_IR38064_REGULATOR)
+static const struct regulator_desc ir38064_reg_desc[] = {
+	PMBUS_REGULATOR("vout", 0),
+};
+#endif /* CONFIG_SENSORS_IR38064_REGULATOR */
 
 static struct pmbus_driver_info ir38064_info = {
 	.pages = 1,
@@ -32,8 +39,18 @@ static struct pmbus_driver_info ir38064_info = {
 	    | PMBUS_HAVE_TEMP | PMBUS_HAVE_STATUS_TEMP
 	    | PMBUS_HAVE_VOUT | PMBUS_HAVE_STATUS_VOUT
 	    | PMBUS_HAVE_IOUT | PMBUS_HAVE_STATUS_IOUT
+#if IS_ENABLED(CONFIG_SENSORS_IR38064_REGULATOR)
+#ifdef PMBUS_HAVE_VOUT_COMMAND
+           | PMBUS_HAVE_VOUT_COMMAND
+#endif
+#endif
 	    | PMBUS_HAVE_POUT,
+#if IS_ENABLED(CONFIG_SENSORS_IR38064_REGULATOR)
+	.num_regulators = 1,
+	.reg_desc = ir38064_reg_desc,
+#endif
 };
+
 
 static int ir38064_probe(struct i2c_client *client)
 {
@@ -42,6 +59,7 @@ static int ir38064_probe(struct i2c_client *client)
 
 static const struct i2c_device_id ir38064_id[] = {
 	{"ir38064", 0},
+	{"ir38164", 0},
 	{"ir38263", 0},
 	{}
 };
@@ -51,6 +69,7 @@ MODULE_DEVICE_TABLE(i2c, ir38064_id);
 #ifdef CONFIG_OF
 static const struct of_device_id ir38064_of_match[] = {
 	{ .compatible = "infineon,ir38064" },
+	{ .compatible = "infineon,ir38164" },
 	{ .compatible = "infineon,ir38263" },
 	{ },
 };
