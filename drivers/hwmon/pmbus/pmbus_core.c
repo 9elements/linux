@@ -1505,6 +1505,11 @@ static const struct pmbus_sensor_attr voltage_attributes[] = {
 		.gbit = PB_STATUS_VOUT_OV,
 		.limit = vout_limit_attrs,
 		.nlimit = ARRAY_SIZE(vout_limit_attrs),
+	}, {
+		.reg = PMBUS_VOUT_COMMAND,
+		.class = PSC_VOLTAGE_OUT,
+		.label = "vout_command",
+		.func = PMBUS_HAVE_VOUT_COMMAND,
 	}
 };
 
@@ -2293,10 +2298,33 @@ static int pmbus_regulator_disable(struct regulator_dev *rdev)
 	return _pmbus_regulator_on_off(rdev, 0);
 }
 
+static int pmbus_regulator_get_voltage(struct regulator_dev *rdev)
+{
+	struct device *dev = rdev_get_dev(rdev);
+	struct i2c_client *client = to_i2c_client(dev->parent);
+	struct pmbus_data *data = i2c_get_clientdata(client);
+	u8 page = rdev_get_id(rdev);
+	struct pmbus_sensor *s;
+
+	s = pmbus_find_sensor(data, page, PMBUS_VOUT_COMMAND);
+	if (IS_ERR(s)) {
+		dev_err(dev, "PMBus sensor not found\n");
+		return -ENODEV;
+	}
+	s->update = true;
+	mutex_lock(&data->update_lock);
+	pmbus_update_sensor_data(client, s);
+	mutex_unlock(&data->update_lock);
+
+	/* Scale to micro units */
+	return pmbus_reg2data(data, s) * 1000;
+}
+
 const struct regulator_ops pmbus_regulator_ops = {
 	.enable = pmbus_regulator_enable,
 	.disable = pmbus_regulator_disable,
 	.is_enabled = pmbus_regulator_is_enabled,
+	.get_voltage = pmbus_regulator_get_voltage,
 };
 EXPORT_SYMBOL_GPL(pmbus_regulator_ops);
 
