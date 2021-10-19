@@ -401,6 +401,7 @@ enum pmbus_sensor_classes {
 #define PMBUS_HAVE_PWM12	BIT(20)
 #define PMBUS_HAVE_PWM34	BIT(21)
 #define PMBUS_HAVE_SAMPLES	BIT(22)
+#define PMBUS_HAVE_VOUT_COMMAND BIT(23)
 
 #define PMBUS_PHASE_VIRTUAL	BIT(30)	/* Phases on this page are virtual */
 #define PMBUS_PAGE_VIRTUAL	BIT(31)	/* Page is virtual */
@@ -459,6 +460,8 @@ struct pmbus_driver_info {
 /* Regulator ops */
 
 extern const struct regulator_ops pmbus_regulator_ops;
+extern const struct regulator_ops pmbus_regulator_ops_vout_command;
+
 
 /* Macro for filling in array of struct regulator_desc */
 #define PMBUS_REGULATOR(_name, _id)				\
@@ -468,6 +471,18 @@ extern const struct regulator_ops pmbus_regulator_ops;
 		.of_match = of_match_ptr(_name # _id),		\
 		.regulators_node = of_match_ptr("regulators"),	\
 		.ops = &pmbus_regulator_ops,			\
+		.type = REGULATOR_VOLTAGE,			\
+		.owner = THIS_MODULE,				\
+	}
+
+/* Macro for filling in array of struct regulator_desc, which supports VOUT_COMMNAD */
+#define PMBUS_REGULATOR_VOUT_CMD(_name, _id)			\
+	[_id] = {						\
+		.name = (_name # _id),				\
+		.id = (_id),					\
+		.of_match = of_match_ptr(_name # _id),		\
+		.regulators_node = of_match_ptr("regulators"),	\
+		.ops = &pmbus_regulator_ops_vout_command,	\
 		.type = REGULATOR_VOLTAGE,			\
 		.owner = THIS_MODULE,				\
 	}
