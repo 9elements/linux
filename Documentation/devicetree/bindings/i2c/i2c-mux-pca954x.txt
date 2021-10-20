@@ -35,6 +35,7 @@ Optional Properties:
     multiplexers on the bus and the devices behind them use same I2C addresses.
   - interrupts: Interrupt mapping for IRQ.
   - interrupt-controller: Marks the device node as an interrupt controller.
+  - vcc-supplies: An optional voltage regulator supplying power to the chip.
   - #interrupt-cells : Should be two.
     - first cell is the pin number
     - second cell is used to specify flags.
@@ -47,6 +48,8 @@ Example:
 		#address-cells = <1>;
 		#size-cells = <0>;
 		reg = <0x74>;
+
+		vcc-supplies = <&pmic>;
 
 		interrupt-parent = <&ipic>;
 		interrupts = <17 IRQ_TYPE_LEVEL_LOW>;
