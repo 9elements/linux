@@ -462,6 +462,7 @@ static int pca954x_probe(struct i2c_client *client,
 	if (IS_ERR(supply)) {
 		if ((PTR_ERR(supply) == -EPROBE_DEFER))
 			return -EPROBE_DEFER;
+		dev_warn(dev, "Failed to get regulator for vcc: %d\n", ret);
 	} else {
 		ret = regulator_enable(supply);
 		if (ret) {
