@@ -63,6 +63,9 @@ properties:
     description: if present, overrides i2c-mux-idle-disconnect
     $ref: /schemas/mux/mux-controller.yaml#/properties/idle-state
 
+  vcc-supplies:
+    description: An optional voltage regulator supplying power to the chip.
+
 required:
   - compatible
   - reg
