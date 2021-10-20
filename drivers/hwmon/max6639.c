@@ -20,6 +20,7 @@
 #include <linux/err.h>
 #include <linux/mutex.h>
 #include <linux/platform_data/max6639.h>
+#include <linux/regulator/consumer.h>
 
 /* Addresses to scan */
 static const unsigned short normal_i2c[] = { 0x2c, 0x2e, 0x2f, I2C_CLIENT_END };
@@ -55,7 +56,8 @@ static const unsigned short normal_i2c[] = { 0x2c, 0x2e, 0x2f, I2C_CLIENT_END };
 
 #define MAX6639_FAN_CONFIG1_PWM			0x80
 
-#define MAX6639_FAN_CONFIG3_THERM_FULL_SPEED	0x40
+#define MAX6639_FAN_CONFIG3_THERM_FS		0x40
+#define MAX6639_FAN_CONFIG3_DISABLE_STRETCH	0x20
 
 static const int rpm_ranges[] = { 2000, 4000, 8000, 16000 };
 
@@ -87,6 +89,11 @@ struct max6639_data {
 	/* Register values initialized only once */
 	u8 ppr;			/* Pulses per rotation 0..3 for 1..4 ppr */
 	u8 rpm_range;		/* Index in above rpm_ranges table */
+	u8 disable_therm_pin;	/* Disable !THERM assert full speed */
+	u8 polarity;
+
+	/* Optional regulator for FAN supply */
+	struct regulator *reg_en;
 };
 
 static struct max6639_data *max6639_update_device(struct device *dev)
@@ -398,14 +405,77 @@ static int rpm_range_to_reg(int range)
 	return 1; /* default: 4000 RPM */
 }
 
+static void max6639_platform_data_of(struct device *dev,
+				     struct max6639_data *data)
+{
+	bool enabled;
+	u32 tmp;
+
+	if (of_property_read_u32(dev->of_node, "maxim,pulses_per_revolution", &tmp) < 0)
+		dev_warn(dev, "No pulses_per_revolution property\n");
+	else if (tmp > 0 && tmp < 5)
+		data->ppr = tmp - 1;
+
+	if (of_property_read_u32(dev->of_node, "maxim,rpm_range", &tmp) < 0)
+		dev_warn(dev, "No rpm_range property\n");
+	else
+		data->rpm_range = rpm_range_to_reg(tmp);
+
+	enabled = of_property_read_bool(dev->of_node, "maxim,pwm_polarity");
+	data->polarity = enabled;
+
+	enabled = of_property_read_bool(dev->of_node, "maxim,disable_therm_full_speed");
+	data->disable_therm_pin = enabled;
+}
+
+static void max6639_platform_data_plat(struct device *dev,
+				       struct max6639_data *data)
+{
+	struct max6639_platform_data *max6639_info = dev_get_platdata(dev);
+
+	if (!max6639_info)
+		return;
+
+	/* Fans pulse per revolution is 2 by default */
+	if (max6639_info->ppr > 0 && max6639_info->ppr < 5)
+		data->ppr = max6639_info->ppr - 1;
+
+	data->rpm_range = rpm_range_to_reg(max6639_info->rpm_range);
+	data->disable_therm_pin = max6639_info->disable_therm_full_speed;
+	data->polarity = max6639_info->pwm_polarity;
+}
+
+static void max6639_init_defaults(struct max6639_data *data)
+{
+	int i;
+
+	/* Fans pulse per revolution is 2 by default */
+	data->ppr = 1;
+	data->rpm_range = 1;	/* default: 4000 RPM */
+	data->disable_therm_pin = 0;
+	data->polarity = 0;
+	for (i = 0; i < 2; i++) {
+		/* Max. temp. 80C/90C/100C */
+		data->temp_therm[i] = 80;
+		data->temp_alert[i] = 90;
+		data->temp_ot[i] = 100;
+		/* PWM 120/120 (i.e. 100%) */
+		data->pwm[i] = 120;
+	}
+}
+
 static int max6639_init_client(struct i2c_client *client,
 			       struct max6639_data *data)
 {
-	struct max6639_platform_data *max6639_info =
-		dev_get_platdata(&client->dev);
 	int i;
-	int rpm_range = 1; /* default: 4000 RPM */
 	int err;
+
+	max6639_init_defaults(data);
+
+	if (client->dev.of_node)
+		max6639_platform_data_of(&client->dev, data);
+	else
+		max6639_platform_data_plat(&client->dev, data);
 
 	/* Reset chip to default values, see below for GCONFIG setup */
 	err = i2c_smbus_write_byte_data(client, MAX6639_REG_GCONFIG,
@@ -413,20 +483,7 @@ static int max6639_init_client(struct i2c_client *client,
 	if (err)
 		goto exit;
 
-	/* Fans pulse per revolution is 2 by default */
-	if (max6639_info && max6639_info->ppr > 0 &&
-			max6639_info->ppr < 5)
-		data->ppr = max6639_info->ppr;
-	else
-		data->ppr = 2;
-	data->ppr -= 1;
-
-	if (max6639_info)
-		rpm_range = rpm_range_to_reg(max6639_info->rpm_range);
-	data->rpm_range = rpm_range;
-
 	for (i = 0; i < 2; i++) {
-
 		/* Set Fan pulse per revolution */
 		err = i2c_smbus_write_byte_data(client,
 				MAX6639_REG_FAN_PPR(i),
@@ -437,12 +494,13 @@ static int max6639_init_client(struct i2c_client *client,
 		/* Fans config PWM, RPM */
 		err = i2c_smbus_write_byte_data(client,
 			MAX6639_REG_FAN_CONFIG1(i),
-			MAX6639_FAN_CONFIG1_PWM | rpm_range);
+			MAX6639_FAN_CONFIG1_PWM | data->rpm_range);
 		if (err)
 			goto exit;
 
 		/* Fans PWM polarity high by default */
-		if (max6639_info && max6639_info->pwm_polarity == 0)
+
+		if (data->polarity == 0)
 			err = i2c_smbus_write_byte_data(client,
 				MAX6639_REG_FAN_CONFIG2a(i), 0x00);
 		else
@@ -457,14 +515,13 @@ static int max6639_init_client(struct i2c_client *client,
 		 */
 		err = i2c_smbus_write_byte_data(client,
 			MAX6639_REG_FAN_CONFIG3(i),
-			MAX6639_FAN_CONFIG3_THERM_FULL_SPEED | 0x03);
+			MAX6639_FAN_CONFIG3_DISABLE_STRETCH |
+			(data->disable_therm_pin ?
+			0 : MAX6639_FAN_CONFIG3_THERM_FS) |
+			0x03);
 		if (err)
 			goto exit;
 
-		/* Max. temp. 80C/90C/100C */
-		data->temp_therm[i] = 80;
-		data->temp_alert[i] = 90;
-		data->temp_ot[i] = 100;
 		err = i2c_smbus_write_byte_data(client,
 				MAX6639_REG_THERM_LIMIT(i),
 				data->temp_therm[i]);
@@ -480,8 +537,6 @@ static int max6639_init_client(struct i2c_client *client,
 		if (err)
 			goto exit;
 
-		/* PWM 120/120 (i.e. 100%) */
-		data->pwm[i] = 120;
 		err = i2c_smbus_write_byte_data(client,
 				MAX6639_REG_TARGTDUTY(i), data->pwm[i]);
 		if (err)
@@ -516,6 +571,11 @@ static int max6639_detect(struct i2c_client *client,
 	return 0;
 }
 
+static void max6639_regulator_disable(void *data)
+{
+	regulator_disable(data);
+}
+
 static int max6639_probe(struct i2c_client *client)
 {
 	struct device *dev = &client->dev;
@@ -528,6 +588,30 @@ static int max6639_probe(struct i2c_client *client)
 		return -ENOMEM;
 
 	data->client = client;
+
+	data->reg_en = devm_regulator_get_optional(dev, "fan");
+	if (IS_ERR(data->reg_en)) {
+		if (PTR_ERR(data->reg_en) != -ENODEV) {
+			err = (int)PTR_ERR(data->reg_en);
+			dev_warn(dev, "Failed looking up fan supply: %d\n", err);
+			return err;
+		}
+
+		data->reg_en = NULL;
+	} else {
+		err = regulator_enable(data->reg_en);
+		if (err) {
+			dev_err(dev, "Failed to enable fan supply: %d\n", err);
+			return err;
+		}
+		err = devm_add_action_or_reset(dev, max6639_regulator_disable,
+					       data->reg_en);
+		if (err) {
+			dev_err(dev, "Failed to register action: %d\n", err);
+			return err;
+		}
+	}
+
 	mutex_init(&data->update_lock);
 
 	/* Initialize the max6639 chip */
@@ -541,24 +625,53 @@ static int max6639_probe(struct i2c_client *client)
 	return PTR_ERR_OR_ZERO(hwmon_dev);
 }
 
+static int max6639_disable(struct i2c_client *client)
+{
+	struct max6639_data *data = dev_get_drvdata(&client->dev);
+
+	int ret = i2c_smbus_read_byte_data(client, MAX6639_REG_GCONFIG);
+
+	if (ret < 0)
+		return ret;
+
+	ret = i2c_smbus_write_byte_data(client, MAX6639_REG_GCONFIG,
+					ret | MAX6639_GCONFIG_STANDBY);
+
+	if (data->reg_en)
+		regulator_disable(data->reg_en);
+
+	return ret;
+}
+
+static void max6639_shutdown(struct i2c_client *client)
+{
+	max6639_disable(client);
+}
+
 #ifdef CONFIG_PM_SLEEP
 static int max6639_suspend(struct device *dev)
 {
 	struct i2c_client *client = to_i2c_client(dev);
-	int data = i2c_smbus_read_byte_data(client, MAX6639_REG_GCONFIG);
-	if (data < 0)
-		return data;
-
-	return i2c_smbus_write_byte_data(client,
-			MAX6639_REG_GCONFIG, data | MAX6639_GCONFIG_STANDBY);
+	return max6639_disable(client);
 }
 
 static int max6639_resume(struct device *dev)
 {
 	struct i2c_client *client = to_i2c_client(dev);
-	int data = i2c_smbus_read_byte_data(client, MAX6639_REG_GCONFIG);
-	if (data < 0)
-		return data;
+	struct max6639_data *data = dev_get_drvdata(dev);
+	int ret;
+
+	if (data->reg_en) {
+		ret = regulator_enable(data->reg_en);
+		if (ret) {
+			dev_err(dev, "Failed to enable fan supply: %d\n", ret);
+			return ret;
+		}
+	}
+
+	ret = i2c_smbus_read_byte_data(client, MAX6639_REG_GCONFIG);
+	if (ret < 0)
+		return ret;
 
 	return i2c_smbus_write_byte_data(client,
 			MAX6639_REG_GCONFIG, data & ~MAX6639_GCONFIG_STANDBY);
@@ -572,6 +685,14 @@ static const struct i2c_device_id max6639_id[] = {
 
 MODULE_DEVICE_TABLE(i2c, max6639_id);
 
+#ifdef CONFIG_OF
+static const struct of_device_id maxim_of_platform_match[] = {
+	{.compatible = "maxim,max6639"},
+	{},
+};
+MODULE_DEVICE_TABLE(of, maxim_of_platform_match);
+#endif
+
 static SIMPLE_DEV_PM_OPS(max6639_pm_ops, max6639_suspend, max6639_resume);
 
 static struct i2c_driver max6639_driver = {
@@ -579,10 +700,12 @@ static struct i2c_driver max6639_driver = {
 	.driver = {
 		   .name = "max6639",
 		   .pm = &max6639_pm_ops,
+		   .of_match_table = of_match_ptr(maxim_of_platform_match),
 		   },
 	.probe_new = max6639_probe,
 	.id_table = max6639_id,
 	.detect = max6639_detect,
+	.shutdown = max6639_shutdown,
 	.address_list = normal_i2c,
 };
 
