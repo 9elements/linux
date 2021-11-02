@@ -33,6 +33,7 @@ struct max597x_data {
 	struct regulator *parent;
 	unsigned int uV;
 	unsigned int irng;
+	struct regmap *regmap;
 };
 
 struct max597x_iio {
@@ -103,8 +104,6 @@ enum max597x_regulator_id {
 
 #define MAX_REGISTERS			0x49
 #define ADC_MASK			0x3FF
-
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(5, 14, 0)
 
 static int max597x_uvp_ovp_check_mode(struct regulator_dev *rdev, int severity)
 {
@@ -215,7 +214,6 @@ static int max597x_set_ocp(struct regulator_dev *rdev, int lim_uA,
 			   int severity, bool enable)
 {
 	int ret, val;
-	int max_range;
 	int vthst, vthfst;
 
 	struct max597x_data *data = rdev_get_drvdata(rdev);
@@ -248,8 +246,6 @@ static int max597x_set_ocp(struct regulator_dev *rdev, int lim_uA,
 
 	return ret;
 }
-#endif
-//FIXME: IRQ support
 
 static int max597x_voltage_op(struct regulator_dev *rdev)
 {
@@ -262,11 +258,9 @@ static const struct regulator_ops max597x_switch_ops = {
 	.disable			= regulator_disable_regmap,
 	.is_enabled			= regulator_is_enabled_regmap,
 	.get_voltage			= max597x_voltage_op,
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(5, 14, 0)
 	.set_over_voltage_protection	= max597x_set_ovp,
 	.set_under_voltage_protection	= max597x_set_uvp,
 	.set_over_current_protection	= max597x_set_ocp,
-#endif
 };
 
 #define MAX597X_SWITCH(_ID, _ereg, _chan) {                      \
@@ -289,9 +283,8 @@ static const struct max597x_regulator regulators[] = {
 	MAX597X_SWITCH(SW1, MAX5970_REG_CHXEN, 1),
 };
 
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(5, 14, 0)
-static int max597x_uvd_handler(int irq, struct regulator_irq_data *rid,
-			      unsigned long *dev_mask)
+static int max597x_irq_handler(int irq, struct regulator_irq_data *rid,
+			       unsigned long *dev_mask)
 {
 	int val, ret, i;
 	struct max597x_data *d = (struct max597x_data *)rid->data;
@@ -300,7 +293,6 @@ static int max597x_uvd_handler(int irq, struct regulator_irq_data *rid,
 	if (ret)
 		return REGULATOR_FAILED_RETRY;
 
-	rid->opaque = val;
 	*dev_mask = 0;
 
 	for (i = 0; i < d->num_switches; i++) {
@@ -321,21 +313,13 @@ static int max597x_uvd_handler(int irq, struct regulator_irq_data *rid,
 	}
 
 	/* Clear the sub-IRQ status */
-	return regmap_write(d->regmap, MAX5970_REG_FAULT0, val);
-}
-
-static int max597x_ovd_handler(int irq, struct regulator_irq_data *rid,
-			      unsigned long *dev_mask)
-{
-	int val, ret, i;
-	struct max597x_data *d = (struct max597x_data *)rid->data;
+	ret = regmap_write(d->regmap, MAX5970_REG_FAULT0, val);
+	if (ret)
+		return REGULATOR_FAILED_RETRY;
 
 	ret = regmap_read(d->regmap, MAX5970_REG_FAULT1, &val);
 	if (ret)
 		return REGULATOR_FAILED_RETRY;
-
-	rid->opaque = val;
-	*dev_mask = 0;
 
 	for (i = 0; i < d->num_switches; i++) {
 		struct regulator_err_state *stat;
@@ -355,21 +339,13 @@ static int max597x_ovd_handler(int irq, struct regulator_irq_data *rid,
 	}
 
 	/* Clear the sub-IRQ status */
-	return regmap_write(d->regmap, MAX5970_REG_FAULT1, val);
-}
-
-static int max597x_ovc_handler(int irq, struct regulator_irq_data *rid,
-			       unsigned long *dev_mask)
-{
-	int val, ret, i;
-	struct max597x_data *d = (struct max597x_data *)rid->data;
+	ret = regmap_write(d->regmap, MAX5970_REG_FAULT1, val);
+	if (ret)
+		return REGULATOR_FAILED_RETRY;
 
 	ret = regmap_read(d->regmap, MAX5970_REG_STATUS0, &val);
 	if (ret)
 		return REGULATOR_FAILED_RETRY;
-
-	rid->opaque = val;
-	*dev_mask = 0;
 
 	for (i = 0; i < d->num_switches; i++) {
 		struct regulator_err_state *stat;
@@ -386,7 +362,6 @@ static int max597x_ovc_handler(int irq, struct regulator_irq_data *rid,
 	/* Clear the sub-IRQ status */
 	return regmap_write(d->regmap, MAX5970_REG_STATUS0, 0);
 }
-#endif
 
 static const struct regmap_config max597x_regmap_config = {
 	.reg_bits = 8,
@@ -506,6 +481,41 @@ static int max597x_parse_dt(struct device *dev)
 }
 #endif
 
+static int max597x_setup_irq(struct device *dev,
+			     int irq,
+			     struct regulator_dev *rdevs[MAX5970_NUM_SWITCHES],
+			     int num_switches,
+			     struct max597x_data *data)
+{
+	struct regulator_irq_desc max597x_notif = {
+		.name = "max597x-irq",
+		.irq_off_ms = 200,
+		.map_event = max597x_irq_handler,
+		.data = data,
+	};
+	int errs = REGULATOR_ERROR_UNDER_VOLTAGE |
+		   REGULATOR_ERROR_UNDER_VOLTAGE_WARN |
+		   REGULATOR_ERROR_OVER_VOLTAGE_WARN |
+		   REGULATOR_ERROR_REGULATION_OUT |
+		   REGULATOR_ERROR_OVER_CURRENT |
+		   REGULATOR_ERROR_FAIL;
+	void *irq_helper;
+
+	/* Register notifiers - can fail if IRQ is not given */
+	irq_helper = devm_regulator_irq_helper(dev, &max597x_notif,
+					irq, 0, errs, NULL,
+					&rdevs[0],
+					num_switches);
+	if (IS_ERR(irq_helper)) {
+		if (PTR_ERR(irq_helper) == -EPROBE_DEFER) {
+			return -EPROBE_DEFER;
+		}
+		dev_warn(dev, "IRQ disabled %pe\n", irq_helper);
+	}
+	
+	return 0;
+}
+
 static int max597x_probe(struct i2c_client *cl, const struct i2c_device_id *id)
 {
 	unsigned int i;
@@ -520,32 +530,6 @@ static int max597x_probe(struct i2c_client *cl, const struct i2c_device_id *id)
 	struct iio_dev *indio_dev;
 	struct max597x_iio *priv;
 	int ret;
-
-
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(5, 14, 0)
-	int irq;
-	int uvd_errs = REGULATOR_ERROR_UNDER_VOLTAGE |
-			REGULATOR_ERROR_UNDER_VOLTAGE_WARN;
-	int ovd_errs = REGULATOR_ERROR_OVER_VOLTAGE_WARN |
-			REGULATOR_ERROR_REGULATION_OUT;
-	int ovc_errs = REGULATOR_ERROR_OVER_CURRENT |
-			REGULATOR_ERROR_FAIL;
-	struct regulator_irq_desc max597x_notif_uvd = {
-		.name = "max597x-uvd",
-		.irq_off_ms = 1000,
-		.map_event = max597x_uvd_handler,
-	};
-	struct regulator_irq_desc max597x_notif_ovd = {
-		.name = "max597x-ovd",
-		.irq_off_ms = 1000,
-		.map_event = max597x_ovd_handler,
-	};
-	struct regulator_irq_desc max597x_notif_ovc = {
-		.name = "max597x-ovc",
-		.irq_off_ms = 1000,
-		.map_event = max597x_ovc_handler,
-	};
-#endif
 	enum max597x_chip_type chip = id->driver_data;
 
 	switch (chip) {
@@ -631,6 +615,8 @@ static int max597x_probe(struct i2c_client *cl, const struct i2c_device_id *id)
 		data->irng = irng;
 		data->num_switches = num_switches;
 		data->regulator = &regulators[i];
+		data->regmap = regmap;
+
 		ret = max597x_parse_dt(&cl->dev, data);
 		if (ret < 0)
 			goto err_regulator_disable;
@@ -645,11 +631,6 @@ static int max597x_probe(struct i2c_client *cl, const struct i2c_device_id *id)
 
 		data->uV = ret;
 
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(5, 14, 0)
-		max597x_notif_uvd.data = data;
-		max597x_notif_ovd.data = data;
-		max597x_notif_ovc.data = data;
-#endif
 		config.dev = &cl->dev;
 		config.driver_data = (void *)data;
 		config.regmap = regmap;
@@ -664,50 +645,16 @@ static int max597x_probe(struct i2c_client *cl, const struct i2c_device_id *id)
 		}
 		rdevs[i] = rdev;
 	}
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(5, 14, 0)
-	if (cl->irq > 0) {
-		/* Register notifiers - can fail if IRQ is not given */
-		ret = devm_regulator_irq_helper(&cl->dev, &max597x_notif_uvd,
-						irq, 0, uvd_errs, NULL,
-						&rdevs[0],
-						data->num_switches);
-		if (IS_ERR(ret)) {
-			if (PTR_ERR(ret) == -EPROBE_DEFER) {
-				ret = -EPROBE_DEFER;
-				goto err_regulator_disable;
-			}
-			dev_warn(&cl->dev, "UVD disabled %pe\n", ret);
+
+	if (cl->irq) {
+		ret = max597x_setup_irq(&cl->dev, cl->irq, rdevs, num_switches, data);
+		if (ret) {
+			dev_err(&cl->dev, "IRQ setup failed");
+			goto err_regulator_disable;
 		}
 	}
 
-	if (cl->irq > 0) {
-		ret = devm_regulator_irq_helper(&cl->dev, &max597x_notif_ovd,
-						irq, 0, ovd_errs, NULL,
-						&rdevs[0],
-						data->num_switches);
-		if (IS_ERR(ret)) {
-			if (PTR_ERR(ret) == -EPROBE_DEFER) {
-				ret = -EPROBE_DEFER;
-				goto err_regulator_disable;
-			}
-			dev_warn(&cl->dev, "OVD disabled %pe\n", ret);
-		}
-	}
 
-	if (cl->irq > 0 && data->shunt_micro_ohms > 0) {
-		ret = devm_regulator_irq_helper(&cl->dev, &max597x_notif_ovc,
-						irq, 0, ovc_errs, NULL,
-						&rdevs[0],
-						data->num_switches);
-		if (IS_ERR(ret)) {
-			if (PTR_ERR(ret) == -EPROBE_DEFER) {
-				ret = -EPROBE_DEFER;
-				goto err_regulator_disable;
-			}
-			dev_warn(&cl->dev, "OVC disabled %pe\n", ret);
-		}
-	}
-#endif
 	ret = devm_iio_device_register(&cl->dev, indio_dev);
 	if (ret) {
 		dev_err(&cl->dev, "could not register iio device");
