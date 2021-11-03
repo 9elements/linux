@@ -33,6 +33,7 @@ struct max597x_data {
 	struct regulator *parent;
 	unsigned int uV;
 	unsigned int irng;
+	unsigned int mon_rng;
 	struct regmap *regmap;
 };
 
@@ -157,7 +158,8 @@ static int max597x_set_vp(struct regulator_dev *rdev, int lim_uV, int severity,
 	}
 
 	if (enable)
-		reg = lim_uV / 1000000 * ADC_MASK / 16;
+		/* reg = ADC_MASK * (lim_uV / 1000000) / (data->mon_rng / 1000000) */
+		reg = ADC_MASK * lim_uV / data->mon_rng;
 	else
 		reg = 0;
 
@@ -424,8 +426,8 @@ static int max597x_iio_read_raw(struct iio_dev *iio_dev,
 		case MAX5970_REG_VOLTAGE_L(0):
 			fallthrough;
 		case MAX5970_REG_VOLTAGE_L(1):
-			*val = data->mon_rng;
-			*val2 = ADC_MASK;
+			*val = data->mon_rng; // in uV
+			*val2 = ADC_MASK * 1000; // convert to mV
 			return IIO_VAL_FRACTIONAL;
 		}
 
@@ -570,7 +572,7 @@ static int max597x_probe(struct i2c_client *cl, const struct i2c_device_id *id)
 	ret = regmap_read(regmap, MAX5970_REG_MON_RANGE, &mon_rng);
 	if (ret)
 		return ret;
-	mon_rng = 16000 >> (mon_rng & MAX5970_MON_MASK);
+	mon_rng = 16000000 >> (mon_rng & MAX5970_MON_MASK);
 
 	/* registering iio */
 	indio_dev = devm_iio_device_alloc(&cl->dev, sizeof(*priv));
@@ -613,6 +615,7 @@ static int max597x_probe(struct i2c_client *cl, const struct i2c_device_id *id)
 		}
 
 		data->irng = irng;
+		data->mon_rng = mon_rng;
 		data->num_switches = num_switches;
 		data->regulator = &regulators[i];
 		data->regmap = regmap;
