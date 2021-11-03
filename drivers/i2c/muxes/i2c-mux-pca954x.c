@@ -475,6 +475,7 @@ static int pca954x_probe(struct i2c_client *client,
 	struct pca954x *data;
 	int num;
 	int ret;
+	int i;
 
 	supply = devm_regulator_get(dev, "vcc");
 	if (IS_ERR(supply)) {
@@ -506,6 +507,13 @@ static int pca954x_probe(struct i2c_client *client,
 	data->client = client;
 	data->supply = supply;
 
+	ret = i2c_smbus_write_byte(client, 0);
+	if (ret >= 0) {
+		dev_err(dev, "Able to write reg before reset!\n");
+	} else {
+		dev_err(dev, "Not able to write reg before reset!\n");
+	}
+
 	/* Reset the mux if a reset GPIO is specified. */
 	gpio = devm_gpiod_get_optional(dev, "reset", GPIOD_OUT_HIGH);
 	if (IS_ERR(gpio)) {
@@ -520,15 +528,30 @@ static int pca954x_probe(struct i2c_client *client,
 		if (ret >= 0) {
 			dev_err(dev, "Able to write reg in reset!\n");
 		}
+		for (i = 0; i< 10; i++) {
+			udelay(1000);
+			ret = i2c_smbus_write_byte(client, 0);
+			if (ret >= 0) {
+				dev_err(dev, "Able to write reg in reset! %d\n", i);
+			} else {
+				break;
+			}
+		}
 
 		gpiod_set_value_cansleep(gpio, 0);
 		/* Give the chip some time to recover. */
 		udelay(100);
 
-		ret = i2c_smbus_write_byte(client, 0);
-		if (ret < 0) {
-			dev_err(dev, "Not able to write reg after reset!\n");
+		for (i = 0; i< 10; i++) {
+			udelay(1000);
+			ret = i2c_smbus_write_byte(client, 0);
+			if (ret < 0) {
+				dev_err(dev, "Not able to write reg after reset!\n");
+			} else {
+				break;
+			}
 		}
+
 	}
 
 	data->chip = device_get_match_data(dev);
