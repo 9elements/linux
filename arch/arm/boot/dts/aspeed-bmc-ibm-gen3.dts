@@ -1867,11 +1867,11 @@
 		reg = <0x77>;
 		interrupt-parent = <&gpio>;
 		// using BMC_MUX_FANPWM_RSSD01_16_RST_INT_N
-		interrupts = <ASPEED_GPIO(A, 4) IRQ_TYPE_LEVEL_HIGH>;
+		interrupts = <ASPEED_GPIO(AA, 4) IRQ_TYPE_LEVEL_HIGH>;
 		interrupt-controller;
 		#interrupt-cells = <2>;
 		vcc-supply = <&p3v3_aux>;
-		reset-gpios = <&gpio ASPEED_GPIO(A, 4) GPIO_ACTIVE_LOW>;
+		reset-gpios = <&gpio ASPEED_GPIO(AA, 4) GPIO_ACTIVE_LOW>;
 
 		i2c@0 { // SMB_MUX_PWM_FANGRP0
 			#address-cells = <1>;
