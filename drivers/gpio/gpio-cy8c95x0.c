@@ -233,9 +233,17 @@ static int cy8c95x0_read_regs(struct cy8c95x0_chip *chip, int reg, unsigned long
 	for (i = 0; i < NBANK(chip); i++)
 		bitmap_set_value8(val, value[i], i * BANK_SZ);
 out:
-	if (ret < 0)
+	if (ret < 0) {
 		dev_err(&chip->client->dev, "failed reading register %d: err %d\n", reg, ret);
-
+		for (int i = 0; i < 1000; i++) {
+			udelay(1000);
+			ret = regmap_read(chip->regmap, reg, &read_val);
+			if (ret < 0)
+				continue;
+			dev_err(&chip->client->dev, "Works again after %d msec\n", i);
+			break;
+		}
+	}
 	return ret;
 }
 
