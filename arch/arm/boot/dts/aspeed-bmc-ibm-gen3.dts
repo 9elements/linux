@@ -1878,13 +1878,8 @@
 				#address-cells = <1>;
 				#size-cells = <0>;
 				reg = <0x70>;
-				interrupt-parent = <&bmc_pex_irq>;
-				// using SMB_MUX_PWM_FANGRP0_RST_INT_N
-				interrupts = <11 IRQ_TYPE_LEVEL_HIGH>;
-				interrupt-controller;
-				#interrupt-cells = <2>;
+			
 				vcc-supply = <&p3v3_aux>;
-				reset-gpios = <&bmc_pex_irq 11 (GPIO_OPEN_DRAIN | GPIO_ACTIVE_LOW)>;
 			};
 		};
 		i2c@1 { // SMB_MUX_PWM_FANGRP1
