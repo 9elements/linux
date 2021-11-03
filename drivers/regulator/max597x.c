@@ -606,7 +606,7 @@ static int max597x_probe(struct i2c_client *cl, const struct i2c_device_id *id)
 	if (ret)
 		return ret;
 	mon_rng = 16000000 >> (mon_rng & MAX5970_MON_MASK);
-	dev_info(&cl->dev, "Voltage ADC upper limit %d mV\n", mon_rng / 1000);
+	//dev_info(&cl->dev, "Voltage ADC upper limit %d mV\n", mon_rng / 1000);
 
 	/* registering iio */
 	indio_dev = devm_iio_device_alloc(&cl->dev, sizeof(*priv));
@@ -661,7 +661,7 @@ static int max597x_probe(struct i2c_client *cl, const struct i2c_device_id *id)
 		/* Set shunt value for IIO backend */
 		priv->shunt_micro_ohms[i] = data->shunt_micro_ohms;
 
-		dev_info(&cl->dev, "Shunt%d ADC upper limit %d mA\n", i, irng * 1000 / data->shunt_micro_ohms);
+		//dev_info(&cl->dev, "Shunt%d ADC upper limit %d mA\n", i, irng * 1000 / data->shunt_micro_ohms);
 
 		/* Store supply voltage to return only supported output voltage */
 		ret = regulator_get_voltage(supplies[i].consumer);
