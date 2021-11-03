@@ -413,10 +413,10 @@ static int cy8c95x0_gpio_set_pincfg(struct cy8c95x0_chip *chip,
 		reg = CY8C95X0_DRV_HIZ;
 		break;
 	case PIN_CONFIG_DRIVE_OPEN_DRAIN:
-		reg = CY8C95X0_DRV_ODH;
+		reg = CY8C95X0_DRV_ODL;
 		break;
 	case PIN_CONFIG_DRIVE_OPEN_SOURCE:
-		reg = CY8C95X0_DRV_ODL;
+		reg = CY8C95X0_DRV_ODH;
 		break;
 	case PIN_CONFIG_DRIVE_PUSH_PULL:
 		reg = CY8C95X0_DRV_PP_FAST;
