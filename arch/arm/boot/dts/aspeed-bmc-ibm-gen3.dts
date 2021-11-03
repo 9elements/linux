@@ -1178,9 +1178,19 @@
 			#size-cells = <0>;
 			reg = <2>;
 
-			p1v8_pch_aux: regulator@40 {
-				compatible = "pmbus";
+			ir38060_p1v8_pch_aux: regulator@40 {
+				compatible = "infineon,ir38060";
 				reg = <0x40>;
+
+				regulators {
+					p1v8_pch_aux: vout0 {
+						regulator-name = "p1v8_pch_aux";
+						regulator-min-microvolt = <1800000>;
+						regulator-max-microvolt = <1800000>;
+						regulator-enable-ramp-delay = <2000>;
+						vin-supply = <&p12v>;
+					};
+				};
 			};
 		};
 		i2c@4 { // SMB_PEX_CPU03_FAULT_ID
