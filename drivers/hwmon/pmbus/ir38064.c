@@ -58,6 +58,7 @@ static int ir38064_probe(struct i2c_client *client)
 }
 
 static const struct i2c_device_id ir38064_id[] = {
+	{"ir38060", 0},
 	{"ir38064", 0},
 	{"ir38164", 0},
 	{"ir38263", 0},
@@ -68,6 +69,7 @@ MODULE_DEVICE_TABLE(i2c, ir38064_id);
 
 #ifdef CONFIG_OF
 static const struct of_device_id ir38064_of_match[] = {
+	{ .compatible = "infineon,ir38060" },
 	{ .compatible = "infineon,ir38064" },
 	{ .compatible = "infineon,ir38164" },
 	{ .compatible = "infineon,ir38263" },
