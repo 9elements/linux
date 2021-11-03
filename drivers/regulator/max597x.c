@@ -229,8 +229,7 @@ static int max597x_set_ocp(struct regulator_dev *rdev, int lim_uA,
 		return -EINVAL;
 
 	/* Calc Vtrip threshold in uV. */
-	vthst = div_u64((uint64_t)data->shunt_micro_ohms * (uint64_t)lim_uA,
-			1000000);
+	vthst = div_u64(mul_u32_u32(data->shunt_micro_ohms, lim_uA), 1000000);
 
 	/* Calc fast Vtrip threshold in uV */
 	vthfst = vthst * (MAX5970_FAST2SLOW_RATIO / 100);
