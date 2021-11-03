@@ -79,6 +79,7 @@ struct chip_desc {
 	u8 nchans;
 	u8 enable;	/* used for muxes only */
 	u8 has_irq;
+	u8 max735x_enhanced;
 	enum muxtype {
 		pca954x_ismux = 0,
 		pca954x_isswi
@@ -112,11 +113,13 @@ static const struct chip_desc chips[] = {
 		.nchans = 8,
 		.muxtype = pca954x_isswi,
 		.id = { .manufacturer_id = I2C_DEVICE_ID_NONE },
+		.max735x_enhanced = 1,
 	},
 	[max_7358] = {
 		.nchans = 8,
 		.muxtype = pca954x_isswi,
 		.id = { .manufacturer_id = I2C_DEVICE_ID_NONE },
+		.max735x_enhanced = 1,
 	},
 	[pca_9540] = {
 		.nchans = 2,
@@ -429,12 +432,27 @@ static void pca954x_cleanup(struct i2c_mux_core *muxc)
 
 static int pca954x_init(struct i2c_client *client, struct pca954x *data)
 {
-	int ret;
+	int ret, i;
 
 	if (data->idle_state >= 0)
 		data->last_chan = pca954x_regval(data, data->idle_state);
 	else
 		data->last_chan = 0; /* Disconnect multiplexer */
+
+ 	/* Configure MAX735x to act like PCA954x without interrupts. */
+	if (data->chip->max735x_enhanced) {
+		/* Clear interrupt by reading all status registers */
+		for (i = 0; i < 7; i++) {
+			ret = i2c_smbus_read_byte(data->client);
+			if (ret < 0)
+				return ret;
+		}
+
+		/* Drop from enhanced to basic mode. */
+		ret = i2c_smbus_write_byte_data(client, 0, 0x40);
+		if (ret < 0)
+			return ret;
+	}
 
 	ret = i2c_smbus_write_byte(client, data->last_chan);
 	if (ret < 0)
