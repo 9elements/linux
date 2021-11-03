@@ -441,7 +441,10 @@ static int pca954x_init(struct i2c_client *client, struct pca954x *data)
 
  	/* Configure MAX735x to act like PCA954x without interrupts. */
 	if (data->chip->max735x_enhanced) {
-		/* Drop from enhanced to basic mode. */
+		/* Drop from enhanced to basic mode.
+		 * When already in basic mode this muxes channel 6 and
+		 * it will be reverted below.
+		 */
 		ret = i2c_smbus_write_byte_data(client, 0, 0x40);
 		if (ret < 0) {
 			dev_err(&client->dev, "Failed to write reg0/reg1\n");
@@ -501,10 +504,6 @@ static int pca954x_probe(struct i2c_client *client,
 	data->client = client;
 	data->supply = supply;
 
-	data->chip = device_get_match_data(dev);
-	if (!data->chip)
-		data->chip = &chips[id->driver_data];
-
 	/* Reset the mux if a reset GPIO is specified. */
 	gpio = devm_gpiod_get_optional(dev, "reset", GPIOD_OUT_HIGH);
 	if (IS_ERR(gpio)) {
@@ -516,8 +515,12 @@ static int pca954x_probe(struct i2c_client *client,
 		udelay(1);
 		gpiod_set_value_cansleep(gpio, 0);
 		/* Give the chip some time to recover. */
-		udelay(1);
+		udelay(100);
 	}
+
+	data->chip = device_get_match_data(dev);
+	if (!data->chip)
+		data->chip = &chips[id->driver_data];
 
 	if (data->chip->id.manufacturer_id != I2C_DEVICE_ID_NONE) {
 		struct i2c_device_identity id;
