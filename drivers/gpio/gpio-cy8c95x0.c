@@ -576,7 +576,19 @@ static int cy8c95x0_irq_set_type(struct irq_data *d, unsigned int type)
 	struct cy8c95x0_chip *chip = gpiochip_get_data(gc);
 	irq_hw_number_t hwirq = CY8C95X0_PIN_TO_OFFSET(irqd_to_hwirq(d));
 
-	if ((type & ~IRQ_TYPE_EDGE_BOTH)) {
+	switch (type) {
+	case IRQ_TYPE_EDGE_RISING:
+	case IRQ_TYPE_EDGE_FALLING:
+	case IRQ_TYPE_EDGE_BOTH:
+		type = type;
+		break;
+	case IRQ_TYPE_LEVEL_HIGH:
+		type = IRQ_TYPE_EDGE_RISING;
+		break;
+	case IRQ_TYPE_LEVEL_LOW:
+		type = IRQ_TYPE_EDGE_FALLING;
+		break;
+	default:
 		dev_err(&chip->client->dev, "irq %d: unsupported type %d\n",
 			d->irq, type);
 		return -EINVAL;
@@ -713,7 +725,7 @@ static int cy8c95x0_irq_setup(struct cy8c95x0_chip *chip, int irq_base)
 
 	ret = devm_request_threaded_irq(&client->dev, client->irq,
 					NULL, cy8c95x0_irq_handler,
-					IRQF_ONESHOT | IRQF_SHARED | IRQF_TRIGGER_RISING,
+					IRQF_ONESHOT | IRQF_SHARED | IRQF_TRIGGER_HIGH,
 					dev_name(&client->dev), chip);
 	if (ret) {
 		dev_err(&client->dev, "failed to request irq %d\n",
