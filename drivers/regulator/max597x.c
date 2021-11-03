@@ -92,6 +92,10 @@ enum max597x_regulator_id {
 #define MAX5970_REG_STATUS2		0x33
 #define  MAX5970_IRNG_MASK		0x3
 
+#define MAX5970_REG_STATUS3		0x34
+#define  MAX5970_STATUS3_ALERT		BIT(4)
+#define  MAX5970_STATUS3_PG(ch)		BIT(ch)
+
 #define MAX5970_REG_FAULT0		0x35
 #define  UV_STATUS_WARN(ch)		(1 << (ch))
 #define  UV_STATUS_CRIT(ch)		(1 << ((ch) + 4))
@@ -258,7 +262,29 @@ static int max597x_set_ocp(struct regulator_dev *rdev, int lim_uA,
 static int max597x_voltage_op(struct regulator_dev *rdev)
 {
 	struct max597x_data *data = rdev_get_drvdata(rdev);
-	return data->uV;
+
+	return data->uV;	/* Output is not regulated */
+}
+
+static int max597x_get_status(struct regulator_dev *rdev)
+{
+	int val, ret;
+
+	ret = regmap_read(rdev->regmap, MAX5970_REG_STATUS3, &val);
+	if (ret)
+		return REGULATOR_FAILED_RETRY;
+
+	if (val & MAX5970_STATUS3_ALERT)
+		return REGULATOR_STATUS_ERROR;
+
+	ret = regulator_is_enabled_regmap(rdev);
+	if (ret < 0)
+		return ret;
+
+	if (ret)
+		return REGULATOR_STATUS_ON;
+
+	return REGULATOR_STATUS_OFF;
 }
 
 static const struct regulator_ops max597x_switch_ops = {
@@ -266,6 +292,7 @@ static const struct regulator_ops max597x_switch_ops = {
 	.disable			= regulator_disable_regmap,
 	.is_enabled			= regulator_is_enabled_regmap,
 	.get_voltage			= max597x_voltage_op,
+	.get_status			= max597x_get_status,
 	.set_over_voltage_protection	= max597x_set_ovp,
 	.set_under_voltage_protection	= max597x_set_uvp,
 	.set_over_current_protection	= max597x_set_ocp,
