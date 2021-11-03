@@ -1859,6 +1859,7 @@
 &i2c11 { // BMC_MUX_FANPWM_RSSD01_16
 	status = "okay";
 	// Bus frequency limited to 100KHz by cy8c9560
+	clock-frequency = <10000>;
 
 	i2cmux14: mux@77 {
 		#address-cells = <1>;
@@ -2246,6 +2247,7 @@
 	status = "okay";
 
 	// Bus frequency limited to 100KHz by cy8c9540
+	clock-frequency = <10000>;
 
 	i2cmux23: mux@77 {
 		compatible = "maxim,max7357";
