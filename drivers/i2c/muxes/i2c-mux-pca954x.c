@@ -432,7 +432,7 @@ static void pca954x_cleanup(struct i2c_mux_core *muxc)
 
 static int pca954x_init(struct i2c_client *client, struct pca954x *data)
 {
-	int ret, i;
+	int ret;
 
 	if (data->idle_state >= 0)
 		data->last_chan = pca954x_regval(data, data->idle_state);
@@ -449,6 +449,8 @@ static int pca954x_init(struct i2c_client *client, struct pca954x *data)
 		if (ret < 0) {
 			dev_err(&client->dev, "Failed to write reg0/reg1\n");
 			return ret;
+		} else {
+			dev_info(&client->dev, "MAX735x in basic mode\n");
 		}
 	}
 
@@ -513,9 +515,20 @@ static int pca954x_probe(struct i2c_client *client,
 
 	if (gpio) {
 		udelay(1);
+
+		ret = i2c_smbus_write_byte(client, 0);
+		if (ret >= 0) {
+			dev_err(dev, "Able to write reg in reset!\n");
+		}
+
 		gpiod_set_value_cansleep(gpio, 0);
 		/* Give the chip some time to recover. */
 		udelay(100);
+
+		ret = i2c_smbus_write_byte(client, 0);
+		if (ret < 0) {
+			dev_err(dev, "Not able to write reg after reset!\n");
+		}
 	}
 
 	data->chip = device_get_match_data(dev);
