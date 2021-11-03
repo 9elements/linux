@@ -514,6 +514,10 @@ static int pca954x_probe(struct i2c_client *client,
 		dev_err(dev, "Not able to write reg before reset!\n");
 	}
 
+	gpio = devm_gpiod_get_optional(dev, "reset", GPIOD_IN);
+	dev_err(dev, "Reset pin is %d\n", gpiod_get_value(gpio));
+	devm_gpiod_put(dev, gpio);
+
 	/* Reset the mux if a reset GPIO is specified. */
 	gpio = devm_gpiod_get_optional(dev, "reset", GPIOD_OUT_HIGH);
 	if (IS_ERR(gpio)) {
