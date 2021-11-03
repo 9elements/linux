@@ -1048,7 +1048,7 @@
 		interrupt-controller;
 		#interrupt-cells = <2>;
 		vcc-supply = <&p3v3_aux>;
-		reset-gpios = <&gpio ASPEED_GPIO(M, 5) (GPIO_ACTIVE_LOW | GPIO_OPEN_DRAIN)>;
+		reset-gpios = <&gpio ASPEED_GPIO(M, 5) (GPIO_OPEN_DRAIN)>;
 
 		i2c@2 { // SMB_M2_SSD1
 			#address-cells = <1>;
@@ -1144,7 +1144,7 @@
 		interrupt-controller;
 		#interrupt-cells = <2>;
 		vcc-supply = <&p3v3_aux>;
-		reset-gpios = <&gpio ASPEED_GPIO(Z, 2) (GPIO_ACTIVE_LOW | GPIO_OPEN_DRAIN)>;
+		reset-gpios = <&gpio ASPEED_GPIO(Z, 2) (GPIO_OPEN_DRAIN)>;
 
 		i2c@0 { // SMB_VR_PVNN_PCH_AUX
 			#address-cells = <1>;
@@ -1270,7 +1270,7 @@
 		interrupt-controller;
 		#interrupt-cells = <2>;
 		vcc-supply = <&p3v3_aux>;
-		reset-gpios = <&gpio ASPEED_GPIO(F, 4) (GPIO_ACTIVE_LOW | GPIO_OPEN_DRAIN)>;
+		reset-gpios = <&gpio ASPEED_GPIO(F, 4) (GPIO_OPEN_DRAIN)>;
 
 		i2c@0 { // SMB_PEX_CPU2_EVENT
 			#address-cells = <1>;
@@ -1371,7 +1371,7 @@
 		interrupt-controller;
 		#interrupt-cells = <2>;
 		vcc-supply = <&p3v3_aux>;
-		reset-gpios = <&gpio ASPEED_GPIO(F, 3) (GPIO_ACTIVE_LOW | GPIO_OPEN_DRAIN)>;
+		reset-gpios = <&gpio ASPEED_GPIO(F, 3) (GPIO_OPEN_DRAIN)>;
 
 		i2c@0 { // SMB_PEX_CPU1_EVENT
 			#address-cells = <1>;
@@ -1474,7 +1474,7 @@
 		interrupt-controller;
 		#interrupt-cells = <2>;
 		vcc-supply = <&p3v3_aux>;
-		reset-gpios = <&gpio ASPEED_GPIO(A, 2) (GPIO_ACTIVE_LOW | GPIO_OPEN_DRAIN)>;
+		reset-gpios = <&gpio ASPEED_GPIO(A, 2) (GPIO_OPEN_DRAIN)>;
 
 		i2c@0 { // SMB_MUX_SSB_FANGRP0
 			#address-cells = <1>;
@@ -1491,7 +1491,7 @@
 				interrupt-controller;
 				#interrupt-cells = <2>;
 				vcc-supply = <&p3v3_aux>;
-				reset-gpios = <&bmc_pex_irq 16 (GPIO_ACTIVE_LOW | GPIO_OPEN_DRAIN)>;
+				reset-gpios = <&bmc_pex_irq 16 (GPIO_OPEN_DRAIN)>;
 			};
 		};
 		i2c@1 { // SMB_MUX_SSB_FANGRP1
@@ -1509,7 +1509,7 @@
 				interrupt-controller;
 				#interrupt-cells = <2>;
 				vcc-supply = <&p3v3_aux>;
-				reset-gpios = <&bmc_pex_irq 7 (GPIO_ACTIVE_LOW | GPIO_OPEN_DRAIN)>;
+				reset-gpios = <&bmc_pex_irq 7 (GPIO_OPEN_DRAIN)>;
 			};
 		};
 		i2c@2 { // SMB_MUX_SSB_FANGRP2
@@ -1527,7 +1527,7 @@
 				interrupt-controller;
 				#interrupt-cells = <2>;
 				vcc-supply = <&p3v3_aux>;
-				reset-gpios = <&bmc_pex_irq 1 (GPIO_ACTIVE_LOW | GPIO_OPEN_DRAIN)>;
+				reset-gpios = <&bmc_pex_irq 1 (GPIO_OPEN_DRAIN)>;
 			};
 		};
 		i2c@3 { // SMB_MUX_SSB_RSSD17_24
@@ -1545,7 +1545,7 @@
 				interrupt-controller;
 				#interrupt-cells = <2>;
 				vcc-supply = <&p3v3_aux>;
-				reset-gpios = <&bmc_pex_irq 10 (GPIO_ACTIVE_LOW | GPIO_OPEN_DRAIN)>;
+				reset-gpios = <&bmc_pex_irq 10 (GPIO_OPEN_DRAIN)>;
 			};
 		};
 		i2c@4 { // SMB_MUX_SSB_RSSD25_32
@@ -1563,7 +1563,7 @@
 				interrupt-controller;
 				#interrupt-cells = <2>;
 				vcc-supply = <&p3v3_aux>;
-				reset-gpios = <&bmc_pex_irq 15 (GPIO_ACTIVE_LOW | GPIO_OPEN_DRAIN)>;
+				reset-gpios = <&bmc_pex_irq 15 (GPIO_OPEN_DRAIN)>;
 			};
 		};
 		i2c@5 { // SMB_PEX_RSSD01_16
@@ -1630,7 +1630,7 @@
 				interrupt-controller;
 				#interrupt-cells = <2>;
 				vcc-supply = <&p3v3_aux>;
-				reset-gpios = <&bmc_pex_irq 12 (GPIO_ACTIVE_LOW | GPIO_OPEN_DRAIN)>;
+				reset-gpios = <&bmc_pex_irq 12 (GPIO_OPEN_DRAIN)>;
 
 				i2c@0 { // SMB_RSSD17
 					#address-cells = <1>;
@@ -1690,7 +1690,7 @@
 				interrupt-controller;
 				#interrupt-cells = <2>;
 				vcc-supply = <&p3v3_aux>;
-				reset-gpios = <&bmc_pex_irq 14 (GPIO_ACTIVE_LOW | GPIO_OPEN_DRAIN)>;
+				reset-gpios = <&bmc_pex_irq 14 (GPIO_OPEN_DRAIN)>;
 
 				i2c@0 { // SMB_RSSD25
 					#address-cells = <1>;
@@ -1767,7 +1767,7 @@
 		interrupt-controller;
 		#interrupt-cells = <2>;
 		vcc-supply = <&p3v3_aux>;
-		reset-gpios = <&gpio ASPEED_GPIO(A, 3) (GPIO_ACTIVE_LOW | GPIO_OPEN_DRAIN)>;
+		reset-gpios = <&gpio ASPEED_GPIO(A, 3) (GPIO_OPEN_DRAIN)>;
 
 		i2c@0 { // SMB_PEX_CPU1_EVENT
 			#address-cells = <1>;
@@ -1889,7 +1889,7 @@
 				interrupt-controller;
 				#interrupt-cells = <2>;
 				vcc-supply = <&p3v3_aux>;
-				reset-gpios = <&bmc_pex_irq 11 (GPIO_ACTIVE_LOW | GPIO_OPEN_DRAIN)>;
+				reset-gpios = <&bmc_pex_irq 11 (GPIO_OPEN_DRAIN)>;
 			};
 		};
 		i2c@1 { // SMB_MUX_PWM_FANGRP1
@@ -1907,7 +1907,7 @@
 				interrupt-controller;
 				#interrupt-cells = <2>;
 				vcc-supply = <&p3v3_aux>;
-				reset-gpios = <&bmc_pex_irq 2 (GPIO_ACTIVE_LOW | GPIO_OPEN_DRAIN)>;
+				reset-gpios = <&bmc_pex_irq 2 (GPIO_OPEN_DRAIN)>;
 			};
 		};
 		i2c@2 { // SMB_MUX_PWM_FANGRP2
@@ -1925,7 +1925,7 @@
 				interrupt-controller;
 				#interrupt-cells = <2>;
 				vcc-supply = <&p3v3_aux>;
-				reset-gpios = <&bmc_pex_irq 0 (GPIO_ACTIVE_LOW | GPIO_OPEN_DRAIN)>;
+				reset-gpios = <&bmc_pex_irq 0 (GPIO_OPEN_DRAIN)>;
 			};
 		};
 		i2c@3 { // SMB_MUX_SSB_RSSD01_08
@@ -1943,7 +1943,7 @@
 				interrupt-controller;
 				#interrupt-cells = <2>;
 				vcc-supply = <&p3v3_aux>;
-				reset-gpios = <&bmc_pex_irq 3 (GPIO_ACTIVE_LOW | GPIO_OPEN_DRAIN)>;
+				reset-gpios = <&bmc_pex_irq 3 (GPIO_OPEN_DRAIN)>;
 			};
 		};
 		i2c@4 { // SMB_MUX_SSB_RSSD09_16
@@ -1961,7 +1961,7 @@
 				interrupt-controller;
 				#interrupt-cells = <2>;
 				vcc-supply = <&p3v3_aux>;
-				reset-gpios = <&bmc_pex_irq 9 (GPIO_ACTIVE_LOW | GPIO_OPEN_DRAIN)>;
+				reset-gpios = <&bmc_pex_irq 9 (GPIO_OPEN_DRAIN)>;
 			};
 		};
 		i2c@5 { // SMB_PEX_RSSD17_32
@@ -2029,7 +2029,7 @@
 				interrupt-controller;
 				#interrupt-cells = <2>;
 				vcc-supply = <&p3v3_aux>;
-				reset-gpios = <&bmc_pex_irq 4 (GPIO_ACTIVE_LOW | GPIO_OPEN_DRAIN)>;
+				reset-gpios = <&bmc_pex_irq 4 (GPIO_OPEN_DRAIN)>;
 
 				i2c@0 { // SMB_RSSD01
 					#address-cells = <1>;
@@ -2089,7 +2089,7 @@
 				interrupt-controller;
 				#interrupt-cells = <2>;
 				vcc-supply = <&p3v3_aux>;
-				reset-gpios = <&bmc_pex_irq 5 (GPIO_ACTIVE_LOW | GPIO_OPEN_DRAIN)>;
+				reset-gpios = <&bmc_pex_irq 5 (GPIO_OPEN_DRAIN)>;
 
 				i2c@0 { // SMB_RSSD09
 					#address-cells = <1>;
@@ -2152,7 +2152,7 @@
 		interrupt-controller;
 		#interrupt-cells = <2>;
 		vcc-supply = <&p3v3_aux>;
-		reset-gpios = <&gpio ASPEED_GPIO(P, 2) (GPIO_ACTIVE_LOW | GPIO_OPEN_DRAIN)>;
+		reset-gpios = <&gpio ASPEED_GPIO(P, 2) (GPIO_OPEN_DRAIN)>;
 
 		i2c@0 { // SMB_PEX_CPU3_EVENT
 			#address-cells = <1>;
@@ -2260,7 +2260,7 @@
 		interrupt-controller;
 		#interrupt-cells = <2>;
 		vcc-supply = <&p3v3_bmc_aux>;
-		reset-gpios = <&gpio ASPEED_GPIO(R, 4) (GPIO_ACTIVE_LOW | GPIO_OPEN_DRAIN)>;
+		reset-gpios = <&gpio ASPEED_GPIO(R, 4) (GPIO_OPEN_DRAIN)>;
 
 		i2c@0 { // SMB_PEX_VR_CTRL
 			#address-cells = <1>;
@@ -2352,7 +2352,7 @@
 				interrupts = <ASPEED_GPIO(P, 3) IRQ_TYPE_LEVEL_HIGH>;
 				interrupt-controller;
 				vcc-supply = <&p3v3_bmc_aux>;
-				reset-gpios = <&gpio ASPEED_GPIO(P, 3) (GPIO_ACTIVE_LOW | GPIO_OPEN_DRAIN)>;
+				reset-gpios = <&gpio ASPEED_GPIO(P, 3) (GPIO_OPEN_DRAIN)>;
 
 				i2c@0 { // SMB_SVC_PEX_RSSD01_16
 					#address-cells = <1>;
@@ -2685,7 +2685,7 @@
 				interrupt-controller;
 				#interrupt-cells = <2>;
 				vcc-supply = <&p3v3_bmc_aux>;
-				reset-gpios = <&gpio ASPEED_GPIO(R, 2) (GPIO_ACTIVE_LOW | GPIO_OPEN_DRAIN)>;
+				reset-gpios = <&gpio ASPEED_GPIO(R, 2) (GPIO_OPEN_DRAIN)>;
 
 				i2c@1 { // SMB_VR_P5V_AUX
 					#address-cells = <1>;
