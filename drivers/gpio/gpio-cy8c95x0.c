@@ -235,7 +235,7 @@ static int cy8c95x0_read_regs(struct cy8c95x0_chip *chip, int reg, unsigned long
 out:
 	if (ret < 0) {
 		dev_err(&chip->client->dev, "failed reading register %d: err %d\n", reg, ret);
-		for (int i = 0; i < 1000; i++) {
+		for (i = 0; i < 1000; i++) {
 			udelay(1000);
 			ret = regmap_read(chip->regmap, reg, &read_val);
 			if (ret < 0)
