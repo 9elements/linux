@@ -72,8 +72,8 @@ enum max597x_regulator_id {
 #define MAX5970_REG_CHx_OV_CRIT_H(ch)		(0x20 + (ch) * 10)
 #define MAX5970_REG_CHx_OV_CRIT_L(ch)		(0x21 + (ch) * 10)
 
-#define  MAX5970_REG_V_H_VAL(x)		(((x) >> 2) & 0xFF)
-#define  MAX5970_REG_V_L_VAL(x)		((x) & 0x3)
+#define  MAX5970_VAL2REG_H(x)		(((x) >> 2) & 0xFF)
+#define  MAX5970_VAL2REG_L(x)		((x) & 0x3)
 
 #define MAX5970_REG_DAC_FAST(ch)	(0x2E + (ch))
 
@@ -163,11 +163,11 @@ static int max597x_set_vp(struct regulator_dev *rdev, int lim_uV, int severity,
 	else
 		reg = 0;
 
-	ret = regmap_write(rdev->regmap, off_h, MAX5970_REG_V_H_VAL(reg));
+	ret = regmap_write(rdev->regmap, off_h, MAX5970_VAL2REG_H(reg));
 	if (ret)
 		return ret;
 
-	ret = regmap_write(rdev->regmap, off_l, MAX5970_REG_V_L_VAL(reg));
+	ret = regmap_write(rdev->regmap, off_l, MAX5970_VAL2REG_L(reg));
 	if (ret)
 		return ret;
 
@@ -215,7 +215,7 @@ static int max597x_set_ovp(struct regulator_dev *rdev, int lim_uV, int severity,
 static int max597x_set_ocp(struct regulator_dev *rdev, int lim_uA,
 			   int severity, bool enable)
 {
-	int ret, val;
+	int ret, val, reg;
 	int vthst, vthfst;
 
 	struct max597x_data *data = rdev_get_drvdata(rdev);
@@ -241,10 +241,16 @@ static int max597x_set_ocp(struct regulator_dev *rdev, int lim_uA,
 
 	/* Program fast trip threshold */
 	if (enable)
-		val = div_u64(mul_u32_u32(0xff, vthfst), data->irng);
+		val = div_u64(mul_u32_u32(ADC_MASK, vthfst), data->irng);
 	else
-		val = 0xff;
-	ret = regmap_write(rdev->regmap, val, MAX5970_REG_DAC_FAST(regulator->channel));
+		val = ADC_MASK;
+
+	reg = MAX5970_REG_DAC_FAST(regulator->channel);
+	ret = regmap_write(rdev->regmap, reg, MAX5970_VAL2REG_H(val));
+	if (ret)
+		return ret;
+
+	ret = regmap_write(rdev->regmap, reg + 1, MAX5970_VAL2REG_L(val));
 
 	return ret;
 }
