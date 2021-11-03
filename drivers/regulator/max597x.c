@@ -241,9 +241,9 @@ static int max597x_set_ocp(struct regulator_dev *rdev, int lim_uA,
 
 	/* Program fast trip threshold */
 	if (enable)
-		val = 255 * vthfst / data->irng;
+		val = div_u64(mul_u32_u32(0xff, vthfst), data->irng);
 	else
-		val = 255;
+		val = 0xff;
 	ret = regmap_write(rdev->regmap, val, MAX5970_REG_DAC_FAST(regulator->channel));
 
 	return ret;
