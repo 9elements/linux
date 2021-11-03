@@ -1469,12 +1469,7 @@
 		#size-cells = <0>;
 		compatible = "maxim,max7357";
 		reg = <0x77>;
-		interrupt-parent = <&gpio>;
-		interrupts = <ASPEED_GPIO(A, 2) IRQ_TYPE_LEVEL_HIGH>; // BMC_MUX_FANSSB_RSSD17_32_RST_INT_N
-		interrupt-controller;
-		#interrupt-cells = <2>;
 		vcc-supply = <&p3v3_aux>;
-		reset-gpios = <&gpio ASPEED_GPIO(A, 2) (GPIO_OPEN_DRAIN | GPIO_ACTIVE_LOW)>;
 
 		i2c@0 { // SMB_MUX_SSB_FANGRP0
 			#address-cells = <1>;
