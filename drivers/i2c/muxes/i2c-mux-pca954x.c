@@ -443,15 +443,19 @@ static int pca954x_init(struct i2c_client *client, struct pca954x *data)
 	if (data->chip->max735x_enhanced) {
 		/* Clear interrupt by reading all status registers */
 		for (i = 0; i < 7; i++) {
-			ret = i2c_smbus_read_byte(data->client);
-			if (ret < 0)
+			ret = i2c_smbus_read_byte(client);
+			if (ret < 0) {
+				dev_err(&client->dev, "Failed to read register %d\n", i);
 				return ret;
+			}
 		}
 
 		/* Drop from enhanced to basic mode. */
 		ret = i2c_smbus_write_byte_data(client, 0, 0x40);
-		if (ret < 0)
+		if (ret < 0) {
+			dev_err(&client->dev, "Failed to write reg0/reg1\n");
 			return ret;
+		}
 	}
 
 	ret = i2c_smbus_write_byte(client, data->last_chan);
