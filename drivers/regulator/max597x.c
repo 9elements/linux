@@ -567,12 +567,14 @@ static int max597x_probe(struct i2c_client *cl, const struct i2c_device_id *id)
 	default:
 		return -EINVAL;
 	}
+	dev_info(&cl->dev, "Shunt ADC upper limit %duV\n", irng);
 
 	/* Decode current voltage monitor range */
 	ret = regmap_read(regmap, MAX5970_REG_MON_RANGE, &mon_rng);
 	if (ret)
 		return ret;
 	mon_rng = 16000000 >> (mon_rng & MAX5970_MON_MASK);
+	dev_info(&cl->dev, "Voltage ADC upper limit %duV\n", mon_rng);
 
 	/* registering iio */
 	indio_dev = devm_iio_device_alloc(&cl->dev, sizeof(*priv));
