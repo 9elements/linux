@@ -2427,10 +2427,75 @@ static int pmbus_regulator_disable(struct regulator_dev *rdev)
 	return _pmbus_regulator_on_off(rdev, 0);
 }
 
+static int pmbus_regulator_get_status(struct regulator_dev *rdev)
+{
+	struct device *dev = rdev_get_dev(rdev);
+	struct i2c_client *client = to_i2c_client(dev->parent);
+	struct pmbus_data *data = i2c_get_clientdata(client);
+	u8 page = rdev_get_id(rdev);
+	int status, status2;
+
+	status = pmbus_get_status(client, page, PMBUS_STATUS_WORD);
+	if (status < 0)
+		return status;
+
+	if (status & PB_STATUS_VIN_UV ||
+	    status & PB_STATUS_IOUT_OC ||
+	    status & PB_STATUS_VOUT_OV ||
+	    status & PB_STATUS_UNKNOWN)
+		return REGULATOR_STATUS_ERROR;
+
+	if (status & PB_STATUS_VOUT_OV &&
+	    data->info->func[page] & PMBUS_HAVE_STATUS_VOUT) {
+		status2 = _pmbus_read_byte_data(client, page, PMBUS_STATUS_VOUT);
+		if (status2 < 0)
+			return status2;
+		if (status2 & PB_VOLTAGE_OV_FAULT ||
+		    status2 & PB_VOLTAGE_UV_FAULT)
+			return REGULATOR_STATUS_ERROR;
+	}
+	if (status & PB_STATUS_IOUT_OC &&
+	    data->info->func[page] & PMBUS_HAVE_STATUS_IOUT) {
+		status2 = _pmbus_read_byte_data(client, page, PMBUS_STATUS_IOUT);
+		if (status2 < 0)
+			return status2;
+		if (status2 & PB_POUT_OP_FAULT ||
+		    status2 & PB_IOUT_UC_FAULT ||
+		    status2 & PB_IOUT_OC_LV_FAULT ||
+		    status2 & PB_IOUT_OC_FAULT)
+			return REGULATOR_STATUS_ERROR;
+	}
+	if (status & PB_STATUS_VIN_UV &&
+	    data->info->func[page] & PMBUS_HAVE_STATUS_INPUT) {
+		status2 = _pmbus_read_byte_data(client, page, PMBUS_STATUS_INPUT);
+		if (status2 < 0)
+			return status2;
+		if (status2 & PB_IIN_OC_FAULT ||
+		    status2 & PB_VOLTAGE_OV_FAULT ||
+		    status2 & PB_VOLTAGE_UV_FAULT)
+			return REGULATOR_STATUS_ERROR;
+	}
+	if (status & PB_STATUS_TEMPERATURE &&
+	    data->info->func[page] & PMBUS_HAVE_STATUS_TEMP) {
+		status2 = _pmbus_read_byte_data(client, page, PMBUS_STATUS_TEMPERATURE);
+		if (status2 < 0)
+			return status2;
+		if (status2 & PB_TEMP_UT_FAULT ||
+		    status2 & PB_TEMP_OT_FAULT)
+			return REGULATOR_STATUS_ERROR;
+	}
+
+	if (status & PB_STATUS_OFF)
+		return REGULATOR_STATUS_OFF;
+
+	return REGULATOR_STATUS_ON;
+}
+
 const struct regulator_ops pmbus_regulator_ops = {
 	.enable = pmbus_regulator_enable,
 	.disable = pmbus_regulator_disable,
 	.is_enabled = pmbus_regulator_is_enabled,
+	.get_status = pmbus_regulator_get_status,
 };
 EXPORT_SYMBOL_NS_GPL(pmbus_regulator_ops, PMBUS);
 
