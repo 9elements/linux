@@ -17,13 +17,9 @@
 #include <linux/kernel.h>
 #include <linux/module.h>
 #include <linux/regulator/driver.h>
+#include <linux/regulator/of_regulator.h>
+#include <linux/regulator/machine.h>
 #include "pmbus.h"
-
-#if IS_ENABLED(CONFIG_SENSORS_BCM6123_REGULATOR)
-static const struct regulator_desc bcm6123_reg_desc[] = {
-       PMBUS_REGULATOR("vout", 0),
-};
-#endif /* CONFIG_SENSORS_BCM6123_REGULATOR */
 
 static struct pmbus_driver_info bcm6123_info = {
 	.pages = 2,
@@ -50,21 +46,63 @@ static struct pmbus_driver_info bcm6123_info = {
 	    | PMBUS_HAVE_TEMP | PMBUS_HAVE_STATUS_TEMP
 	    | PMBUS_HAVE_VOUT | PMBUS_HAVE_STATUS_VOUT
 	    | PMBUS_HAVE_IOUT | PMBUS_HAVE_STATUS_IOUT
-	    | PMBUS_HAVE_IIN
-#if IS_ENABLED(CONFIG_SENSORS_BCM6123_REGULATOR)
-#ifdef PMBUS_HAVE_VOUT_COMMAND
-           | PMBUS_HAVE_VOUT_COMMAND
-#endif
-#endif
-	    | PMBUS_HAVE_POUT,
-#if IS_ENABLED(CONFIG_SENSORS_BCM6123_REGULATOR)
-       .num_regulators = 1,
-       .reg_desc = bcm6123_reg_desc,
-#endif
+	    | PMBUS_HAVE_IIN | PMBUS_HAVE_POUT,
 };
 
 static int bcm6123_probe(struct i2c_client *client)
 {
+#if IS_ENABLED(CONFIG_SENSORS_BCM6123_REGULATOR)
+	struct regulator_init_data *init_data;
+	struct device *dev = &client->dev;
+	struct device_node *np;
+	struct of_regulator_match rmatch[1];
+	struct regulator_desc *rdesc;
+	int matched;
+	const struct regulator_desc bcm6123_reg_desc = {
+		.name = "vout0",
+		.id = 1,
+		.of_match = of_match_ptr("vout0"),
+		.regulators_node = of_match_ptr("regulators"),
+		.ops = &pmbus_regulator_ops,
+		.type = REGULATOR_VOLTAGE,
+		.owner = THIS_MODULE,
+	};
+
+	np = of_get_child_by_name(dev->of_node, "regulators");
+	if (!np) {
+		dev_err(dev, "could not find regulators sub-node\n");
+		return -EINVAL;
+	}
+
+	rmatch[0].name = bcm6123_reg_desc.of_match;
+	matched = of_regulator_match(dev, np, rmatch, ARRAY_SIZE(rmatch));
+	of_node_put(np);
+
+	if (matched <= 0) {
+		dev_err(dev, "could not find %s sub-node\n",
+			bcm6123_reg_desc.of_match);
+		return matched;
+	}
+
+	init_data = rmatch[0].init_data;
+	if (!init_data->constraints.min_uV ||
+	    init_data->constraints.min_uV != init_data->constraints.max_uV) {
+		dev_err(dev, "only fixed voltage regulators are supported\n");
+		return -EINVAL;
+	}
+
+	rdesc = devm_kzalloc(dev, sizeof(*rdesc), GFP_KERNEL);
+	if (!rdesc)
+		return -ENOMEM;
+
+	memcpy(rdesc, &bcm6123_reg_desc, sizeof(bcm6123_reg_desc));
+
+	rdesc->fixed_uV = init_data->constraints.min_uV;
+	rdesc->n_voltages = 1;
+
+	bcm6123_info.reg_desc = rdesc;
+	bcm6123_info.num_regulators = 1;
+#endif
 	return pmbus_do_probe(client, &bcm6123_info);
 }
 
