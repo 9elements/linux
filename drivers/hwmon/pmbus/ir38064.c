@@ -21,7 +21,11 @@
 
 #if IS_ENABLED(CONFIG_SENSORS_IR38064_REGULATOR)
 static const struct regulator_desc ir38064_reg_desc[] = {
+#ifdef PMBUS_REGULATOR_VOUT_CMD
+	PMBUS_REGULATOR_VOUT_CMD("vout", 0),
+#else
 	PMBUS_REGULATOR("vout", 0),
+#endif
 };
 #endif /* CONFIG_SENSORS_IR38064_REGULATOR */
 
