@@ -1106,7 +1106,7 @@ static struct pmbus_sensor *pmbus_add_sensor(struct pmbus_data *data,
 {
 	struct pmbus_sensor *sensor;
 	struct device_attribute *a;
-	bool absolute;
+	bool absolute = false;
 
 	sensor = devm_kzalloc(data->dev, sizeof(*sensor), GFP_KERNEL);
 	if (!sensor)
