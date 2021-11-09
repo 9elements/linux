@@ -73,6 +73,17 @@
  */
 #define PMBUS_USE_COEFFICIENTS_CMD		BIT(5)
 
+/*
+ * PMBUS_ABSOLUTE_NUMBERS
+ *
+ * Some PMBus chips respond with negative sensor readings when the output is
+ * turned off. For such chips, this flag should be set so that the PMBus core
+ * driver will refuse to return negative values, but instead return a read
+ * failure.
+ */
+#define PMBUS_ABSOLUTE_NUMBERS			BIT(6)
+
+
 struct pmbus_platform_data {
 	u32 flags;		/* Device specific flags */
 
