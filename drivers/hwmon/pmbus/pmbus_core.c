@@ -38,6 +38,7 @@ struct pmbus_sensor {
 	enum pmbus_sensor_classes class;	/* sensor class */
 	bool update;		/* runtime sensor update needed */
 	bool convert;		/* Whether or not to apply linear/vid/direct */
+	bool absolute;		/* Whether to report only absolute numbers */
 	int data;		/* Sensor data.
 				   Negative if there was a read error */
 };
@@ -877,6 +878,7 @@ static s64 pmbus_reg2data(struct pmbus_data *data, struct pmbus_sensor *sensor)
 		val = pmbus_reg2data_linear(data, sensor);
 		break;
 	}
+
 	return val;
 }
 
@@ -1106,13 +1108,19 @@ static ssize_t pmbus_show_sensor(struct device *dev,
 	struct pmbus_sensor *sensor = to_pmbus_sensor(devattr);
 	struct pmbus_data *data = i2c_get_clientdata(client);
 	ssize_t ret;
+	s64 val;
 
 	mutex_lock(&data->update_lock);
 	pmbus_update_sensor_data(client, sensor);
-	if (sensor->data < 0)
+	if (sensor->data < 0) {
 		ret = sensor->data;
-	else
-		ret = sysfs_emit(buf, "%lld\n", pmbus_reg2data(data, sensor));
+	} else {
+		val = pmbus_reg2data(data, sensor);
+		if (sensor->absolute && val < 0)
+			ret = -ENODATA;
+		else
+			ret = sysfs_emit(buf, "%lld\n", val);
+	}
 	mutex_unlock(&data->update_lock);
 	return ret;
 }
@@ -1239,6 +1247,7 @@ static struct pmbus_sensor *pmbus_add_sensor(struct pmbus_data *data,
 {
 	struct pmbus_sensor *sensor;
 	struct device_attribute *a;
+	bool absolute = false;
 
 	sensor = devm_kzalloc(data->dev, sizeof(*sensor), GFP_KERNEL);
 	if (!sensor)
@@ -1255,12 +1264,16 @@ static struct pmbus_sensor *pmbus_add_sensor(struct pmbus_data *data,
 	if (data->flags & PMBUS_WRITE_PROTECTED)
 		readonly = true;
 
+	if (data->flags & PMBUS_ABSOLUTE_NUMBERS)
+		absolute = true;
+
 	sensor->page = page;
 	sensor->phase = phase;
 	sensor->reg = reg;
 	sensor->class = class;
 	sensor->update = update;
 	sensor->convert = convert;
+	sensor->absolute = absolute;
 	sensor->data = -ENODATA;
 	pmbus_dev_attr_init(a, sensor->name,
 			    readonly ? 0444 : 0644,
