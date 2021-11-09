@@ -21,6 +21,15 @@
 #include <linux/regulator/machine.h>
 #include "pmbus.h"
 
+/*
+ * Device reports negative sensor readings when the output is disabled.
+ */
+static struct pmbus_platform_data bcm6123_plat_data = {
+#ifdef PMBUS_ABSOLUTE_NUMBERS
+	.flags = PMBUS_ABSOLUTE_NUMBERS,
+#endif
+};
+
 static struct pmbus_driver_info bcm6123_info = {
 	.pages = 2,
 	.format[PSC_VOLTAGE_IN] = direct,
@@ -102,6 +111,7 @@ static int bcm6123_probe(struct i2c_client *client)
 
 	bcm6123_info.reg_desc = rdesc;
 	bcm6123_info.num_regulators = 1;
+
 #endif
 	return pmbus_do_probe(client, &bcm6123_info);
 }
