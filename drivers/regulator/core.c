@@ -2658,6 +2658,8 @@ static int _regulator_do_enable(struct regulator_dev *rdev)
 		_regulator_enable_delay(delay);
 	}
 
+	sysfs_notify(&rdev->dev.kobj, NULL, dev_attr_state.attr.name);
+
 	trace_regulator_enable_complete(rdev_get_name(rdev));
 
 	return 0;
@@ -2834,6 +2836,8 @@ static int _regulator_do_disable(struct regulator_dev *rdev)
 
 	if (rdev->desc->off_on_delay)
 		rdev->last_off = ktime_get();
+
+	sysfs_notify(&rdev->dev.kobj, NULL, dev_attr_state.attr.name);
 
 	trace_regulator_disable_complete(rdev_get_name(rdev));
 
@@ -4707,8 +4711,15 @@ EXPORT_SYMBOL_GPL(regulator_unregister_notifier);
 static int _notifier_call_chain(struct regulator_dev *rdev,
 				  unsigned long event, void *data)
 {
+	int ret;
+
 	/* call rdev chain first */
-	return blocking_notifier_call_chain(&rdev->notifier, event, data);
+	ret =  blocking_notifier_call_chain(&rdev->notifier, event, data);
+
+	if (event & REGULATOR_EVENT_STATUS_CHANGE)
+		sysfs_notify(&rdev->dev.kobj, NULL, dev_attr_status.attr.name);
+
+	return ret;
 }
 
 /**

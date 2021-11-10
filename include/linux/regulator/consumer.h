@@ -102,6 +102,9 @@ struct regulator_dev;
  *                      Data passed is old voltage cast to (void *).
  * PRE_DISABLE    Regulator is about to be disabled
  * ABORT_DISABLE  Regulator disable failed for some reason
+ * STATUS_CHANGE  Regulator event that can cause status change.
+ *                i.e., under/over voltage, regulation out, failure,
+ *                over temperature, enable/disable & abort events.
  *
  * NOTE: These events can be OR'ed together when passed into handler.
  */
@@ -119,6 +122,7 @@ struct regulator_dev;
 #define REGULATOR_EVENT_PRE_DISABLE		0x400
 #define REGULATOR_EVENT_ABORT_DISABLE		0x800
 #define REGULATOR_EVENT_ENABLE			0x1000
+#define REGULATOR_EVENT_STATUS_CHANGE		0x1ABF
 /*
  * Following notifications should be emitted only if detected condition
  * is such that the HW is likely to still be working but consumers should
