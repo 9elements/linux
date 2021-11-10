@@ -52,14 +52,11 @@ static struct pmbus_driver_info xdpe112_info = {
 
 static int xdpe112_probe(struct i2c_client *client)
 {
-	struct pmbus_driver_info *info;
+	if (client->dev.of_node->full_name) {
+		dev_err(&client->dev, "full name %s\n",client->dev.of_node->full_name);
+	}
 
-	info = devm_kmemdup(&client->dev, &xdpe112_info, sizeof(*info),
-			    GFP_KERNEL);
-	if (!info)
-		return -ENOMEM;
-
-	return pmbus_do_probe(client, info);
+	return pmbus_do_probe(client, &xdpe112_info);
 }
 
 static const struct i2c_device_id xdpe112_id[] = {
