@@ -52,9 +52,9 @@ static struct pmbus_driver_info xdpe112_info = {
 
 static int xdpe112_probe(struct i2c_client *client)
 {
-	if (client->dev.of_node->full_name) {
-		dev_err(&client->dev, "full name %s\n",client->dev.of_node->full_name);
-	}
+
+	if (client->dev.of_node->full_name)
+		strlcpy(client->name, client->dev.of_node->full_name, I2C_NAME_SIZE);
 
 	return pmbus_do_probe(client, &xdpe112_info);
 }
