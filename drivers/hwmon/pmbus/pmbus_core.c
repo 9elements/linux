@@ -2574,6 +2574,136 @@ const struct regulator_ops pmbus_regulator_ops = {
 };
 EXPORT_SYMBOL_NS_GPL(pmbus_regulator_ops, PMBUS);
 
+/*
+ * Write the SMALERT mask register.
+ */
+static int pmbus_write_smbalert_mask(struct i2c_client *client, u8 page, u8 reg, u8 val)
+{
+	return pmbus_write_word_data(client, page, PMBUS_SMBALERT_MASK,
+				     reg | (val << 8));
+}
+
+static const struct {
+	unsigned int func;
+	u8 reg;
+	u8 mask;
+	unsigned long notifs;
+	unsigned long errors;
+} pmbus_irq_status[] = {
+	{
+		-1,
+		PMBUS_STATUS_BYTE,
+		PB_STATUS_IOUT_OC,
+		REGULATOR_EVENT_OVER_CURRENT,
+		REGULATOR_ERROR_OVER_CURRENT,
+	},
+	{
+		-1,
+		PMBUS_STATUS_BYTE,
+		PB_STATUS_VOUT_OV,
+		REGULATOR_EVENT_REGULATION_OUT | REGULATOR_EVENT_OVER_VOLTAGE_WARN,
+		REGULATOR_ERROR_REGULATION_OUT | REGULATOR_ERROR_OVER_VOLTAGE_WARN,
+	},
+	{
+		-1,
+		PMBUS_STATUS_BYTE,
+		PB_STATUS_VIN_UV,
+		REGULATOR_EVENT_UNDER_VOLTAGE,
+		REGULATOR_ERROR_UNDER_VOLTAGE,
+	},
+	{
+		-1,
+		PMBUS_STATUS_BYTE,
+		PB_STATUS_TEMPERATURE,
+		REGULATOR_EVENT_OVER_TEMP_WARN,
+		0,
+	},
+	{
+		-1,
+		PMBUS_STATUS_BYTE,
+		PB_STATUS_UNKNOWN,
+		REGULATOR_EVENT_FAIL,
+		REGULATOR_ERROR_FAIL,
+	},
+	{
+		PMBUS_HAVE_STATUS_VOUT,
+		PMBUS_STATUS_VOUT,
+		PB_VOLTAGE_OV_FAULT,
+		REGULATOR_EVENT_REGULATION_OUT | REGULATOR_EVENT_OVER_VOLTAGE_WARN,
+		REGULATOR_ERROR_REGULATION_OUT | REGULATOR_ERROR_OVER_VOLTAGE_WARN,
+	},
+	{
+		PMBUS_HAVE_STATUS_VOUT,
+		PMBUS_STATUS_VOUT,
+		PB_VOLTAGE_UV_FAULT,
+		REGULATOR_EVENT_UNDER_VOLTAGE,
+		REGULATOR_ERROR_UNDER_VOLTAGE,
+	},
+	{
+		PMBUS_HAVE_STATUS_VOUT,
+		PMBUS_STATUS_VOUT,
+		PB_VOLTAGE_OV_WARNING,
+		REGULATOR_EVENT_OVER_VOLTAGE_WARN,
+		REGULATOR_ERROR_OVER_VOLTAGE_WARN,
+	},
+	{
+		PMBUS_HAVE_STATUS_IOUT,
+		PMBUS_STATUS_IOUT,
+		PB_IOUT_OC_FAULT | PB_IOUT_OC_LV_FAULT | PB_POUT_OP_FAULT,
+		REGULATOR_EVENT_OVER_CURRENT,
+		REGULATOR_ERROR_OVER_CURRENT,
+	},
+	{
+		PMBUS_HAVE_STATUS_IOUT,
+		PMBUS_STATUS_IOUT,
+		PB_IOUT_OC_WARNING,
+		REGULATOR_EVENT_OVER_CURRENT_WARN,
+		REGULATOR_ERROR_OVER_CURRENT_WARN,
+	},
+	{
+		PMBUS_HAVE_STATUS_INPUT,
+		PMBUS_STATUS_INPUT,
+		PB_IIN_OC_FAULT,
+		REGULATOR_EVENT_OVER_CURRENT,
+		REGULATOR_ERROR_OVER_CURRENT,
+	},
+	{
+		PMBUS_HAVE_STATUS_INPUT,
+		PMBUS_STATUS_INPUT,
+		PB_VOLTAGE_OV_FAULT,
+		REGULATOR_EVENT_REGULATION_OUT | REGULATOR_EVENT_OVER_VOLTAGE_WARN,
+		REGULATOR_ERROR_REGULATION_OUT | REGULATOR_ERROR_OVER_VOLTAGE_WARN,
+	},
+	{
+		PMBUS_HAVE_STATUS_INPUT,
+		PMBUS_STATUS_INPUT,
+		PB_VOLTAGE_OV_WARNING,
+		REGULATOR_EVENT_OVER_VOLTAGE_WARN,
+		REGULATOR_ERROR_OVER_VOLTAGE_WARN,
+	},
+	{
+		PMBUS_HAVE_STATUS_INPUT,
+		PMBUS_STATUS_INPUT,
+		PB_VOLTAGE_UV_FAULT,
+		REGULATOR_EVENT_UNDER_VOLTAGE,
+		REGULATOR_ERROR_UNDER_VOLTAGE,
+	},
+	{
+		PMBUS_HAVE_STATUS_TEMP,
+		PMBUS_STATUS_TEMPERATURE,
+		PB_TEMP_OT_FAULT,
+		REGULATOR_EVENT_OVER_TEMP,
+		REGULATOR_ERROR_OVER_TEMP,
+	},
+	{
+		PMBUS_HAVE_STATUS_TEMP,
+		PMBUS_STATUS_TEMPERATURE,
+		PB_TEMP_OT_WARNING,
+		REGULATOR_EVENT_OVER_TEMP_WARN,
+		REGULATOR_ERROR_OVER_TEMP_WARN,
+	}
+};
+
 static int pmbus_fault_handler(int irq, struct regulator_irq_data *rid,
 			       unsigned long *dev_mask)
 {
@@ -2584,127 +2714,6 @@ static int pmbus_fault_handler(int irq, struct regulator_irq_data *rid,
 	int status;
 	u8 page, reg;
 	int i, j;
-
-	struct {
-		unsigned int func;
-		u8 reg;
-		u8 mask;
-		unsigned long notifs;
-		unsigned long errors;
-	} l[] = {
-		{
-			-1,
-			PMBUS_STATUS_WORD,
-			PB_STATUS_IOUT_OC,
-			REGULATOR_EVENT_OVER_CURRENT,
-			REGULATOR_ERROR_OVER_CURRENT,
-		},
-		{
-			-1,
-			PMBUS_STATUS_WORD,
-			PB_STATUS_VOUT_OV,
-			REGULATOR_EVENT_REGULATION_OUT | REGULATOR_EVENT_OVER_VOLTAGE_WARN,
-			REGULATOR_ERROR_REGULATION_OUT | REGULATOR_ERROR_OVER_VOLTAGE_WARN,
-		},
-		{
-			-1,
-			PMBUS_STATUS_WORD,
-			PB_STATUS_VIN_UV,
-			REGULATOR_EVENT_UNDER_VOLTAGE,
-			REGULATOR_ERROR_UNDER_VOLTAGE,
-		},
-		{
-			-1,
-			PMBUS_STATUS_WORD,
-			PB_STATUS_TEMPERATURE,
-			REGULATOR_EVENT_OVER_TEMP_WARN,
-			0,
-		},
-		{
-			-1,
-			PMBUS_STATUS_WORD,
-			PB_STATUS_UNKNOWN,
-			REGULATOR_EVENT_FAIL,
-			REGULATOR_ERROR_FAIL,
-		},
-		{
-			PMBUS_HAVE_STATUS_VOUT,
-			PMBUS_STATUS_VOUT,
-			PB_VOLTAGE_OV_FAULT,
-			REGULATOR_EVENT_REGULATION_OUT | REGULATOR_EVENT_OVER_VOLTAGE_WARN,
-			REGULATOR_ERROR_REGULATION_OUT | REGULATOR_ERROR_OVER_VOLTAGE_WARN,
-		},
-		{
-			PMBUS_HAVE_STATUS_VOUT,
-			PMBUS_STATUS_VOUT,
-			PB_VOLTAGE_UV_FAULT,
-			REGULATOR_EVENT_UNDER_VOLTAGE,
-			REGULATOR_ERROR_UNDER_VOLTAGE,
-		},
-		{
-			PMBUS_HAVE_STATUS_VOUT,
-			PMBUS_STATUS_VOUT,
-			PB_VOLTAGE_OV_WARNING,
-			REGULATOR_EVENT_OVER_VOLTAGE_WARN,
-			REGULATOR_ERROR_OVER_VOLTAGE_WARN,
-		},
-		{
-			PMBUS_HAVE_STATUS_IOUT,
-			PMBUS_STATUS_IOUT,
-			PB_IOUT_OC_FAULT | PB_IOUT_OC_LV_FAULT | PB_POUT_OP_FAULT,
-			REGULATOR_EVENT_OVER_CURRENT,
-			REGULATOR_ERROR_OVER_CURRENT,
-		},
-		{
-			PMBUS_HAVE_STATUS_IOUT,
-			PMBUS_STATUS_IOUT,
-			PB_IOUT_OC_WARNING,
-			REGULATOR_EVENT_OVER_CURRENT_WARN,
-			REGULATOR_ERROR_OVER_CURRENT_WARN,
-		},
-		{
-			PMBUS_HAVE_STATUS_INPUT,
-			PMBUS_STATUS_INPUT,
-			PB_IIN_OC_FAULT,
-			REGULATOR_EVENT_OVER_CURRENT,
-			REGULATOR_ERROR_OVER_CURRENT,
-		},
-		{
-			PMBUS_HAVE_STATUS_INPUT,
-			PMBUS_STATUS_INPUT,
-			PB_VOLTAGE_OV_FAULT,
-			REGULATOR_EVENT_REGULATION_OUT | REGULATOR_EVENT_OVER_VOLTAGE_WARN,
-			REGULATOR_ERROR_REGULATION_OUT | REGULATOR_ERROR_OVER_VOLTAGE_WARN,
-		},
-		{
-			PMBUS_HAVE_STATUS_INPUT,
-			PMBUS_STATUS_INPUT,
-			PB_VOLTAGE_OV_WARNING,
-			REGULATOR_EVENT_OVER_VOLTAGE_WARN,
-			REGULATOR_ERROR_OVER_VOLTAGE_WARN,
-		},
-		{
-			PMBUS_HAVE_STATUS_INPUT,
-			PMBUS_STATUS_INPUT,
-			PB_VOLTAGE_UV_FAULT,
-			REGULATOR_EVENT_UNDER_VOLTAGE,
-			REGULATOR_ERROR_UNDER_VOLTAGE,
-		},
-		{
-			PMBUS_HAVE_STATUS_TEMP,
-			PMBUS_STATUS_TEMPERATURE,
-			PB_TEMP_OT_FAULT,
-			REGULATOR_EVENT_OVER_TEMP,
-			REGULATOR_ERROR_OVER_TEMP,
-		},
-		{
-			PMBUS_HAVE_STATUS_TEMP,
-			PMBUS_STATUS_TEMPERATURE,
-			PB_TEMP_OT_WARNING,
-			REGULATOR_EVENT_OVER_TEMP_WARN,
-			REGULATOR_ERROR_OVER_TEMP_WARN,
-		}
-	};
 
 	for (i = 0; i < rid->num_states; i++) {
 		stat  = &rid->states[i];
@@ -2719,22 +2728,28 @@ static int pmbus_fault_handler(int irq, struct regulator_irq_data *rid,
 		*dev_mask = 0;
 		reg = 0;
 
-		for (j = 0; j < ARRAY_SIZE(l); j++) {
-			if (!(data->info->func[page] & l[j].func))
+		for (j = 0; j < ARRAY_SIZE(pmbus_irq_status); j++) {
+			if (!(data->info->func[page] & pmbus_irq_status[j].func))
 				continue;
-			if (reg != l[j].reg) {
-				reg = l[j].reg;
+			if (reg != pmbus_irq_status[j].reg) {
+				reg = pmbus_irq_status[j].reg;
 				status = _pmbus_read_byte_data(client, page, reg);
 				if (status < 0)
 					return REGULATOR_FAILED_RETRY;
 			}
-			if (status & l[j].mask) {
+			if (status & pmbus_irq_status[j].mask) {
 				*dev_mask |= BIT(i);
-				stat->notifs |= l[j].notifs;
-				stat->errors |= l[j].errors;
+				stat->notifs |= pmbus_irq_status[j].notifs;
+				stat->errors |= pmbus_irq_status[j].errors;
 			}
 		}
-		pmbus_clear_fault_page(client, page);
+
+		status = pmbus_read_status_byte(client, page);
+		if (status < 0)
+			return REGULATOR_FAILED_RETRY;
+
+		if (status & ~(PB_STATUS_OFF | PB_STATUS_BUSY))
+			pmbus_clear_fault_page(client, page);
 	}
 
 	return 0;
@@ -2753,7 +2768,7 @@ static int pmbus_regulator_register(struct i2c_client *client, struct pmbus_data
 	int errs = REGULATOR_ERROR_REGULATION_OUT |
 		   REGULATOR_ERROR_FAIL;
 	void *irq_helper;
-	int i, err;
+	int i, j, err;
 
 	/* Optional external supply for the drivers, enabled before outputs are turned on,
 	 * disabled when outputs are off.
@@ -2795,20 +2810,59 @@ static int pmbus_regulator_register(struct i2c_client *client, struct pmbus_data
 	if (client->irq > 0) {
 		pmbus_notif.data = rdevs;
 		for (i = 0; i < data->info->pages; i++) {
-			if(data->info->func[i] & PMBUS_HAVE_STATUS_TEMP)
-				errs |= REGULATOR_ERROR_OVER_TEMP |
-					REGULATOR_ERROR_OVER_TEMP_WARN;
-			if(data->info->func[i] & PMBUS_HAVE_STATUS_INPUT)
-				errs |= REGULATOR_ERROR_UNDER_VOLTAGE |
-					REGULATOR_ERROR_UNDER_VOLTAGE_WARN;
-			if(data->info->func[i] & PMBUS_HAVE_STATUS_VOUT)
-				errs |= REGULATOR_ERROR_UNDER_VOLTAGE |
-					REGULATOR_ERROR_UNDER_VOLTAGE_WARN |
-					REGULATOR_ERROR_OVER_VOLTAGE_WARN |
-					REGULATOR_ERROR_REGULATION_OUT;
-			if(data->info->func[i] & PMBUS_HAVE_STATUS_IOUT)
-				errs |= REGULATOR_ERROR_OVER_CURRENT |
-					REGULATOR_ERROR_OVER_CURRENT_WARN;
+			for (j = 0; j < ARRAY_SIZE(pmbus_irq_status); j++) {
+				if(!(data->info->func[i] & pmbus_irq_status[j].func))
+					continue;
+				errs |= pmbus_irq_status[j].errors;
+			}
+
+			if(data->info->func[i] & PMBUS_HAVE_STATUS_TEMP) {
+				err = pmbus_write_smbalert_mask(client, i, PMBUS_STATUS_TEMPERATURE, ~(
+					PB_TEMP_OT_FAULT |
+					PB_TEMP_OT_WARNING
+				));
+				if (err)
+					dev_err(dev, "Failed to set smbalert mask 0x%02x\n",PMBUS_STATUS_TEMPERATURE);
+			}
+			if(data->info->func[i] & PMBUS_HAVE_STATUS_INPUT) {
+				err = pmbus_write_smbalert_mask(client, i, PMBUS_STATUS_INPUT, ~(
+					PB_PIN_OP_WARNING |
+					PB_IIN_OC_WARNING |
+					PB_IIN_OC_FAULT
+				));
+				if (err)
+					dev_err(dev, "Failed to set smbalert mask 0x%02x\n",PMBUS_STATUS_INPUT);
+			}
+			if(data->info->func[i] & PMBUS_HAVE_STATUS_VOUT) {
+				err = pmbus_write_smbalert_mask(client, i, PMBUS_STATUS_VOUT, ~(
+					PB_VOLTAGE_UV_FAULT |
+					PB_VOLTAGE_UV_WARNING |
+					PB_VOLTAGE_OV_WARNING |
+					PB_VOLTAGE_OV_FAULT
+				));
+				if (err)
+					dev_err(dev, "Failed to set smbalert mask 0x%02x\n",PMBUS_STATUS_VOUT);
+			}
+
+			if(data->info->func[i] & PMBUS_HAVE_STATUS_IOUT) {
+				err = pmbus_write_smbalert_mask(client, i, PMBUS_STATUS_IOUT, ~(
+					PB_IOUT_OC_WARNING |
+					PB_IOUT_OC_FAULT |
+					PB_POUT_OP_FAULT
+				));
+				if (err)
+					dev_err(dev, "Failed to set smbalert mask 0x%02x\n",PMBUS_STATUS_IOUT);
+			}
+
+			pmbus_write_smbalert_mask(client, i, PMBUS_STATUS_CML, 0xff);
+			pmbus_write_smbalert_mask(client, i, PMBUS_STATUS_OTHER, 0xff);
+			pmbus_write_smbalert_mask(client, i, PMBUS_STATUS_MFR_SPECIFIC, 0xff);
+			if(data->info->func[i] & PMBUS_HAVE_FAN12) {
+				pmbus_write_smbalert_mask(client, i, PMBUS_STATUS_FAN_12, 0xff);
+			}
+			if(data->info->func[i] & PMBUS_HAVE_FAN34) {
+				pmbus_write_smbalert_mask(client, i, PMBUS_STATUS_FAN_34, 0xff);
+			}
 		}
 
 		/* Register notifiers - can fail if IRQ is not given */
