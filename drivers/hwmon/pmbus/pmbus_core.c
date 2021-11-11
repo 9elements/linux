@@ -103,6 +103,7 @@ struct pmbus_data {
 
 	s16 currpage;	/* current page, -1 for unknown/unset */
 	s16 currphase;	/* current phase, 0xff for all, -1 for unknown/unset */
+	struct regulator *reg_drv;	/* Regulator supplying external driver */
 };
 
 struct pmbus_debugfs_entry {
@@ -2428,11 +2429,32 @@ static int _pmbus_regulator_on_off(struct regulator_dev *rdev, bool enable)
 {
 	struct device *dev = rdev_get_dev(rdev);
 	struct i2c_client *client = to_i2c_client(dev->parent);
+	struct pmbus_data *data = i2c_get_clientdata(client);
 	u8 page = rdev_get_id(rdev);
+	int ret;
 
-	return pmbus_update_byte_data(client, page, PMBUS_OPERATION,
-				      PB_OPERATION_CONTROL_ON,
-				      enable ? PB_OPERATION_CONTROL_ON : 0);
+	if (data->reg_drv && enable) {
+		ret = regulator_enable(data->reg_drv);
+		if (ret) {
+			dev_err(dev, "Failed to enable driver supply: %d\n", ret);
+			return ret;
+		}
+	}
+
+	ret = pmbus_update_byte_data(client, page, PMBUS_OPERATION,
+				     PB_OPERATION_CONTROL_ON,
+				     enable ? PB_OPERATION_CONTROL_ON : 0);
+	if (ret)
+		return ret;
+
+	if (data->reg_drv && !enable) {
+		ret = regulator_disable(data->reg_drv);
+		if (ret) {
+			dev_err(dev, "Failed to disable driver supply: %d\n", ret);
+			return ret;
+		}
+	}
+	return 0;
 }
 
 static int pmbus_regulator_enable(struct regulator_dev *rdev)
@@ -2731,7 +2753,22 @@ static int pmbus_regulator_register(struct i2c_client *client, struct pmbus_data
 	int errs = REGULATOR_ERROR_REGULATION_OUT |
 		   REGULATOR_ERROR_FAIL;
 	void *irq_helper;
-	int i;
+	int i, err;
+
+	/* Optional external supply for the drivers, enabled before outputs are turned on,
+	 * disabled when outputs are off.
+	 * Do not use if device can be enabled by anything else except PMBUS commands!
+	 */
+	data->reg_drv = devm_regulator_get_optional(dev, "vdrv");
+	if (IS_ERR(data->reg_drv)) {
+		if (PTR_ERR(data->reg_drv) != -ENODEV) {
+			err = (int)PTR_ERR(data->reg_drv);
+			dev_warn(dev, "Failed looking up fan supply: %d\n", err);
+			return err;
+		}
+
+		data->reg_drv = NULL;
+	}
 
 	rdevs = devm_kzalloc(dev, sizeof(*rdevs) * info->num_regulators, GFP_KERNEL);
 	if (!rdevs)
