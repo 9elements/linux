@@ -85,7 +85,7 @@ MODULE_DEVICE_TABLE(of, cy8c95x0_dt_ids);
 #define BANK_SZ 8
 #define MAX_LINE	(MAX_BANK * BANK_SZ)
 
-#define NBANK(chip) DIV_ROUND_UP((chip)->gpio_chip.ngpio, BANK_SZ)
+#define NBANK(chip) (cypress_get_nbank(chip))
 #define CY8C95X0_GPIO_MASK		GENMASK(7, 0)
 
 struct cy8c95x0_chip {
@@ -108,6 +108,23 @@ struct cy8c95x0_chip {
 	unsigned long driver_data;
 	struct regulator *regulator;
 };
+
+static inline u8 cypress_get_nbank(struct cy8c95x0_chip *chip)
+{
+	switch(chip->gpio_chip.ngpio)
+	{
+	case 0 ... 20:
+		/* cy8c9520a */
+		return 3;
+	case 21 ... 40:
+		/* cy8c9540a */
+		return 6;
+	case 41 ... 60:
+		/* cy8c9560a */
+		return 8;
+	}
+	return -1;
+}
 
 static bool cy8c95x0_readable_register(struct device *dev, unsigned int reg)
 {
