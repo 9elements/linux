@@ -550,6 +550,7 @@ config REGULATOR_MAX597X
 	tristate "Maxim 597x power switch and monitor"
 	depends on I2C
 	depends on OF
+	depends on IIO
 	select REGMAP_I2C
 	help
 	  This driver controls a Maxim 5970/5978 switch via I2C bus.
