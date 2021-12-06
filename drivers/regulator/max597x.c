@@ -12,6 +12,7 @@
 #include <linux/err.h>
 #include <linux/module.h>
 #include <linux/io.h>
+#include <linux/iio/iio.h>
 #include <linux/of.h>
 #include <linux/i2c.h>
 #include <linux/regmap.h>
@@ -34,6 +35,13 @@ struct max597x_data {
 	unsigned int irng;
 	unsigned int mon_rng;
 	struct regmap *regmap;
+};
+
+struct max597x_iio {
+	int shunt_micro_ohms[2];
+	struct regmap *regmap;
+	unsigned int irng;
+	unsigned int mon_rng;
 };
 
 struct max597x_regulator {
@@ -566,6 +574,8 @@ static int max597x_probe(struct i2c_client *cl, const struct i2c_device_id *id)
 	struct regmap *regmap;
 	struct regulator_bulk_data supplies[MAX5970_NUM_SWITCHES];
 	unsigned int irng, mon_rng;
+	struct iio_dev *indio_dev;
+	struct max597x_iio *priv;
 	int ret;
 	enum max597x_chip_type chip = id->driver_data;
 
@@ -611,6 +621,28 @@ static int max597x_probe(struct i2c_client *cl, const struct i2c_device_id *id)
 	mon_rng = 16000000 >> (mon_rng & MAX5970_MON_MASK);
 	dev_info(&cl->dev, "Voltage ADC limit %d mV\n", mon_rng / 1000);
 
+	/* registering iio */
+	indio_dev = devm_iio_device_alloc(&cl->dev, sizeof(*priv));
+	if (!indio_dev) {
+		dev_err(&cl->dev, "failed allocating iio device\n");
+		return -ENOMEM;
+	}
+	indio_dev->name = dev_name(&cl->dev);
+	indio_dev->info = &max597x_adc_iio_info;
+	indio_dev->modes = INDIO_DIRECT_MODE;
+	if (num_switches == 1) {
+		indio_dev->channels = max5978_adc_iio_channels;
+		indio_dev->num_channels = ARRAY_SIZE(max5978_adc_iio_channels);
+	} else {
+		indio_dev->channels = max5970_adc_iio_channels;
+		indio_dev->num_channels = ARRAY_SIZE(max5970_adc_iio_channels);
+	}
+
+	priv = iio_priv(indio_dev);
+	priv->regmap = regmap;
+	priv->irng = irng;
+	priv->mon_rng = mon_rng;
+
 	/* Enable supply regulators */
 	supplies[0].supply = "vss1";
 	supplies[1].supply = "vss2";
@@ -638,6 +670,9 @@ static int max597x_probe(struct i2c_client *cl, const struct i2c_device_id *id)
 		ret = max597x_parse_dt(&cl->dev, data);
 		if (ret < 0)
 			goto err_regulator_disable;
+
+		/* Set shunt value for IIO backend */
+		priv->shunt_micro_ohms[i] = data->shunt_micro_ohms;
 
 		dev_info(&cl->dev, "Shunt%d ADC upper limit %d mA\n", i,
 			 irng * 1000 / data->shunt_micro_ohms);
@@ -670,6 +705,12 @@ static int max597x_probe(struct i2c_client *cl, const struct i2c_device_id *id)
 			dev_err(&cl->dev, "IRQ setup failed");
 			goto err_regulator_disable;
 		}
+	}
+
+	ret = devm_iio_device_register(&cl->dev, indio_dev);
+	if (ret) {
+		dev_err(&cl->dev, "could not register iio device");
+		goto err_regulator_disable;
 	}
 
 	return 0;
