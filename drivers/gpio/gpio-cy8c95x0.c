@@ -524,7 +524,7 @@ static int cy8c95x0_gpio_set_config(struct gpio_chip *gc, unsigned int offset,
 	case PIN_CONFIG_DRIVE_PUSH_PULL:
 		return cy8c95x0_gpio_set_pincfg(chip, offset, config);
 	default:
-		return -EOPNOTSUPP;
+		return -ENOTSUPP;
 	}
 }
 
