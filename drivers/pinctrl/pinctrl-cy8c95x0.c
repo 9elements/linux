@@ -6,7 +6,7 @@
  *
  *  Derived from drivers/i2c/chips/pca953x.c
  */
-#define DEBUG
+
 #include <linux/bitmap.h>
 #include <linux/gpio/driver.h>
 #include <linux/gpio/consumer.h>
@@ -689,7 +689,7 @@ static int cy8c95x0_gpio_get_multiple(struct gpio_chip *gc,
 }
 
 static void cy8c95x0_gpio_set_multiple(struct gpio_chip *gc,
-				       unsigned long *mask, unsigned long *bits)
+					unsigned long *mask, unsigned long *bits)
 {
 	struct cy8c95x0_chip *chip = gpiochip_get_data(gc);
 	DECLARE_BITMAP(reg_val, MAX_LINE);
@@ -908,16 +908,92 @@ static irqreturn_t cy8c95x0_irq_handler(int irq, void *devid)
 	return IRQ_RETVAL(ret);
 }
 
+static const unsigned cy8c95x0_pins[] = { 0, 1, 2, 3, 4 ,5 ,6 ,7 , 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59 };
+
+static const char * const cy8c95x0_groups[] = {
+	"gp00",
+	"gp01",
+	"gp02",
+	"gp03",
+	"gp04",
+	"gp05",
+	"gp06",
+	"gp07",
+
+	"gp10",
+	"gp11",
+	"gp12",
+	"gp13",
+	"gp14",
+	"gp15",
+	"gp16",
+	"gp17",
+
+	"gp20",
+	"gp21",
+	"gp22",
+	"gp23",
+
+	"gp30",
+	"gp31",
+	"gp32",
+	"gp33",
+	"gp34",
+	"gp35",
+	"gp36",
+	"gp37",
+
+	"gp40",
+	"gp41",
+	"gp42",
+	"gp43",
+	"gp44",
+	"gp45",
+	"gp46",
+	"gp47",
+
+	"gp50",
+	"gp51",
+	"gp52",
+	"gp53",
+	"gp54",
+	"gp55",
+	"gp56",
+	"gp57",
+
+	"gp60",
+	"gp61",
+	"gp62",
+	"gp63",
+	"gp64",
+	"gp65",
+	"gp66",
+	"gp67",
+
+	"gp70",
+	"gp71",
+	"gp72",
+	"gp73",
+	"gp74",
+	"gp75",
+	"gp76",
+	"gp77",
+};
 
 static int cy8c95x0_pinctrl_get_groups_count(struct pinctrl_dev *pctldev)
 {
-	return 0;
+	struct cy8c95x0_chip *chip = pinctrl_dev_get_drvdata(pctldev);
+	return chip->gpio_chip.ngpio;
 }
 
 static const char *cy8c95x0_pinctrl_get_group_name(struct pinctrl_dev *pctldev,
 						unsigned int group)
 {
-	return NULL;
+	return cy8c95x0_groups[group];
+	if (group == 0)
+		return "gpio";
+	else
+		return "pwm";
 }
 
 static int cy8c95x0_pinctrl_get_group_pins(struct pinctrl_dev *pctldev,
@@ -925,7 +1001,10 @@ static int cy8c95x0_pinctrl_get_group_pins(struct pinctrl_dev *pctldev,
 					const unsigned int **pins,
 					unsigned int *num_pins)
 {
-	return -ENOTSUPP;
+	struct cy8c95x0_chip *chip = pinctrl_dev_get_drvdata(pctldev);
+	*pins = cy8c95x0_pins;
+	*num_pins = chip->gpio_chip.ngpio;
+	return 0;
 }
 
 static const struct pinctrl_ops cy8c95x0_pinctrl_ops = {
@@ -936,6 +1015,81 @@ static const struct pinctrl_ops cy8c95x0_pinctrl_ops = {
 	.dt_node_to_map = pinconf_generic_dt_node_to_map_pin,
 	.dt_free_map = pinconf_generic_dt_free_map,
 #endif
+};
+
+static int cy8c95x0_get_functions_count(struct pinctrl_dev *pctldev)
+{
+	return 2;
+}
+
+static const char *cy8c95x0_get_fname(struct pinctrl_dev *pctldev, unsigned selector)
+{
+	if (selector == 0)
+		return "gpio";
+	else
+		return "pwm";
+
+}
+
+static int cy8c95x0_get_groups(struct pinctrl_dev *pctldev, unsigned selector,
+			  const char * const **groups,
+			  unsigned * const num_groups)
+{
+	struct cy8c95x0_chip *chip = pinctrl_dev_get_drvdata(pctldev);
+	*groups = cy8c95x0_groups;
+	*num_groups = chip->gpio_chip.ngpio + 1;
+	return 0;
+}
+
+static int cy8c95x0_pinmux_cfg(struct cy8c95x0_chip *chip,
+				   unsigned int val,
+				   unsigned long off)
+{
+	u8 port = cy8c95x0_offset_to_port(chip, off);
+	u8 bank = cypress_get_bank(chip, off);
+	struct device *dev = chip->dev;
+	u8 bit = BIT(off % BANK_SZ);
+	u32 reg_val;
+	u16 arg = 0;
+	int ret;
+
+	mutex_lock(&chip->i2c_lock);
+	/* select bank */
+	ret = regmap_write(chip->regmap, CY8C95X0_PORTSEL, bank);
+	if (ret < 0) {
+		mutex_unlock(&chip->i2c_lock);
+		return ret;
+	}
+		if (val)
+			val = bit & 0xff;
+	else
+	    val = 0;
+	dev_err(dev, "%s: bit: %u, val %u", __func__, bit, val);
+	ret = regmap_write_bits(chip->regmap, CY8C95X0_PWMSEL, bit, val);
+	/* Set direction to output so that PWM can work */
+	ret = regmap_write_bits(chip->regmap, CY8C95X0_DIRECTION, bit, bit);
+
+exit:
+	mutex_unlock(&chip->i2c_lock);
+	return ret;
+}
+
+static int cy8c95x0_set_mux(struct pinctrl_dev *pctldev, unsigned selector,
+		unsigned group)
+{
+	struct cy8c95x0_chip *chip = pinctrl_dev_get_drvdata(pctldev);
+	struct device *dev = chip->dev;
+	   dev_err(dev, "%s: selector: %d, group %d", __func__, selector, group);
+	cy8c95x0_pinmux_cfg(chip, selector, group);
+	return 0;
+}
+
+static struct pinmux_ops cy8c95x0_pmxops = {
+	.get_functions_count = cy8c95x0_get_functions_count,
+	.get_function_name = cy8c95x0_get_fname,
+	.get_function_groups = cy8c95x0_get_groups,
+	.set_mux = cy8c95x0_set_mux,
+	.strict = true,
 };
 
 static int cy8c95x0_pinconf_get(struct pinctrl_dev *pctldev, unsigned int pin,
@@ -1358,6 +1512,7 @@ static int cy8c95x0_probe(struct i2c_client *client)
 
 	chip->pinctrl_desc.pctlops = &cy8c95x0_pinctrl_ops;
 	chip->pinctrl_desc.confops = &cy8c95x0_pinconf_ops;
+	chip->pinctrl_desc.pmxops = &cy8c95x0_pmxops;
 	chip->pinctrl_desc.npins = chip->gpio_chip.ngpio;
 	chip->pinctrl_desc.name = "cy8c95x0-pinctrl";
 
