@@ -3549,7 +3549,7 @@
 								shunt-resistor-micro-ohms = <12000>;
 								regulator-over-current-protection;
 								regulator-oc-protection-microamp = <3400000>;
-								regulator-enable-ramp-delay = <1000>;
+								regulator-enable-ramp-delay = <100000>;
 							};
 							p3v3_pch: SW1 {
 								vss2-supply = <&p3v3_aux>;
@@ -3560,6 +3560,7 @@
 								shunt-resistor-micro-ohms = <12000>;
 								regulator-over-current-protection;
 								regulator-oc-protection-microamp = <3400000>;
+								regulator-enable-ramp-delay = <100000>;
 							};
 						};
 					};
