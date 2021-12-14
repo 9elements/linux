@@ -59,6 +59,9 @@ properties:
     description: if present, overrides i2c-mux-idle-disconnect
     $ref: /schemas/mux/mux-controller.yaml#/properties/idle-state
 
+  vdd-supply:
+    description: A voltage regulator supplying power to the chip.
+
 required:
   - compatible
   - reg
@@ -78,6 +81,8 @@ examples:
             #address-cells = <1>;
             #size-cells = <0>;
             reg = <0x74>;
+
+            vdd-supply = <&p3v3>;
 
             interrupt-parent = <&ipic>;
             interrupts = <17 IRQ_TYPE_LEVEL_LOW>;
