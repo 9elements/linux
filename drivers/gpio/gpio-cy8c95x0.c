@@ -165,7 +165,7 @@ static inline u8 cypress_get_bank(struct cy8c95x0_chip *chip, unsigned gpio)
 	{
 		case 0 ... 20:
 			for (i = 0; i < sizeof(cy8c9520a_bank_offs) - 1; i ++)
-				if (! (gpio / cy8c9540a_bank_offs[i + 1]))
+				if (! (gpio / cy8c9520a_bank_offs[i + 1]))
 					break;
 			break;
 		case 21 ... 40:
@@ -174,25 +174,29 @@ static inline u8 cypress_get_bank(struct cy8c95x0_chip *chip, unsigned gpio)
 					break;
 		case 41 ... 60:
 			for (i = 0; i < sizeof(cy8c9560a_bank_offs) - 1; i ++)
-				if (! (gpio / cy8c9540a_bank_offs[i + 1]))
+				if (! (gpio / cy8c9560a_bank_offs[i + 1]))
 					break;
 	}
 	return i;
 }
 
-static int cy8c95x0_offset_to_port(struct cy8c95x0_chip *chip, unsigned off)
+static int cy8c95x0_bit_by_port(struct cy8c95x0_chip *chip, unsigned off)
 {
+	u8 bit_offset = 0;
 	u8 i = cypress_get_bank(chip, off);
 	switch(chip->gpio_chip.ngpio)
 	{
 	case 0 ... 20:
-		return off - cy8c9520a_bank_offs[i];
+		bit_offset = off - cy8c9520a_bank_offs[i];
+		break;
 	case 21 ... 40:
-		return off - cy8c9540a_bank_offs[i];
+		bit_offset = off - cy8c9540a_bank_offs[i];
+		break;
 	case 41 ... 60:
-		return off - cy8c9560a_bank_offs[i];
+		bit_offset = off - cy8c9560a_bank_offs[i];
+		break;
 	}
-	return -1;
+	return 1 << bit_offset;
 }
 
 static bool cy8c95x0_readable_register(struct device *dev, unsigned int reg)
@@ -330,8 +334,8 @@ out:
 static int cy8c95x0_gpio_direction_input(struct gpio_chip *gc, unsigned int off)
 {
 	struct cy8c95x0_chip *chip = gpiochip_get_data(gc);
-	u8 port = cy8c95x0_offset_to_port(chip, off);
-	u8 bit = BIT(off % BANK_SZ);
+	u8 port = cypress_get_bank(chip, off);
+	u8 bit = cy8c95x0_bit_by_port(chip, off);
 	u32 reg_val;
 	int ret, bias_enabled;
 
@@ -376,9 +380,9 @@ static int cy8c95x0_gpio_direction_output(struct gpio_chip *gc,
 					  unsigned int off, int val)
 {
 	struct cy8c95x0_chip *chip = gpiochip_get_data(gc);
-	u8 port = cy8c95x0_offset_to_port(chip, off);
+	u8 port = cypress_get_bank(chip, off);
+	u8 bit = cy8c95x0_bit_by_port(chip, off);
 	u8 outreg = CY8C95X0_OUTPUT_(port);
-	u8 bit = BIT(off % BANK_SZ);
 	int ret;
 
 	mutex_lock(&chip->i2c_lock);
@@ -402,8 +406,9 @@ exit:
 static int cy8c95x0_gpio_get_value(struct gpio_chip *gc, unsigned int off)
 {
 	struct cy8c95x0_chip *chip = gpiochip_get_data(gc);
-	u8 inreg = CY8C95X0_INPUT_(cy8c95x0_offset_to_port(chip, off));
-	u8 bit = BIT(off % BANK_SZ);
+	u8 port = cypress_get_bank(chip, off);
+	u8 bit = cy8c95x0_bit_by_port(chip, off);
+	u8 inreg = CY8C95X0_INPUT_(port);
 	u32 reg_val;
 	int ret;
 
@@ -427,8 +432,9 @@ static void cy8c95x0_gpio_set_value(struct gpio_chip *gc, unsigned int off,
 				    int val)
 {
 	struct cy8c95x0_chip *chip = gpiochip_get_data(gc);
-	u8 outreg = CY8C95X0_OUTPUT_(cy8c95x0_offset_to_port(chip, off));
-	u8 bit = BIT(off % BANK_SZ);
+	u8 port = cypress_get_bank(chip, off);
+	u8 bit = cy8c95x0_bit_by_port(chip, off);
+	u8 outreg = CY8C95X0_OUTPUT_(port);
 
 	mutex_lock(&chip->i2c_lock);
 	regmap_write_bits(chip->regmap, outreg, bit, val ? bit : 0);
@@ -438,8 +444,8 @@ static void cy8c95x0_gpio_set_value(struct gpio_chip *gc, unsigned int off,
 static int cy8c95x0_gpio_get_direction(struct gpio_chip *gc, unsigned int off)
 {
 	struct cy8c95x0_chip *chip = gpiochip_get_data(gc);
-	u8 port = cy8c95x0_offset_to_port(chip, off);
-	u8 bit = BIT(off % BANK_SZ);
+	u8 port = cypress_get_bank(chip, off);
+	u8 bit = cy8c95x0_bit_by_port(chip, off);
 	u32 reg_val;
 	int ret;
 
@@ -469,8 +475,8 @@ static int cy8c95x0_gpio_set_pincfg(struct cy8c95x0_chip *chip,
 				    unsigned int off,
 				    unsigned long config)
 {
-	u8 port = cy8c95x0_offset_to_port(chip, off);
-	u8 bit = BIT(off % BANK_SZ);
+	u8 port = cypress_get_bank(chip, off);
+	u8 bit = cy8c95x0_bit_by_port(chip, off);
 	unsigned int reg;
 	int ret;
 
