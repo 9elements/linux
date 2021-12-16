@@ -56,7 +56,8 @@ static const unsigned short normal_i2c[] = { 0x2c, 0x2e, 0x2f, I2C_CLIENT_END };
 
 #define MAX6639_FAN_CONFIG1_PWM			0x80
 
-#define MAX6639_FAN_CONFIG3_THERM_FULL_SPEED	0x40
+#define MAX6639_FAN_CONFIG3_THERM_FS		0x40
+#define MAX6639_FAN_CONFIG3_DISABLE_STRETCH	0x20
 
 static const int rpm_ranges[] = { 2000, 4000, 8000, 16000 };
 
@@ -88,6 +89,7 @@ struct max6639_data {
 	/* Register values initialized only once */
 	u8 ppr;			/* Pulses per rotation 0..3 for 1..4 ppr */
 	u8 rpm_range;		/* Index in above rpm_ranges table */
+	u8 disable_therm_pin;	/* Disable !THERM assert full speed */
 	u8 polarity;
 
 	/* Optional regulator for FAN supply */
@@ -434,6 +436,7 @@ static void max6639_platform_data_of(struct device *dev,
 	data->polarity = enabled;
 
 	enabled = of_property_read_bool(dev->of_node, "maxim,disable_therm_full_speed");
+	data->disable_therm_pin = enabled;
 }
 
 static void max6639_platform_data_plat(struct device *dev,
@@ -449,6 +452,7 @@ static void max6639_platform_data_plat(struct device *dev,
 		data->ppr = max6639_info->ppr - 1;
 
 	data->rpm_range = rpm_range_to_reg(max6639_info->rpm_range);
+	data->disable_therm_pin = max6639_info->disable_therm_full_speed;
 	data->polarity = max6639_info->pwm_polarity;
 }
 
@@ -459,6 +463,7 @@ static void max6639_init_defaults(struct max6639_data *data)
 	/* Fans pulse per revolution is 2 by default */
 	data->ppr = 1;
 	data->rpm_range = 1;	/* default: 4000 RPM */
+	data->disable_therm_pin = 0;
 	data->polarity = 0;
 	for (i = 0; i < 2; i++) {
 		/* Max. temp. 80C/90C/100C */
@@ -521,7 +526,10 @@ static int max6639_init_client(struct i2c_client *client,
 		 */
 		err = i2c_smbus_write_byte_data(client,
 			MAX6639_REG_FAN_CONFIG3(i),
-			MAX6639_FAN_CONFIG3_THERM_FULL_SPEED | 0x03);
+			MAX6639_FAN_CONFIG3_DISABLE_STRETCH |
+			(data->disable_therm_pin ?
+			0 : MAX6639_FAN_CONFIG3_THERM_FS) |
+			0x03);
 		if (err)
 			goto exit;
 
@@ -658,7 +666,10 @@ static void max6639_shutdown(struct i2c_client *client)
 static int max6639_suspend(struct device *dev)
 {
 	struct i2c_client *client = to_i2c_client(dev);
+<<<<<<< HEAD
 
+=======
+>>>>>>> 14ad8c19aa4e (max6639: Add devicetree support)
 	return max6639_disable(client);
 }
 
