@@ -432,6 +432,11 @@ static void max6639_platform_data_of(struct device *dev,
 	else
 		data->rpm_range = rpm_range_to_reg(tmp);
 
+	if (!of_property_read_u32(dev->of_node, "maxim,initial_pwm", &tmp) && tmp < 256) {
+		data->pwm[0] = (tmp * 120 / 255);
+		data->pwm[1] = data->pwm[0];
+	}
+
 	enabled = of_property_read_bool(dev->of_node, "maxim,pwm_polarity");
 	data->polarity = enabled;
 
