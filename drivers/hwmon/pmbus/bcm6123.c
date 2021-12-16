@@ -27,7 +27,9 @@
  */
 static struct pmbus_platform_data bcm6123_plat_data = {
 #ifdef PMBUS_ABSOLUTE_NUMBERS
-	.flags = PMBUS_ABSOLUTE_NUMBERS,
+	.flags = PMBUS_NO_CAPABILITY | PMBUS_ABSOLUTE_NUMBERS,
+#else
+	.flags = PMBUS_NO_CAPABILITY,
 #endif
 };
 
