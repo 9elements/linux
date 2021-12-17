@@ -1693,13 +1693,12 @@
 
 				regulators {
 					sw0_smb_m2_ssb_ssd1: SW0 {
-						vss1-supply = <&p3v3_aux>;
 						regulator-compatible = "SW0";
-						regulator-min-microvolt = <3300000>;
-						regulator-max-microvolt = <3300000>;
 						shunt-resistor-micro-ohms = <12000>;
 						regulator-over-current-protection;
 						regulator-oc-protection-microamp = <2800000>;
+						regulator-name = "p3v3_m2_ssd1";
+						regulator-enable-ramp-delay = <10000>;
 					};
 				};
 			};
@@ -1727,13 +1726,12 @@
 
 				regulators {
 					sw0_smb_m2_ssb_ssd2: SW0 {
-						vss1-supply = <&p3v3_aux>;
 						regulator-compatible = "SW0";
-						regulator-min-microvolt = <3300000>;
-						regulator-max-microvolt = <3300000>;
 						shunt-resistor-micro-ohms = <12000>;
 						regulator-over-current-protection;
 						regulator-oc-protection-microamp = <2800000>;
+						regulator-name = "p3v3_m2_ssd2";
+						regulator-enable-ramp-delay = <10000>;
 					};
 				};
 			};
