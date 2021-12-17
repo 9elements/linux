@@ -1251,6 +1251,8 @@ patternProperties:
   "^vdl,.*":
     description: Van der Laan b.v.
   "^via,.*":
+    description: Vicor Corporation
+  "^vicor,.*":
     description: VIA Technologies, Inc.
   "^videostrong,.*":
     description: Videostrong Technology Co., Ltd.
