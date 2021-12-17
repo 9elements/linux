@@ -3666,6 +3666,7 @@
 					shunt-resistor-micro-ohms = <12000>;
 					regulator-over-current-protection;
 					regulator-oc-protection-microamp = <3400000>;
+					regulator-enable-ramp-delay = <1000>;
 				};
 			};
 		};
@@ -3694,6 +3695,7 @@
 					shunt-resistor-micro-ohms = <12000>;
 					regulator-over-current-protection;
 					regulator-oc-protection-microamp = <3400000>;
+					regulator-enable-ramp-delay = <1000>;
 				};
 			};
 		};
@@ -3722,6 +3724,7 @@
 					shunt-resistor-micro-ohms = <12000>;
 					regulator-over-current-protection;
 					regulator-oc-protection-microamp = <3400000>;
+					regulator-enable-ramp-delay = <1000>;
 				};
 			};
 		};
@@ -3750,6 +3753,7 @@
 					shunt-resistor-micro-ohms = <12000>;
 					regulator-over-current-protection;
 					regulator-oc-protection-microamp = <3400000>;
+					regulator-enable-ramp-delay = <1000>;
 				};
 			};
 		};
@@ -3778,6 +3782,7 @@
 					shunt-resistor-micro-ohms = <12000>;
 					regulator-over-current-protection;
 					regulator-oc-protection-microamp = <3400000>;
+					regulator-enable-ramp-delay = <1000>;
 				};
 			};
 		};
@@ -3806,6 +3811,7 @@
 					shunt-resistor-micro-ohms = <12000>;
 					regulator-over-current-protection;
 					regulator-oc-protection-microamp = <3400000>;
+					regulator-enable-ramp-delay = <1000>;
 				};
 			};
 		};
@@ -3834,6 +3840,7 @@
 					shunt-resistor-micro-ohms = <12000>;
 					regulator-over-current-protection;
 					regulator-oc-protection-microamp = <3400000>;
+					regulator-enable-ramp-delay = <1000>;
 				};
 			};
 		};
@@ -3862,6 +3869,7 @@
 					shunt-resistor-micro-ohms = <12000>;
 					regulator-over-current-protection;
 					regulator-oc-protection-microamp = <3400000>;
+					regulator-enable-ramp-delay = <1000>;
 				};
 			};
 		};
@@ -3894,6 +3902,7 @@
 					shunt-resistor-micro-ohms = <12000>;
 					regulator-over-current-protection;
 					regulator-oc-protection-microamp = <3400000>;
+					regulator-enable-ramp-delay = <1000>;
 				};
 			};
 		};
@@ -3922,6 +3931,7 @@
 					shunt-resistor-micro-ohms = <12000>;
 					regulator-over-current-protection;
 					regulator-oc-protection-microamp = <3400000>;
+					regulator-enable-ramp-delay = <1000>;
 				};
 			};
 		};
@@ -3950,6 +3960,7 @@
 					shunt-resistor-micro-ohms = <12000>;
 					regulator-over-current-protection;
 					regulator-oc-protection-microamp = <3400000>;
+					regulator-enable-ramp-delay = <1000>;
 				};
 			};
 		};
@@ -3978,6 +3989,7 @@
 					shunt-resistor-micro-ohms = <12000>;
 					regulator-over-current-protection;
 					regulator-oc-protection-microamp = <3400000>;
+					regulator-enable-ramp-delay = <1000>;
 				};
 			};
 		};
@@ -4006,6 +4018,7 @@
 					shunt-resistor-micro-ohms = <12000>;
 					regulator-over-current-protection;
 					regulator-oc-protection-microamp = <3400000>;
+					regulator-enable-ramp-delay = <1000>;
 				};
 			};
 		};
@@ -4034,6 +4047,7 @@
 					shunt-resistor-micro-ohms = <12000>;
 					regulator-over-current-protection;
 					regulator-oc-protection-microamp = <3400000>;
+					regulator-enable-ramp-delay = <1000>;
 				};
 			};
 		};
@@ -4062,6 +4076,7 @@
 					shunt-resistor-micro-ohms = <12000>;
 					regulator-over-current-protection;
 					regulator-oc-protection-microamp = <3400000>;
+					regulator-enable-ramp-delay = <1000>;
 				};
 			};
 		};
@@ -4090,6 +4105,7 @@
 					shunt-resistor-micro-ohms = <12000>;
 					regulator-over-current-protection;
 					regulator-oc-protection-microamp = <3400000>;
+					regulator-enable-ramp-delay = <1000>;
 				};
 			};
 		};
@@ -4121,6 +4137,7 @@
 					shunt-resistor-micro-ohms = <12000>;
 					regulator-over-current-protection;
 					regulator-oc-protection-microamp = <3400000>;
+					regulator-enable-ramp-delay = <1000>;
 				};
 			};
 		};
@@ -4150,6 +4167,7 @@
 					shunt-resistor-micro-ohms = <12000>;
 					regulator-over-current-protection;
 					regulator-oc-protection-microamp = <3400000>;
+					regulator-enable-ramp-delay = <1000>;
 				};
 			};
 		};
@@ -4179,6 +4197,7 @@
 					shunt-resistor-micro-ohms = <12000>;
 					regulator-over-current-protection;
 					regulator-oc-protection-microamp = <3400000>;
+					regulator-enable-ramp-delay = <1000>;
 				};
 			};
 		};
@@ -4207,6 +4226,7 @@
 					shunt-resistor-micro-ohms = <12000>;
 					regulator-over-current-protection;
 					regulator-oc-protection-microamp = <3400000>;
+					regulator-enable-ramp-delay = <1000>;
 				};
 			};
 		};
@@ -4235,6 +4255,7 @@
 					shunt-resistor-micro-ohms = <12000>;
 					regulator-over-current-protection;
 					regulator-oc-protection-microamp = <3400000>;
+					regulator-enable-ramp-delay = <1000>;
 				};
 			};
 		};
@@ -4263,6 +4284,7 @@
 					shunt-resistor-micro-ohms = <12000>;
 					regulator-over-current-protection;
 					regulator-oc-protection-microamp = <3400000>;
+					regulator-enable-ramp-delay = <1000>;
 				};
 			};
 		};
@@ -4291,6 +4313,7 @@
 					shunt-resistor-micro-ohms = <12000>;
 					regulator-over-current-protection;
 					regulator-oc-protection-microamp = <3400000>;
+					regulator-enable-ramp-delay = <1000>;
 				};
 			};
 		};
@@ -4319,6 +4342,7 @@
 					shunt-resistor-micro-ohms = <12000>;
 					regulator-over-current-protection;
 					regulator-oc-protection-microamp = <3400000>;
+					regulator-enable-ramp-delay = <1000>;
 				};
 			};
 		};
@@ -4351,6 +4375,7 @@
 					shunt-resistor-micro-ohms = <100000>;
 					regulator-over-current-protection;
 					regulator-oc-protection-microamp = <410000>;
+					regulator-enable-ramp-delay = <1000>;
 				};
 				sw1_ssb_rssd19: SW1 {
 					vss2-supply = <&p12v_a>;
@@ -4361,6 +4386,7 @@
 					shunt-resistor-micro-ohms = <9000>;
 					regulator-over-current-protection;
 					regulator-oc-protection-microamp = <4500000>;
+					regulator-enable-ramp-delay = <1000>;
 				};
 			};
 		};
@@ -4390,6 +4416,7 @@
 					shunt-resistor-micro-ohms = <100000>;
 					regulator-over-current-protection;
 					regulator-oc-protection-microamp = <410000>;
+					regulator-enable-ramp-delay = <1000>;
 				};
 				sw1_ssb_rssd18: SW1 {
 					vss2-supply = <&p12v_a>;
@@ -4400,6 +4427,7 @@
 					shunt-resistor-micro-ohms = <9000>;
 					regulator-over-current-protection;
 					regulator-oc-protection-microamp = <4500000>;
+					regulator-enable-ramp-delay = <1000>;
 				};
 			};
 		};
@@ -4429,6 +4457,7 @@
 					shunt-resistor-micro-ohms = <100000>;
 					regulator-over-current-protection;
 					regulator-oc-protection-microamp = <410000>;
+					regulator-enable-ramp-delay = <1000>;
 				};
 				sw1_ssb_rssd17: SW1 {
 					vss2-supply = <&p12v_a>;
@@ -4439,6 +4468,7 @@
 					shunt-resistor-micro-ohms = <9000>;
 					regulator-over-current-protection;
 					regulator-oc-protection-microamp = <4500000>;
+					regulator-enable-ramp-delay = <1000>;
 				};
 			};
 		};
@@ -4468,6 +4498,7 @@
 					shunt-resistor-micro-ohms = <100000>;
 					regulator-over-current-protection;
 					regulator-oc-protection-microamp = <410000>;
+					regulator-enable-ramp-delay = <1000>;
 				};
 				sw1_ssb_rssd20: SW1 {
 					vss2-supply = <&p12v_a>;
@@ -4478,6 +4509,7 @@
 					shunt-resistor-micro-ohms = <9000>;
 					regulator-over-current-protection;
 					regulator-oc-protection-microamp = <4500000>;
+					regulator-enable-ramp-delay = <1000>;
 				};
 			};
 		};
@@ -4507,6 +4539,7 @@
 					shunt-resistor-micro-ohms = <100000>;
 					regulator-over-current-protection;
 					regulator-oc-protection-microamp = <410000>;
+					regulator-enable-ramp-delay = <1000>;
 				};
 				sw1_ssb_rssd21: SW1 {
 					vss2-supply = <&p12v_a>;
@@ -4517,6 +4550,7 @@
 					shunt-resistor-micro-ohms = <9000>;
 					regulator-over-current-protection;
 					regulator-oc-protection-microamp = <4500000>;
+					regulator-enable-ramp-delay = <1000>;
 				};
 			};
 		};
@@ -4546,6 +4580,7 @@
 					shunt-resistor-micro-ohms = <100000>;
 					regulator-over-current-protection;
 					regulator-oc-protection-microamp = <410000>;
+					regulator-enable-ramp-delay = <1000>;
 				};
 				sw1_ssb_rssd22: SW1 {
 					vss2-supply = <&p12v_a>;
@@ -4556,6 +4591,7 @@
 					shunt-resistor-micro-ohms = <9000>;
 					regulator-over-current-protection;
 					regulator-oc-protection-microamp = <4500000>;
+					regulator-enable-ramp-delay = <1000>;
 				};
 			};
 		};
@@ -4585,6 +4621,7 @@
 					shunt-resistor-micro-ohms = <100000>;
 					regulator-over-current-protection;
 					regulator-oc-protection-microamp = <410000>;
+					regulator-enable-ramp-delay = <1000>;
 				};
 				sw1_ssb_rssd24: SW1 {
 					vss2-supply = <&p12v_a>;
@@ -4595,6 +4632,7 @@
 					shunt-resistor-micro-ohms = <9000>;
 					regulator-over-current-protection;
 					regulator-oc-protection-microamp = <4500000>;
+					regulator-enable-ramp-delay = <1000>;
 				};
 			};
 		};
@@ -4624,6 +4662,7 @@
 					shunt-resistor-micro-ohms = <100000>;
 					regulator-over-current-protection;
 					regulator-oc-protection-microamp = <410000>;
+					regulator-enable-ramp-delay = <1000>;
 				};
 				sw1_ssb_rssd23: SW1 {
 					vss2-supply = <&p12v_a>;
@@ -4634,6 +4673,7 @@
 					shunt-resistor-micro-ohms = <9000>;
 					regulator-over-current-protection;
 					regulator-oc-protection-microamp = <4500000>;
+					regulator-enable-ramp-delay = <1000>;
 				};
 			};
 		};
@@ -4666,6 +4706,7 @@
 					shunt-resistor-micro-ohms = <100000>;
 					regulator-over-current-protection;
 					regulator-oc-protection-microamp = <410000>;
+					regulator-enable-ramp-delay = <1000>;
 				};
 				sw1_ssb_rssd25: SW1 {
 					vss2-supply = <&p12v_a>;
@@ -4676,6 +4717,7 @@
 					shunt-resistor-micro-ohms = <9000>;
 					regulator-over-current-protection;
 					regulator-oc-protection-microamp = <4500000>;
+					regulator-enable-ramp-delay = <1000>;
 				};
 			};
 		};
@@ -4705,6 +4747,7 @@
 					shunt-resistor-micro-ohms = <100000>;
 					regulator-over-current-protection;
 					regulator-oc-protection-microamp = <410000>;
+					regulator-enable-ramp-delay = <1000>;
 				};
 				sw1_ssb_rssd26: SW1 {
 					vss2-supply = <&p12v_a>;
@@ -4715,6 +4758,7 @@
 					shunt-resistor-micro-ohms = <9000>;
 					regulator-over-current-protection;
 					regulator-oc-protection-microamp = <4500000>;
+					regulator-enable-ramp-delay = <1000>;
 				};
 			};
 		};
@@ -4744,6 +4788,7 @@
 					shunt-resistor-micro-ohms = <100000>;
 					regulator-over-current-protection;
 					regulator-oc-protection-microamp = <410000>;
+					regulator-enable-ramp-delay = <1000>;
 				};
 				sw1_ssb_rssd27: SW1 {
 					vss2-supply = <&p12v_a>;
@@ -4754,6 +4799,7 @@
 					shunt-resistor-micro-ohms = <9000>;
 					regulator-over-current-protection;
 					regulator-oc-protection-microamp = <4500000>;
+					regulator-enable-ramp-delay = <1000>;
 				};
 			};
 		};
@@ -4783,6 +4829,7 @@
 					shunt-resistor-micro-ohms = <100000>;
 					regulator-over-current-protection;
 					regulator-oc-protection-microamp = <410000>;
+					regulator-enable-ramp-delay = <1000>;
 				};
 				sw1_ssb_rssd32: SW1 {
 					vss2-supply = <&p12v_a>;
@@ -4793,6 +4840,7 @@
 					shunt-resistor-micro-ohms = <9000>;
 					regulator-over-current-protection;
 					regulator-oc-protection-microamp = <4500000>;
+					regulator-enable-ramp-delay = <1000>;
 				};
 			};
 		};
@@ -4822,6 +4870,7 @@
 					shunt-resistor-micro-ohms = <100000>;
 					regulator-over-current-protection;
 					regulator-oc-protection-microamp = <410000>;
+					regulator-enable-ramp-delay = <1000>;
 				};
 				sw1_ssb_rssd31: SW1 {
 					vss2-supply = <&p12v_a>;
@@ -4832,6 +4881,7 @@
 					shunt-resistor-micro-ohms = <9000>;
 					regulator-over-current-protection;
 					regulator-oc-protection-microamp = <4500000>;
+					regulator-enable-ramp-delay = <1000>;
 				};
 			};
 		};
@@ -4861,6 +4911,7 @@
 					shunt-resistor-micro-ohms = <100000>;
 					regulator-over-current-protection;
 					regulator-oc-protection-microamp = <410000>;
+					regulator-enable-ramp-delay = <1000>;
 				};
 				sw1_ssb_rssd30: SW1 {
 					vss2-supply = <&p12v_a>;
@@ -4871,6 +4922,7 @@
 					shunt-resistor-micro-ohms = <9000>;
 					regulator-over-current-protection;
 					regulator-oc-protection-microamp = <4500000>;
+					regulator-enable-ramp-delay = <1000>;
 				};
 			};
 		};
@@ -4900,6 +4952,7 @@
 					shunt-resistor-micro-ohms = <100000>;
 					regulator-over-current-protection;
 					regulator-oc-protection-microamp = <410000>;
+					regulator-enable-ramp-delay = <1000>;
 				};
 				sw1_ssb_rssd29: SW1 {
 					vss2-supply = <&p12v_a>;
@@ -4910,6 +4963,7 @@
 					shunt-resistor-micro-ohms = <9000>;
 					regulator-over-current-protection;
 					regulator-oc-protection-microamp = <4500000>;
+					regulator-enable-ramp-delay = <1000>;
 				};
 			};
 		};
@@ -4939,6 +4993,7 @@
 					shunt-resistor-micro-ohms = <100000>;
 					regulator-over-current-protection;
 					regulator-oc-protection-microamp = <410000>;
+					regulator-enable-ramp-delay = <1000>;
 				};
 				sw1_ssb_rssd28: SW1 {
 					vss2-supply = <&p12v_a>;
@@ -4949,6 +5004,7 @@
 					shunt-resistor-micro-ohms = <9000>;
 					regulator-over-current-protection;
 					regulator-oc-protection-microamp = <4500000>;
+					regulator-enable-ramp-delay = <1000>;
 				};
 			};
 		};
@@ -5374,6 +5430,7 @@
 					shunt-resistor-micro-ohms = <100000>;
 					regulator-over-current-protection;
 					regulator-oc-protection-microamp = <410000>;
+					regulator-enable-ramp-delay = <1000>;
 				};
 				sw1_ssb_rssd03: SW1 {
 					vss2-supply = <&p12v_a>;
@@ -5384,6 +5441,7 @@
 					shunt-resistor-micro-ohms = <9000>;
 					regulator-over-current-protection;
 					regulator-oc-protection-microamp = <4500000>;
+					regulator-enable-ramp-delay = <1000>;
 				};
 			};
 		};
@@ -5413,6 +5471,7 @@
 					shunt-resistor-micro-ohms = <100000>;
 					regulator-over-current-protection;
 					regulator-oc-protection-microamp = <410000>;
+					regulator-enable-ramp-delay = <1000>;
 				};
 				sw1_ssb_rssd02: SW1 {
 					vss2-supply = <&p12v_a>;
@@ -5423,6 +5482,7 @@
 					shunt-resistor-micro-ohms = <9000>;
 					regulator-over-current-protection;
 					regulator-oc-protection-microamp = <4500000>;
+					regulator-enable-ramp-delay = <1000>;
 				};
 			};
 		};
@@ -5452,6 +5512,7 @@
 					shunt-resistor-micro-ohms = <100000>;
 					regulator-over-current-protection;
 					regulator-oc-protection-microamp = <410000>;
+					regulator-enable-ramp-delay = <1000>;
 				};
 				sw1_ssb_rssd01: SW1 {
 					vss2-supply = <&p12v_a>;
@@ -5462,6 +5523,7 @@
 					shunt-resistor-micro-ohms = <9000>;
 					regulator-over-current-protection;
 					regulator-oc-protection-microamp = <4500000>;
+					regulator-enable-ramp-delay = <1000>;
 				};
 			};
 		};
@@ -5491,6 +5553,7 @@
 					shunt-resistor-micro-ohms = <100000>;
 					regulator-over-current-protection;
 					regulator-oc-protection-microamp = <410000>;
+					regulator-enable-ramp-delay = <1000>;
 				};
 				sw1_ssb_rssd04: SW1 {
 					vss2-supply = <&p12v_a>;
@@ -5501,6 +5564,7 @@
 					shunt-resistor-micro-ohms = <9000>;
 					regulator-over-current-protection;
 					regulator-oc-protection-microamp = <4500000>;
+					regulator-enable-ramp-delay = <1000>;
 				};
 			};
 		};
@@ -5530,6 +5594,7 @@
 					shunt-resistor-micro-ohms = <100000>;
 					regulator-over-current-protection;
 					regulator-oc-protection-microamp = <410000>;
+					regulator-enable-ramp-delay = <1000>;
 				};
 				sw1_ssb_rssd05: SW1 {
 					vss2-supply = <&p12v_a>;
@@ -5540,6 +5605,7 @@
 					shunt-resistor-micro-ohms = <9000>;
 					regulator-over-current-protection;
 					regulator-oc-protection-microamp = <4500000>;
+					regulator-enable-ramp-delay = <1000>;
 				};
 			};
 		};
@@ -5569,6 +5635,7 @@
 					shunt-resistor-micro-ohms = <100000>;
 					regulator-over-current-protection;
 					regulator-oc-protection-microamp = <410000>;
+					regulator-enable-ramp-delay = <1000>;
 				};
 				sw1_ssb_rssd08: SW1 {
 					vss2-supply = <&p12v_a>;
@@ -5579,6 +5646,7 @@
 					shunt-resistor-micro-ohms = <9000>;
 					regulator-over-current-protection;
 					regulator-oc-protection-microamp = <4500000>;
+					regulator-enable-ramp-delay = <1000>;
 				};
 			};
 		};
@@ -5608,6 +5676,7 @@
 					shunt-resistor-micro-ohms = <100000>;
 					regulator-over-current-protection;
 					regulator-oc-protection-microamp = <410000>;
+					regulator-enable-ramp-delay = <1000>;
 				};
 				sw1_ssb_rssd07: SW1 {
 					vss2-supply = <&p12v_a>;
@@ -5618,6 +5687,7 @@
 					shunt-resistor-micro-ohms = <9000>;
 					regulator-over-current-protection;
 					regulator-oc-protection-microamp = <4500000>;
+					regulator-enable-ramp-delay = <1000>;
 				};
 			};
 		};
@@ -5647,6 +5717,7 @@
 					shunt-resistor-micro-ohms = <100000>;
 					regulator-over-current-protection;
 					regulator-oc-protection-microamp = <410000>;
+					regulator-enable-ramp-delay = <1000>;
 				};
 				sw1_ssb_rssd06: SW1 {
 					vss2-supply = <&p12v_a>;
@@ -5657,6 +5728,7 @@
 					shunt-resistor-micro-ohms = <9000>;
 					regulator-over-current-protection;
 					regulator-oc-protection-microamp = <4500000>;
+					regulator-enable-ramp-delay = <1000>;
 				};
 			};
 		};
@@ -5689,6 +5761,7 @@
 					shunt-resistor-micro-ohms = <100000>;
 					regulator-over-current-protection;
 					regulator-oc-protection-microamp = <410000>;
+					regulator-enable-ramp-delay = <1000>;
 				};
 				sw1_ssb_rssd14: SW1 {
 					vss2-supply = <&p12v_a>;
@@ -5699,6 +5772,7 @@
 					shunt-resistor-micro-ohms = <9000>;
 					regulator-over-current-protection;
 					regulator-oc-protection-microamp = <4500000>;
+					regulator-enable-ramp-delay = <1000>;
 				};
 			};
 		};
@@ -5728,6 +5802,7 @@
 					shunt-resistor-micro-ohms = <100000>;
 					regulator-over-current-protection;
 					regulator-oc-protection-microamp = <410000>;
+					regulator-enable-ramp-delay = <1000>;
 				};
 				sw1_ssb_rssd13: SW1 {
 					vss2-supply = <&p12v_a>;
@@ -5738,6 +5813,7 @@
 					shunt-resistor-micro-ohms = <9000>;
 					regulator-over-current-protection;
 					regulator-oc-protection-microamp = <4500000>;
+					regulator-enable-ramp-delay = <1000>;
 				};
 			};
 		};
@@ -5767,6 +5843,7 @@
 					shunt-resistor-micro-ohms = <100000>;
 					regulator-over-current-protection;
 					regulator-oc-protection-microamp = <410000>;
+					regulator-enable-ramp-delay = <1000>;
 				};
 				sw1_ssb_rssd12: SW1 {
 					vss2-supply = <&p12v_a>;
@@ -5777,6 +5854,7 @@
 					shunt-resistor-micro-ohms = <9000>;
 					regulator-over-current-protection;
 					regulator-oc-protection-microamp = <4500000>;
+					regulator-enable-ramp-delay = <1000>;
 				};
 			};
 		};
@@ -5806,6 +5884,7 @@
 					shunt-resistor-micro-ohms = <100000>;
 					regulator-over-current-protection;
 					regulator-oc-protection-microamp = <410000>;
+					regulator-enable-ramp-delay = <1000>;
 				};
 				sw1_ssb_rssd11: SW1 {
 					vss2-supply = <&p12v_a>;
@@ -5816,6 +5895,7 @@
 					shunt-resistor-micro-ohms = <9000>;
 					regulator-over-current-protection;
 					regulator-oc-protection-microamp = <4500000>;
+					regulator-enable-ramp-delay = <1000>;
 				};
 			};
 		};
@@ -5845,6 +5925,7 @@
 					shunt-resistor-micro-ohms = <100000>;
 					regulator-over-current-protection;
 					regulator-oc-protection-microamp = <410000>;
+					regulator-enable-ramp-delay = <1000>;
 				};
 				sw1_ssb_rssd10: SW1 {
 					vss2-supply = <&p12v_a>;
@@ -5855,6 +5936,7 @@
 					shunt-resistor-micro-ohms = <9000>;
 					regulator-over-current-protection;
 					regulator-oc-protection-microamp = <4500000>;
+					regulator-enable-ramp-delay = <1000>;
 				};
 			};
 		};
@@ -5884,6 +5966,7 @@
 					shunt-resistor-micro-ohms = <100000>;
 					regulator-over-current-protection;
 					regulator-oc-protection-microamp = <410000>;
+					regulator-enable-ramp-delay = <1000>;
 				};
 				sw1_ssb_rssd09: SW1 {
 					vss2-supply = <&p12v_a>;
@@ -5894,6 +5977,7 @@
 					shunt-resistor-micro-ohms = <9000>;
 					regulator-over-current-protection;
 					regulator-oc-protection-microamp = <4500000>;
+					regulator-enable-ramp-delay = <1000>;
 				};
 			};
 		};
@@ -5923,6 +6007,7 @@
 					shunt-resistor-micro-ohms = <100000>;
 					regulator-over-current-protection;
 					regulator-oc-protection-microamp = <410000>;
+					regulator-enable-ramp-delay = <1000>;
 				};
 				sw1_ssb_rssd15: SW1 {
 					vss2-supply = <&p12v_a>;
@@ -5933,6 +6018,7 @@
 					shunt-resistor-micro-ohms = <9000>;
 					regulator-over-current-protection;
 					regulator-oc-protection-microamp = <4500000>;
+					regulator-enable-ramp-delay = <1000>;
 				};
 			};
 		};
@@ -5962,6 +6048,7 @@
 					shunt-resistor-micro-ohms = <100000>;
 					regulator-over-current-protection;
 					regulator-oc-protection-microamp = <410000>;
+					regulator-enable-ramp-delay = <1000>;
 				};
 				sw1_ssb_rssd16: SW1 {
 					vss2-supply = <&p12v_a>;
@@ -5972,6 +6059,7 @@
 					shunt-resistor-micro-ohms = <9000>;
 					regulator-over-current-protection;
 					regulator-oc-protection-microamp = <4500000>;
+					regulator-enable-ramp-delay = <1000>;
 				};
 			};
 		};
