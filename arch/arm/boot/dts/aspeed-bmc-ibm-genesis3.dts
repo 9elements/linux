@@ -1339,6 +1339,11 @@
 	status = "okay";
 };
 
+// FIXME: This is not upstream yet
+&espi_ctrl {
+	status = "okay";
+};
+
 &mac0 {
 	status = "okay";
 
