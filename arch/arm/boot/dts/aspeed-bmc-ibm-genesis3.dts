@@ -1337,11 +1337,26 @@
 
 &uart5 {
 	status = "okay";
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_txd1_default
+			&pinctrl_rxd1_default
+			&pinctrl_nrts1_default
+			&pinctrl_ndtr1_default
+			&pinctrl_ndsr1_default
+			&pinctrl_ncts1_default
+			&pinctrl_ndcd1_default
+			&pinctrl_nri1_default>;
 };
 
 // FIXME: This is not upstream yet
 &espi_ctrl {
 	status = "okay";
+};
+
+&pinctrl {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_vgahs_default &pinctrl_vgavs_default
+			&pinctrl_ddcclk_default &pinctrl_ddcdat_default>;
 };
 
 &mac0 {
@@ -1399,17 +1414,6 @@
 	};
 #endif
 };
-
-&lpc_snoop {
-	status = "okay";
-	snoop-ports = <0x80>;
-};
-
-&lpc_ctrl {
-	//Enable lpc clock
-	status = "okay";
-};
-
 
 &gfx {
      status = "okay";
