@@ -1,0 +1,44 @@
+# SPDX-License-Identifier: (GPL-2.0 OR BSD-2-Clause)
+%YAML 1.2
+---
+
+$id: http://devicetree.org/schemas/hwmon/pmbus/vicor,bcm6123.yaml#
+$schema: http://devicetree.org/meta-schemas/core.yaml#
+
+title: Vicor Corporation BCM6123 Bus Converter
+
+maintainers:
+  - Patrick Rudolph <patrick.rudolph@9elements.com>
+
+description: |
+  The BCM6123 is an isolated Fixed-Ratio DC-DC Converter,
+  operating from a 260V to 410V primary bus to deliver an unregulated
+  ratiometric secondary voltage.
+
+  Datasheet: https://www.vicorpower.com/documents/datasheets/ds_BCM6123xD1E5135yzz.pdf
+
+properties:
+  compatible:
+    enum:
+      - vicor,bcm6123
+
+  reg:
+    maxItems: 1
+
+required:
+  - compatible
+  - reg
+
+additionalProperties: false
+
+examples:
+  - |
+    i2c {
+        #address-cells = <1>;
+        #size-cells = <0>;
+
+        bcm6123@5f {
+            compatible = "vicor,bcm6123";
+            reg = <0x5f>;
+        };
+    };
