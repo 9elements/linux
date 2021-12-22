@@ -1461,8 +1461,8 @@
 	/*B0-B7*/	"","","","","","","","",
 	/*C0-C7*/	"","","","","","","","",
 	/*D0-D7*/	"","","","","","RST_RTCRST_N","","",
-	/*E0-E7*/	"BMC_PEX_IRQ_INT","","SMB_PEX_VR_CTRL_INT","","PWRGD_CPUPWRGD","",
-			"SMB_SVC_PEX_CPU12_LED_INT","BMC_MAC0_RESET_N",
+	/*E0-E7*/	"BMC_PEX_IRQ_INT","RTC_BATT_TEST","SMB_PEX_VR_CTRL_INT","",
+			"PWRGD_CPUPWRGD","","SMB_SVC_PEX_CPU12_LED_INT","BMC_MAC0_RESET_N",
 	/*F0-F7*/	"","","","BMC_MUX_CPU1_RST_INT_N","BMC_MUX_CPU2_RST_INT_N",
 			"BMC_MUX_CPU3_RST_INT_N","","",
 	/*G0-G7*/	"FM_SSD_CLK_DRVR1_EN","","BMC_MAC1_RESET_N","","FM_CPU_MSMI_LVT3_N",
@@ -1501,6 +1501,8 @@
 			"JTAG_MUX_MSTR_SEL","BMC_MUX_FANPWM_RSSD01_16_RST_INT_N","","","",
 	/*AB0-AB7*/	"","JTAG_MUX_LSP_SEL3","RST_PCIE_PCH_PERST_N","","","","","",
 	/*AC0-AC7*/	"","","","","","","","";
+
+	gpio-reserved-ranges = <30 2>, <40 1>, <46 2>, <54 1>, <62 2>, <64 8>, <73 1>, <150 1>, <192 6>;
 };
 
 &i2c1 { // BMC_MUX_NIC
