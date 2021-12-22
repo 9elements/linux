@@ -75,7 +75,12 @@
 		// Voltage sensors top to down
 		io-channels = <&p12v_vd 0>, <&p5v_aux_vd 0>, <&p5v_bmc_aux_vd 0>, <&p3v3_aux_vd 0>,
 			<&p3v3_bmc_aux_vd 0>, <&p1v8_bmc_aux_vd 0>, <&adc 12>, <&adc 2>, <&adc 8>,
-			<&p2V5_aux_vd 0>, <&rtc_bat_vd 0>;
+			<&p2V5_aux_vd 0>;
+	};
+
+	iio-hwmon-rtcbat {
+		compatible = "iio-hwmon";
+		io-channels = <&rtc_bat_vd 0>;
 	};
 
 	p12v_vd: voltage_divider1 {
