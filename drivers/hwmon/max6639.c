@@ -412,6 +412,33 @@ static int rpm_range_to_reg(int range)
 	return 1; /* default: 4000 RPM */
 }
 
+static struct max6639_platform_data *get_pdata_from_dt_node(struct device *dev)
+{
+	struct max6639_platform_data *pdata;
+	u32 ppr, rpm;
+	int ret;
+
+	pdata = devm_kzalloc(dev, sizeof(*pdata), GFP_KERNEL);
+	if (!pdata)
+		return ERR_PTR(-ENOMEM);
+
+	ret = of_property_read_u32(dev->of_node, "maxim,pulses_per_revolution", &ppr);
+	if (ret < 0)
+		dev_warn(dev, "No pulses_per_revolution property\n");
+	else
+		pdata->ppr = ppr;
+
+	ret = of_property_read_u32(dev->of_node, "maxim,rpm_range", &rpm);
+	if (ret < 0)
+		dev_warn(dev, "no rpm_range property\n");
+	else
+		pdata->rpm_range = rpm;
+
+	pdata->pwm_polarity = of_property_read_bool(dev->of_node, "maxim,pwm_polarity");
+
+	return pdata;
+}
+
 static int max6639_init_client(struct i2c_client *client,
 			       struct max6639_data *data)
 {
@@ -420,6 +447,12 @@ static int max6639_init_client(struct i2c_client *client,
 	int i;
 	int rpm_range = 1; /* default: 4000 RPM */
 	int err;
+
+	if (!max6639_info && client->dev.of_node) {
+		max6639_info = get_pdata_from_dt_node(&client->dev);
+		if (IS_ERR(max6639_info))
+			return PTR_ERR(max6639_info);
+	}
 
 	/* Reset chip to default values, see below for GCONFIG setup */
 	err = i2c_smbus_write_byte_data(client, MAX6639_REG_GCONFIG,
@@ -631,6 +664,14 @@ static const struct i2c_device_id max6639_id[] = {
 
 MODULE_DEVICE_TABLE(i2c, max6639_id);
 
+#ifdef CONFIG_OF
+static const struct of_device_id maxim_of_platform_match[] = {
+	{.compatible = "maxim,max6639"},
+	{},
+};
+MODULE_DEVICE_TABLE(of, maxim_of_platform_match);
+#endif
+
 static SIMPLE_DEV_PM_OPS(max6639_pm_ops, max6639_suspend, max6639_resume);
 
 static struct i2c_driver max6639_driver = {
@@ -638,6 +679,7 @@ static struct i2c_driver max6639_driver = {
 	.driver = {
 		   .name = "max6639",
 		   .pm = &max6639_pm_ops,
+		   .of_match_table = of_match_ptr(maxim_of_platform_match),
 		   },
 	.probe_new = max6639_probe,
 	.id_table = max6639_id,
