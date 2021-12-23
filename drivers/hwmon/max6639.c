@@ -446,6 +446,7 @@ static int max6639_init_client(struct i2c_client *client,
 		dev_get_platdata(&client->dev);
 	int i;
 	int rpm_range = 1; /* default: 4000 RPM */
+	bool disable_therm_full_speed = false;
 	int err;
 
 	if (!max6639_info && client->dev.of_node) {
@@ -471,6 +472,10 @@ static int max6639_init_client(struct i2c_client *client,
 	if (max6639_info)
 		rpm_range = rpm_range_to_reg(max6639_info->rpm_range);
 	data->rpm_range = rpm_range;
+
+	if (client->dev.of_node)
+		disable_therm_full_speed = of_property_read_bool(client->dev.of_node,
+				"maxim,disable_therm_full_speed");
 
 	for (i = 0; i < 2; i++) {
 
@@ -504,7 +509,8 @@ static int max6639_init_client(struct i2c_client *client,
 		 */
 		err = i2c_smbus_write_byte_data(client,
 			MAX6639_REG_FAN_CONFIG3(i),
-			MAX6639_FAN_CONFIG3_THERM_FULL_SPEED | 0x03);
+			(disable_therm_full_speed ?
+			 0 : MAX6639_FAN_CONFIG3_THERM_FULL_SPEED) | 0x03);
 		if (err)
 			goto exit;
 
