@@ -10,6 +10,7 @@ BRANCHES=$(git branch --list -r |grep $PREFIX|xargs)
 for b in ${BRANCHES}; do
   if [ "${b}" == "${PREFIX}" ]; then continue; fi
   if [ "${b}" == "${PREFIX}_base" ]; then continue; fi
+  if [[ "${b}" =~ "${PREFIX}-"[0-9]* ]]; then continue; fi
 
   echo "Commits on branch ${b}:"
   commits=$(git log --oneline ${b}...origin/dev-5.15_base --no-decorate --reverse| cut -d' ' -f1)
