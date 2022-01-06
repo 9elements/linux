@@ -1440,6 +1440,14 @@
 		spi-max-frequency = <50000000>;
 #include "openbmc-flash-layout.dtsi"
 	};
+
+	flash@1 {
+		status = "okay";
+		m25p,fast-read;
+		label = "alt-bmc";
+		spi-max-frequency = <50000000>;
+#include "openbmc-flash-layout.dtsi"
+	};
 };
 
 &uart5 {
