@@ -1462,7 +1462,7 @@
 	/*D0-D7*/	"","","","","","RST_RTCRST_N","","",
 	/*E0-E7*/	"BMC_PEX_IRQ_INT","RTC_BATT_TEST","SMB_PEX_VR_CTRL_INT","",
 			"PWRGD_CPUPWRGD","","SMB_SVC_PEX_CPU12_LED_INT","BMC_MAC0_RESET_N",
-	/*F0-F7*/	"","","","BMC_MUX_CPU1_RST_INT_N","BMC_MUX_CPU2_RST_INT_N",
+	/*F0-F7*/	"","","","BMC_MUX_CPU1_RST_INT_N","",
 			"","","",
 	/*G0-G7*/	"FM_SSD_CLK_DRVR1_EN","","BMC_MAC1_RESET_N","","FM_CPU_MSMI_LVT3_N",
 			"FM_CPU_CATERR_LVT3_N","","XDP_SYSPWROK",
@@ -1501,7 +1501,7 @@
 	/*AB0-AB7*/	"","JTAG_MUX_LSP_SEL3","RST_PCIE_PCH_PERST_N","","","","","",
 	/*AC0-AC7*/	"","","","","","","","";
 
-	gpio-reserved-ranges = <30 2>, <40 1>, <45 3>, <54 1>, <62 2>, <64 8>, <73 1>, <150 1>, <192 6>;
+	gpio-reserved-ranges = <8 8>, <24 5>, <30 2>, <40 1>, <45 3>, <54 1>, <60 12>, <73 1>, <150 1>, <192 6>;
 };
 
 &i2c1 { // BMC_MUX_NIC
@@ -1866,6 +1866,7 @@
 				/* GPB */ "", "", "", "",
 					  "H_LVT3_CPLD0_THERMTRIP_N", "H_LVT3_CPLD0_FIVR_FAULT",
 					  "H_LVT3_CPLD3_THERMTRIP_N", "H_LVT3_CPLD3_FIVR_FAULT";
+				gpio-reserved-ranges = <8 4>;
 			};
 		};
 		i2c@5 { // SMB_PEX_CPU12_FAULT_ID
@@ -1894,7 +1895,7 @@
 				/* GPB */ "", "", "", "",
 					  "H_LVT3_CPLD1_THERMTRIP_N", "H_LVT3_CPLD1_FIVR_FAULT",
 					  "H_LVT3_CPLD2_THERMTRIP_N", "H_LVT3_CPLD2_FIVR_FAULT";
-
+				gpio-reserved-ranges = <8 4>;
 			};
 		};
 	};
