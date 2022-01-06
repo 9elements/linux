@@ -70,6 +70,56 @@
 			<&fan24_ssb 0>, <&fan24_ssb 1>;
 	};
 
+	iio-hwmon-rssbs {
+		compatible = "iio-hwmon";
+		// Voltage and current sensors
+		io-channels = <&ssb_rssd01 0>, <&ssb_rssd01 1>, <&ssb_rssd01 2>, <&ssb_rssd01 3>,
+			<&ssb_rssd02 0>, <&ssb_rssd02 1>, <&ssb_rssd02 2>, <&ssb_rssd02 3>,
+			<&ssb_rssd03 0>, <&ssb_rssd03 1>, <&ssb_rssd03 2>, <&ssb_rssd03 3>,
+			<&ssb_rssd04 0>, <&ssb_rssd04 1>, <&ssb_rssd04 2>, <&ssb_rssd04 3>,
+			<&ssb_rssd05 0>, <&ssb_rssd05 1>, <&ssb_rssd05 2>, <&ssb_rssd05 3>,
+			<&ssb_rssd06 0>, <&ssb_rssd06 1>, <&ssb_rssd06 2>, <&ssb_rssd06 3>,
+			<&ssb_rssd07 0>, <&ssb_rssd07 1>, <&ssb_rssd07 2>, <&ssb_rssd07 3>,
+			<&ssb_rssd08 0>, <&ssb_rssd08 1>, <&ssb_rssd08 2>, <&ssb_rssd08 3>,
+			<&ssb_rssd09 0>, <&ssb_rssd09 1>, <&ssb_rssd09 2>, <&ssb_rssd09 3>,
+			<&ssb_rssd10 0>, <&ssb_rssd10 1>, <&ssb_rssd10 2>, <&ssb_rssd10 3>,
+			<&ssb_rssd11 0>, <&ssb_rssd11 1>, <&ssb_rssd11 2>, <&ssb_rssd11 3>,
+			<&ssb_rssd12 0>, <&ssb_rssd12 1>, <&ssb_rssd12 2>, <&ssb_rssd12 3>,
+			<&ssb_rssd13 0>, <&ssb_rssd13 1>, <&ssb_rssd13 2>, <&ssb_rssd13 3>,
+			<&ssb_rssd14 0>, <&ssb_rssd14 1>, <&ssb_rssd14 2>, <&ssb_rssd14 3>,
+			<&ssb_rssd15 0>, <&ssb_rssd15 1>, <&ssb_rssd15 2>, <&ssb_rssd15 3>,
+			<&ssb_rssd16 0>, <&ssb_rssd16 1>, <&ssb_rssd16 2>, <&ssb_rssd16 3>,
+			<&ssb_rssd17 0>, <&ssb_rssd17 1>, <&ssb_rssd17 2>, <&ssb_rssd17 3>,
+			<&ssb_rssd18 0>, <&ssb_rssd18 1>, <&ssb_rssd18 2>, <&ssb_rssd18 3>,
+			<&ssb_rssd19 0>, <&ssb_rssd19 1>, <&ssb_rssd19 2>, <&ssb_rssd19 3>,
+			<&ssb_rssd20 0>, <&ssb_rssd20 1>, <&ssb_rssd20 2>, <&ssb_rssd20 3>,
+			<&ssb_rssd21 0>, <&ssb_rssd21 1>, <&ssb_rssd21 2>, <&ssb_rssd21 3>,
+			<&ssb_rssd22 0>, <&ssb_rssd22 1>, <&ssb_rssd22 2>, <&ssb_rssd22 3>,
+			<&ssb_rssd23 0>, <&ssb_rssd23 1>, <&ssb_rssd23 2>, <&ssb_rssd23 3>,
+			<&ssb_rssd24 0>, <&ssb_rssd24 1>, <&ssb_rssd24 2>, <&ssb_rssd24 3>,
+			<&ssb_rssd25 0>, <&ssb_rssd25 1>, <&ssb_rssd25 2>, <&ssb_rssd25 3>,
+			<&ssb_rssd26 0>, <&ssb_rssd26 1>, <&ssb_rssd26 2>, <&ssb_rssd26 3>,
+			<&ssb_rssd27 0>, <&ssb_rssd27 1>, <&ssb_rssd27 2>, <&ssb_rssd27 3>,
+			<&ssb_rssd28 0>, <&ssb_rssd28 1>, <&ssb_rssd28 2>, <&ssb_rssd28 3>,
+			<&ssb_rssd29 0>, <&ssb_rssd29 1>, <&ssb_rssd29 2>, <&ssb_rssd29 3>,
+			<&ssb_rssd30 0>, <&ssb_rssd30 1>, <&ssb_rssd30 2>, <&ssb_rssd30 3>,
+			<&ssb_rssd31 0>, <&ssb_rssd31 1>, <&ssb_rssd31 2>, <&ssb_rssd31 3>,
+			<&ssb_rssd32 0>, <&ssb_rssd32 1>, <&ssb_rssd32 2>, <&ssb_rssd32 3>;
+	};
+
+	iio-hwmon-m2-ssb {
+		compatible = "iio-hwmon";
+		// Voltage and current sensors
+		io-channels = <&smb_m2_ssb_ssd1 0>, <&smb_m2_ssb_ssd1 1>,
+			<&smb_m2_ssb_ssd2 0>, <&smb_m2_ssb_ssd2 1>;
+	};
+
+	iio-hwmon-pch-ssb {
+		compatible = "iio-hwmon";
+		// Voltage and current sensors
+		io-channels = <&aux_ssb 0>, <&aux_ssb 1>, <&aux_ssb 2>, <&aux_ssb 3>;
+	};
+
 	iio-hwmon {
 		compatible = "iio-hwmon";
 		// Voltage sensors top to down
