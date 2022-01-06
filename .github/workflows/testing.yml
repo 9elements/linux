@@ -1,0 +1,43 @@
+---
+
+name: Testing
+
+env:
+  ARCH: arm
+  CROSS_COMPILE: arm-none-eabi-
+
+on:
+  - push
+  - pull_request
+
+jobs:
+
+  build-gen3:
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Install dependencies
+        run: |
+          DEBIAN_FRONTEND=noninteractive sudo apt-get -qq update
+          DEBIAN_FRONTEND=noninteractive sudo apt-get -qqy install \
+          libncurses-dev gawk flex bison openssl libssl-dev dkms libelf-dev \
+          libudev-dev libpci-dev libiberty-dev autoconf gcc-arm-none-eabi \
+          binutils-arm-none-eabi
+
+      - name: Build Genesis 3
+        run: |
+          cp .github/assets/gen3_defconfig arch/arm/configs/gen3_defconfig
+          make gen3_defconfig
+          make
+
+  checkpatch:
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Checkpatch
+        run: |
+          ./scripts/checkpatch.pl --git ${{ github.sha }}
