@@ -1605,7 +1605,7 @@
 		reg = <0x77>;
 		interrupt-parent = <&gpio>;
 		interrupts = <ASPEED_GPIO(R, 3) IRQ_TYPE_LEVEL_HIGH>; // BMC_MUX_NIC_RST_INT_N
-		vcc-supply = <&p3v3_aux>;
+		vdd-supply = <&p3v3_aux>;
 
 		i2c@0 {
 			#address-cells = <1>;
@@ -1780,7 +1780,7 @@
 		reg = <0x77>;
 		interrupt-parent = <&gpio>;
 		interrupts = <ASPEED_GPIO(M, 5) IRQ_TYPE_LEVEL_HIGH>; // BMC_MUX_M2_RST_INT_N
-		vcc-supply = <&p3v3_aux>;
+		vdd-supply = <&p3v3_aux>;
 
 		i2c@2 { // SMB_M2_SSD1
 			#address-cells = <1>;
@@ -1865,7 +1865,7 @@
 		reg = <0x77>;
 		interrupt-parent = <&gpio>;
 		interrupts = <ASPEED_GPIO(Z, 2) IRQ_TYPE_LEVEL_HIGH>; // BMC_MUX_VR_PCH_CPU_RST_INT_N
-		vcc-supply = <&p3v3_aux>;
+		vdd-supply = <&p3v3_aux>;
 
 		i2c@0 { // SMB_VR_PVNN_PCH_AUX
 			#address-cells = <1>;
@@ -2002,7 +2002,7 @@
 		reg = <0x77>;
 		interrupt-parent = <&gpio>;
 		interrupts = <ASPEED_GPIO(F, 4) IRQ_TYPE_LEVEL_HIGH>; // BMC_MUX_CPU2_RST_INT_N
-		vcc-supply = <&p3v3_aux>;
+		vdd-supply = <&p3v3_aux>;
 
 		i2c@0 { // SMB_PEX_CPU2_EVENT
 			#address-cells = <1>;
@@ -2159,7 +2159,7 @@
 		reg = <0x77>;
 		interrupt-parent = <&gpio>;
 		interrupts = <ASPEED_GPIO(F, 3) IRQ_TYPE_LEVEL_HIGH>; // BMC_MUX_CPU1_RST_INT_N
-		vcc-supply = <&p3v3_aux>;
+		vdd-supply = <&p3v3_aux>;
 
 		i2c@0 { // SMB_PEX_CPU1_EVENT
 			#address-cells = <1>;
@@ -2317,7 +2317,7 @@
 		reg = <0x77>;
 		interrupt-parent = <&gpio>;
 		interrupts = <ASPEED_GPIO(A, 2) IRQ_TYPE_LEVEL_HIGH>; // BMC_MUX_FANSSB_RSSD17_32_RST_INT_N
-		vcc-supply = <&p3v3_aux>;
+		vdd-supply = <&p3v3_aux>;
 
 		i2c@0 { // SMB_MUX_SSB_FANGRP0
 			#address-cells = <1>;
@@ -2331,7 +2331,7 @@
 				interrupt-parent = <&bmc_pex_irq>;
 				// using SMB_MUX_SSB_FANGRP0_RST_INT_N
 				interrupts = <16 IRQ_TYPE_LEVEL_HIGH>;
-				vcc-supply = <&p3v3_aux>;
+				vdd-supply = <&p3v3_aux>;
 			};
 		};
 		i2c@1 { // SMB_MUX_SSB_FANGRP1
@@ -2346,7 +2346,7 @@
 				reg = <0x70>;
 				interrupt-parent = <&bmc_pex_irq>;
 				interrupts = <7 IRQ_TYPE_LEVEL_HIGH>; // SMB_MUX_SSB_FANGRP1_RST_INT_N
-				vcc-supply = <&p3v3_aux>;
+				vdd-supply = <&p3v3_aux>;
 			};
 		};
 		i2c@2 { // SMB_MUX_SSB_FANGRP2
@@ -2361,7 +2361,7 @@
 				reg = <0x70>;
 				interrupt-parent = <&bmc_pex_irq>;
 				interrupts = <1 IRQ_TYPE_LEVEL_HIGH>; // SMB_MUX_SSB_FANGRP2_RST_INT_N
-				vcc-supply = <&p3v3_aux>;
+				vdd-supply = <&p3v3_aux>;
 			};
 		};
 		i2c@3 { // SMB_MUX_SSB_RSSD17_24
@@ -2376,7 +2376,7 @@
 				reg = <0x70>;
 				interrupt-parent = <&bmc_pex_irq>;
 				interrupts = <10 IRQ_TYPE_LEVEL_HIGH>; // SMB_MUX_SSB_RSSD17_24_RST_INT_N
-				vcc-supply = <&p3v3_aux>;
+				vdd-supply = <&p3v3_aux>;
 			};
 		};
 		i2c@4 { // SMB_MUX_SSB_RSSD25_32
@@ -2391,7 +2391,7 @@
 				reg = <0x70>;
 				interrupt-parent = <&bmc_pex_irq>;
 				interrupts = <15 IRQ_TYPE_LEVEL_HIGH>; // SMB_MUX_SSB_RSSD25_32_RST_INT_N
-				vcc-supply = <&p3v3_aux>;
+				vdd-supply = <&p3v3_aux>;
 			};
 		};
 		i2c@5 { // SMB_PEX_RSSD01_16
@@ -2455,7 +2455,7 @@
 				interrupt-parent = <&bmc_pex_irq>;
 				// using SMB_MUX_RSSD17_24_RST_INT_N
 				interrupts = <12 IRQ_TYPE_LEVEL_HIGH>;
-				vcc-supply = <&p3v3_aux>;
+				vdd-supply = <&p3v3_aux>;
 
 				i2c@0 { // SMB_RSSD17
 					#address-cells = <1>;
@@ -2512,7 +2512,7 @@
 				interrupt-parent = <&bmc_pex_irq>;
 				// using SMB_MUX_RSSD25_32_RST_INT_N
 				interrupts = <14 IRQ_TYPE_LEVEL_HIGH>;
-				vcc-supply = <&p3v3_aux>;
+				vdd-supply = <&p3v3_aux>;
 
 				i2c@0 { // SMB_RSSD25
 					#address-cells = <1>;
@@ -2586,7 +2586,7 @@
 		interrupt-parent = <&gpio>;
 		// using BMC_MUX_CPU0_RST_INT_N
 		interrupts = <ASPEED_GPIO(A, 3) IRQ_TYPE_LEVEL_HIGH>;
-		vcc-supply = <&p3v3_aux>;
+		vdd-supply = <&p3v3_aux>;
 
 		i2c@0 { // SMB_PEX_CPU1_EVENT
 			#address-cells = <1>;
@@ -2745,7 +2745,7 @@
 		interrupt-parent = <&gpio>;
 		// using BMC_MUX_FANPWM_RSSD01_16_RST_INT_N
 		interrupts = <ASPEED_GPIO(AA, 4) IRQ_TYPE_LEVEL_HIGH>;
-		vcc-supply = <&p3v3_aux>;
+		vdd-supply = <&p3v3_aux>;
 
 		i2c@0 { // SMB_MUX_PWM_FANGRP0
 			#address-cells = <1>;
@@ -2759,7 +2759,7 @@
 				interrupt-parent = <&bmc_pex_irq>;
 				// using SMB_MUX_PWM_FANGRP0_RST_INT_N
 				interrupts = <11 IRQ_TYPE_LEVEL_HIGH>;
-				vcc-supply = <&p3v3_aux>;
+				vdd-supply = <&p3v3_aux>;
 			};
 		};
 		i2c@1 { // SMB_MUX_PWM_FANGRP1
@@ -2774,7 +2774,7 @@
 				reg = <0x70>;
 				interrupt-parent = <&bmc_pex_irq>;
 				interrupts = <2 IRQ_TYPE_LEVEL_HIGH>; // SMB_MUX_PWM_FANGRP1_RST_INT_N
-				vcc-supply = <&p3v3_aux>;
+				vdd-supply = <&p3v3_aux>;
 			};
 		};
 		i2c@2 { // SMB_MUX_PWM_FANGRP2
@@ -2789,7 +2789,7 @@
 				reg = <0x70>;
 				interrupt-parent = <&bmc_pex_irq>;
 				interrupts = <0 IRQ_TYPE_LEVEL_HIGH>; // SMB_MUX_PWM_FANGRP2_RST_INT_N
-				vcc-supply = <&p3v3_aux>;
+				vdd-supply = <&p3v3_aux>;
 			};
 		};
 		i2c@3 { // SMB_MUX_SSB_RSSD01_08
@@ -2804,7 +2804,7 @@
 				reg = <0x70>;
 				interrupt-parent = <&bmc_pex_irq>;
 				interrupts = <3 IRQ_TYPE_LEVEL_HIGH>; // SMB_MUX_SSB_RSSD01_08_RST_INT_N
-				vcc-supply = <&p3v3_aux>;
+				vdd-supply = <&p3v3_aux>;
 			};
 		};
 		i2c@4 { // SMB_MUX_SSB_RSSD09_16
@@ -2819,7 +2819,7 @@
 				reg = <0x70>;
 				interrupt-parent = <&bmc_pex_irq>;
 				interrupts = <9 IRQ_TYPE_LEVEL_HIGH>; // SMB_MUX_SSB_RSSD09_16_RST_INT_N
-				vcc-supply = <&p3v3_aux>;
+				vdd-supply = <&p3v3_aux>;
 			};
 		};
 		i2c@5 { // SMB_PEX_RSSD17_32
@@ -2884,7 +2884,7 @@
 				interrupt-parent = <&bmc_pex_irq>;
 				// using SMB_MUX_RSSD01_08_RST_INT_N
 				interrupts = <4 IRQ_TYPE_LEVEL_HIGH>;
-				vcc-supply = <&p3v3_aux>;
+				vdd-supply = <&p3v3_aux>;
 
 				i2c@0 { // SMB_RSSD01
 					#address-cells = <1>;
@@ -2941,7 +2941,7 @@
 				interrupt-parent = <&bmc_pex_irq>;
 				// using MB_MUX_RSSD09_16_RST_INT_N
 				interrupts = <5 IRQ_TYPE_LEVEL_HIGH>;
-				vcc-supply = <&p3v3_aux>;
+				vdd-supply = <&p3v3_aux>;
 
 				i2c@0 { // SMB_RSSD09
 					#address-cells = <1>;
@@ -3001,7 +3001,7 @@
 		interrupt-parent = <&gpio>;
 		// using BMC_MUX_CPU3_RST_INT_N
 		interrupts = <ASPEED_GPIO(P, 2) IRQ_TYPE_LEVEL_HIGH>;
-		vcc-supply = <&p3v3_aux>;
+		vdd-supply = <&p3v3_aux>;
 
 		i2c@0 { // SMB_PEX_CPU3_EVENT
 			#address-cells = <1>;
@@ -3164,7 +3164,7 @@
 		interrupt-parent = <&gpio>;
 		// using BMC_MUX_SVC_EXP_RST_INT_N
 		interrupts = <ASPEED_GPIO(R, 4) IRQ_TYPE_LEVEL_HIGH>;
-		vcc-supply = <&p3v3_bmc_aux>;
+		vdd-supply = <&p3v3_bmc_aux>;
 
 		i2c@0 { // SMB_PEX_VR_CTRL
 			#address-cells = <1>;
@@ -3253,7 +3253,7 @@
 				// using BMC_MUX_SVC_RSSD_INT
 				interrupt-parent = <&gpio>;
 				interrupts = <ASPEED_GPIO(P, 3) IRQ_TYPE_LEVEL_HIGH>;
-				vcc-supply = <&p3v3_bmc_aux>;
+				vdd-supply = <&p3v3_bmc_aux>;
 
 				i2c@0 { // SMB_SVC_PEX_RSSD01_16
 					#address-cells = <1>;
@@ -3583,7 +3583,7 @@
 				// uses BMC_MUX_SVC_VR_RST_INT
 				interrupt-parent = <&gpio>;
 				interrupts = <ASPEED_GPIO(R, 2) IRQ_TYPE_LEVEL_HIGH>;
-				vcc-supply = <&p3v3_bmc_aux>;
+				vdd-supply = <&p3v3_bmc_aux>;
 
 				i2c@1 { // SMB_VR_P5V_AUX
 					#address-cells = <1>;
