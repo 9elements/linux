@@ -1339,6 +1339,46 @@
 		sw0-supply = <&sw0_ssb_rssd32>;
 		sw1-supply = <&sw1_ssb_rssd32>;
 	};
+
+	p3v3_nic_consumer {
+		status = "okay";
+		compatible = "reg-userspace-consumer";
+		regulator-name = "p3v3_nic";
+		regulator-supplies = "vbus";
+		vbus-supply = <&p3v3_nic>;
+	};
+
+	p1v8_nic_consumer {
+		status = "okay";
+		compatible = "reg-userspace-consumer";
+		regulator-name = "p1v8_nic";
+		regulator-supplies = "vbus";
+		vbus-supply = <&p1v8_nic>;
+	};
+
+	p1v2_nic_consumer {
+		status = "okay";
+		compatible = "reg-userspace-consumer";
+		regulator-name = "p1v2_nic";
+		regulator-supplies = "vbus";
+		vbus-supply = <&p1v2_nic>;
+	};
+
+	pvcore_nic1_consumer {
+		status = "okay";
+		compatible = "reg-userspace-consumer";
+		regulator-name = "pvcore_nic1";
+		regulator-supplies = "vbus";
+		vbus-supply = <&pvcore_nic1>;
+	};
+
+	pvcore_nic2_consumer {
+		status = "okay";
+		compatible = "reg-userspace-consumer";
+		regulator-name = "pvcore_nic2";
+		regulator-supplies = "vbus";
+		vbus-supply = <&pvcore_nic2>;
+	};
 };
 
 &fmc {
