@@ -36,7 +36,17 @@
 #define CY8C95X0_INTMASK	0x19
 #define CY8C95X0_INVERT		0x1B
 #define CY8C95X0_DIRECTION	0x1C
-/* Drive mode register change state on writing '1' */
+/* Drive mode register change state on writing '1'.
+ * When direction is input, the pin can be configured as:
+ * - PU
+ * - PD
+ * - High-Z.
+ * When direction is output, the pin can be configured as:
+ * - OD_H
+ * - OD_L
+ * - PP_FAST
+ * - PP_SLOW
+ */
 #define CY8C95X0_DRV_PU		0x1D
 #define CY8C95X0_DRV_PD		0x1E
 #define CY8C95X0_DRV_ODH	0x1F
@@ -336,8 +346,7 @@ static int cy8c95x0_gpio_direction_input(struct gpio_chip *gc, unsigned int off)
 	struct cy8c95x0_chip *chip = gpiochip_get_data(gc);
 	u8 port = cypress_get_bank(chip, off);
 	u8 bit = cy8c95x0_bit_by_port(chip, off);
-	u32 reg_val;
-	int ret, bias_enabled;
+	int ret;
 
 	mutex_lock(&chip->i2c_lock);
 	/* select bank */
@@ -345,30 +354,13 @@ static int cy8c95x0_gpio_direction_input(struct gpio_chip *gc, unsigned int off)
 	if (ret)
 		goto exit;
 
-	bias_enabled = 0;
-	/* Check BIAS registers */
-	ret = regmap_read(chip->regmap, CY8C95X0_DRV_PU, &reg_val);
-	if (ret)
-		goto exit;
-	if (reg_val & bit) {
-		/* Set output high */
-		regmap_write_bits(chip->regmap, CY8C95X0_OUTPUT_(port), bit, bit);
-
-		bias_enabled = 1;
-	}
-
-	ret = regmap_read(chip->regmap, CY8C95X0_DRV_PD, &reg_val);
-	if (ret)
-		goto exit;
-	if (reg_val & bit) {
-		/* Set output low */
-		regmap_write_bits(chip->regmap, CY8C95X0_OUTPUT_(port), bit, 0);
-
-		bias_enabled = 1;
-	}
-
 	/* Set direction to output if BIAS is enabled, else input */
-	ret = regmap_write_bits(chip->regmap, CY8C95X0_DIRECTION, bit, bias_enabled ? 0 : bit);
+	ret = regmap_write_bits(chip->regmap, CY8C95X0_DIRECTION, bit, bit);
+	if (ret)
+		goto exit;
+
+	/* Disable driving the pin by forcing it to HighZ. */
+	ret = regmap_write_bits(chip->regmap, CY8C95X0_DRV_HIZ, bit, bit);
 	if (ret)
 		goto exit;
 exit:
@@ -488,14 +480,14 @@ static int cy8c95x0_gpio_set_pincfg(struct cy8c95x0_chip *chip,
 		return ret;
 	}
 
-	switch (config) {
+	switch (pinconf_to_config_param(config)) {
 	case PIN_CONFIG_BIAS_PULL_UP:
 		reg = CY8C95X0_DRV_PU;
 		break;
 	case PIN_CONFIG_BIAS_PULL_DOWN:
 		reg = CY8C95X0_DRV_PD;
 		break;
-	case PIN_CONFIG_BIAS_HIGH_IMPEDANCE:
+	case PIN_CONFIG_BIAS_DISABLE:
 		reg = CY8C95X0_DRV_HIZ;
 		break;
 	case PIN_CONFIG_DRIVE_OPEN_DRAIN:
@@ -524,7 +516,7 @@ static int cy8c95x0_gpio_set_config(struct gpio_chip *gc, unsigned int offset,
 	switch (pinconf_to_config_param(config)) {
 	case PIN_CONFIG_BIAS_PULL_UP:
 	case PIN_CONFIG_BIAS_PULL_DOWN:
-	case PIN_CONFIG_BIAS_HIGH_IMPEDANCE:
+	case PIN_CONFIG_BIAS_DISABLE:
 	case PIN_CONFIG_DRIVE_OPEN_DRAIN:
 	case PIN_CONFIG_DRIVE_OPEN_SOURCE:
 	case PIN_CONFIG_DRIVE_PUSH_PULL:
@@ -540,6 +532,7 @@ static int cy8c95x0_gpio_get_multiple(struct gpio_chip *gc,
 	struct cy8c95x0_chip *chip = gpiochip_get_data(gc);
 	DECLARE_BITMAP(reg_val, MAX_LINE);
 	DECLARE_BITMAP(tmp, MAX_LINE);
+	DECLARE_BITMAP(shiftmask, MAX_LINE);
 	int ret;
 
 	mutex_lock(&chip->i2c_lock);
@@ -547,10 +540,13 @@ static int cy8c95x0_gpio_get_multiple(struct gpio_chip *gc,
 	mutex_unlock(&chip->i2c_lock);
 	if (ret)
 		return ret;
+	
+	bitmap_zero(shiftmask, gc->ngpio);
+	bitmap_set(shiftmask, 0, 20);
 
 	/* Fill the 4 bit gap of Gport2 */
 	bitmap_shift_right(tmp, reg_val, 4, gc->ngpio);
-	bitmap_copy(tmp, reg_val, 20);
+	bitmap_replace(tmp, tmp, reg_val, shiftmask, gc->ngpio);
 
 	bitmap_replace(bits, bits, tmp, mask, gc->ngpio);
 
