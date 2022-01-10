@@ -321,7 +321,7 @@ static int cy8c95x0_gpio_direction_input(struct gpio_chip *gc, unsigned int off)
 {
 	struct cy8c95x0_chip *chip = gpiochip_get_data(gc);
 	u8 port = chip->cy8c95x0_lt[off].port;
-	u8 bit = BIT(chip->cy8c95x0_lt[off].pin);
+	u8 bit = chip->cy8c95x0_lt[off].pin;
 	u32 reg_val;
 	int ret, bias_enabled;
 
@@ -368,7 +368,7 @@ static int cy8c95x0_gpio_direction_output(struct gpio_chip *gc,
 	struct cy8c95x0_chip *chip = gpiochip_get_data(gc);
 	u8 port = chip->cy8c95x0_lt[off].port;
 	u8 outreg = CY8C95X0_OUTPUT_(port);
-	u8 bit = BIT(chip->cy8c95x0_lt[off].pin);
+	u8 bit = chip->cy8c95x0_lt[off].pin;
 	int ret;
 
 	mutex_lock(&chip->i2c_lock);
@@ -393,7 +393,7 @@ static int cy8c95x0_gpio_get_value(struct gpio_chip *gc, unsigned int off)
 {
 	struct cy8c95x0_chip *chip = gpiochip_get_data(gc);
 	u8 inreg = CY8C95X0_INPUT_(cypress_get_pin(chip, off));
-	u8 bit = BIT(chip->cy8c95x0_lt[off].pin);
+	u8 bit = chip->cy8c95x0_lt[off].pin;
 	u32 reg_val;
 	int ret;
 
@@ -418,7 +418,7 @@ static void cy8c95x0_gpio_set_value(struct gpio_chip *gc, unsigned int off,
 {
 	struct cy8c95x0_chip *chip = gpiochip_get_data(gc);
 	u8 outreg = CY8C95X0_OUTPUT_(cypress_get_pin(chip, off));
-	u8 bit = BIT(chip->cy8c95x0_lt[off].pin);
+	u8 bit = chip->cy8c95x0_lt[off].pin;
 
 	mutex_lock(&chip->i2c_lock);
 	regmap_write_bits(chip->regmap, outreg, bit, val ? bit : 0);
@@ -429,7 +429,7 @@ static int cy8c95x0_gpio_get_direction(struct gpio_chip *gc, unsigned int off)
 {
 	struct cy8c95x0_chip *chip = gpiochip_get_data(gc);
 	u8 port = chip->cy8c95x0_lt[off].port;
-	u8 bit = BIT(chip->cy8c95x0_lt[off].pin);
+	u8 bit = chip->cy8c95x0_lt[off].pin;
 	u32 reg_val;
 	int ret;
 
@@ -462,7 +462,7 @@ static int cy8c95x0_gpio_get_pincfg(struct cy8c95x0_chip *chip,
 	u8 port = chip->cy8c95x0_lt[off].port;
 	enum pin_config_param param = pinconf_to_config_param(*config);
 	struct device *dev = chip->dev;
-	u8 bit = BIT(chip->cy8c95x0_lt[off].pin);
+	u8 bit = chip->cy8c95x0_lt[off].pin;
 	unsigned int reg;
 	u32 reg_val;
 	u16 arg = 0;
@@ -545,7 +545,7 @@ static int cy8c95x0_gpio_set_pincfg(struct cy8c95x0_chip *chip,
 {
 	u8 port = chip->cy8c95x0_lt[off].port;
 	struct device *dev = chip->dev;
-	u8 bit = BIT(chip->cy8c95x0_lt[off].pin);
+	u8 bit = chip->cy8c95x0_lt[off].pin;
 	unsigned int reg, reg_val;
 	int ret;
 
@@ -1025,7 +1025,7 @@ static int cy8c95x0_pinmux_cfg(struct cy8c95x0_chip *chip,
 				   unsigned long off)
 {
 	u8 port = chip->cy8c95x0_lt[off].port;
-	u8 bit = BIT(chip->cy8c95x0_lt[off].pin);
+	u8 bit = chip->cy8c95x0_lt[off].pin;
 	int ret;
 
 	mutex_lock(&chip->i2c_lock);
@@ -1302,7 +1302,7 @@ static int device_cy8c95x0_init(struct cy8c95x0_chip *chip, u32 invert)
 	/* Update lookup table */
 	for (i = 0 ; i < chip->tpin; i++) {
 		chip->cy8c95x0_lt[i].port = cypress_get_port(chip, i);
-		chip->cy8c95x0_lt[i].pin = cypress_get_pin(chip, i);
+		chip->cy8c95x0_lt[i].pin = BIT(cypress_get_pin(chip, i));
 	}
 
 	chip->gpio_chip.label = devm_kasprintf(&chip->client->dev, GFP_KERNEL, "%s@%s", \
