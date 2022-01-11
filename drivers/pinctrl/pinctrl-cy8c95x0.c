@@ -111,6 +111,7 @@ struct cy8c95x0_chip {
 	DECLARE_BITMAP(irq_trig_fall, MAX_LINE);
 	DECLARE_BITMAP(irq_trig_low, MAX_LINE);
 	DECLARE_BITMAP(irq_trig_high, MAX_LINE);
+	DECLARE_BITMAP(push_pull, MAX_LINE);
 	struct irq_chip irq_chip;
 	atomic_t wakeup_path;
 
@@ -335,10 +336,16 @@ static int cy8c95x0_gpio_direction_input(struct gpio_chip *gc, unsigned int off)
 	if (ret)
 		goto exit;
 
-	/* Disable driving the pin by forcing it to HighZ. */
-	ret = regmap_write_bits(chip->regmap, CY8C95X0_DRV_HIZ, bit, bit);
-	if (ret)
-		goto exit;
+	if (test_bit(off, chip->push_pull)) {
+		/* 
+		 * Disable driving the pin by forcing it to HighZ. Only setting the
+		 * direction register isn't sufficient in Push-Pull mode.
+		 */
+		ret = regmap_write_bits(chip->regmap, CY8C95X0_DRV_HIZ, bit, bit);
+		if (ret)
+			goto exit;
+		clear_bit(off, chip->push_pull);
+	}
 exit:
 	mutex_unlock(&chip->i2c_lock);
 	return ret;
@@ -529,6 +536,7 @@ static int cy8c95x0_gpio_set_pincfg(struct cy8c95x0_chip *chip,
 	u8 port = chip->cy8c95x0_lt[off].port;
 	struct device *dev = chip->dev;
 	u8 bit = chip->cy8c95x0_lt[off].pin;
+	unsigned long param = pinconf_to_config_param(config);
 	unsigned int reg, reg_val;
 	int ret;
 
@@ -540,55 +548,34 @@ static int cy8c95x0_gpio_set_pincfg(struct cy8c95x0_chip *chip,
 		return ret;
 	}
 
-	switch (pinconf_to_config_param(config)) {
+	switch (param) {
 	case PIN_CONFIG_BIAS_PULL_UP:
+		clear_bit(off, chip->push_pull);
 		reg = CY8C95X0_DRV_PU;
 		break;
 	case PIN_CONFIG_BIAS_PULL_DOWN:
+		clear_bit(off, chip->push_pull);
 		reg = CY8C95X0_DRV_PD;
 		break;
 	case PIN_CONFIG_BIAS_DISABLE:
+		clear_bit(off, chip->push_pull);
 		reg = CY8C95X0_DRV_HIZ;
 		break;
 	case PIN_CONFIG_DRIVE_OPEN_DRAIN:
+		clear_bit(off, chip->push_pull);
 		reg = CY8C95X0_DRV_ODL;
 		break;
 	case PIN_CONFIG_DRIVE_OPEN_SOURCE:
+		clear_bit(off, chip->push_pull);
 		reg = CY8C95X0_DRV_ODH;
 		break;
 	case PIN_CONFIG_DRIVE_PUSH_PULL:
+		set_bit(off, chip->push_pull);
 		reg = CY8C95X0_DRV_PP_FAST;
-		break;
-	case PIN_CONFIG_INPUT_ENABLE:
-		reg = CY8C95X0_DIRECTION;
 		break;
 	case PIN_CONFIG_MODE_PWM:
 		reg = CY8C95X0_PWMSEL;
 		break;
-	case PIN_CONFIG_OUTPUT:
-		reg = CY8C95X0_OUTPUT_(port);
-		break;
-	case PIN_CONFIG_OUTPUT_ENABLE:
-		reg = CY8C95X0_DIRECTION;
-		ret = regmap_read(chip->regmap, reg, &reg_val);
-		reg_val &= ~bit;
-		ret = regmap_write(chip->regmap, reg, reg_val);
-		goto exit;
-
-	case PIN_CONFIG_BIAS_HIGH_IMPEDANCE:
-	case PIN_CONFIG_BIAS_BUS_HOLD:
-	case PIN_CONFIG_BIAS_PULL_PIN_DEFAULT:
-	case PIN_CONFIG_DRIVE_STRENGTH:
-	case PIN_CONFIG_DRIVE_STRENGTH_UA:
-	case PIN_CONFIG_INPUT_DEBOUNCE:
-	case PIN_CONFIG_INPUT_SCHMITT:
-	case PIN_CONFIG_INPUT_SCHMITT_ENABLE:
-	case PIN_CONFIG_MODE_LOW_POWER:
-	case PIN_CONFIG_PERSIST_STATE:
-	case PIN_CONFIG_POWER_SOURCE:
-	case PIN_CONFIG_SKEW_DELAY:
-	case PIN_CONFIG_SLEEP_HARDWARE_STATE:
-	case PIN_CONFIG_SLEW_RATE:
 	default:
 		ret = -ENOTSUPP;
 		goto exit;
@@ -607,18 +594,20 @@ static int cy8c95x0_gpio_set_config(struct gpio_chip *gc, unsigned int offset,
 				    unsigned long config)
 {
 	struct cy8c95x0_chip *chip = gpiochip_get_data(gc);
+	unsigned long arg = pinconf_to_config_argument(config);
 
 	switch (pinconf_to_config_param(config)) {
+	case PIN_CONFIG_INPUT_ENABLE:
+		return cy8c95x0_gpio_direction_input(gc, offset);
+	case PIN_CONFIG_OUTPUT:
+		return cy8c95x0_gpio_direction_output(gc, offset, arg);
+	case PIN_CONFIG_MODE_PWM:
 	case PIN_CONFIG_BIAS_PULL_UP:
 	case PIN_CONFIG_BIAS_PULL_DOWN:
 	case PIN_CONFIG_BIAS_DISABLE:
 	case PIN_CONFIG_DRIVE_OPEN_DRAIN:
 	case PIN_CONFIG_DRIVE_OPEN_SOURCE:
 	case PIN_CONFIG_DRIVE_PUSH_PULL:
-	case PIN_CONFIG_INPUT_ENABLE:
-	case PIN_CONFIG_MODE_PWM:
-	case PIN_CONFIG_OUTPUT:
-	case PIN_CONFIG_OUTPUT_ENABLE:
 		return cy8c95x0_gpio_set_pincfg(chip, offset, config);
 	default:
 		return -ENOTSUPP;
@@ -1235,6 +1224,8 @@ static int device_cy8c95x0_init(struct cy8c95x0_chip *chip, u32 invert)
 	int ret;
 	unsigned int devid;
 	int index, i;
+
+	bitmap_zero(chip->push_pull, MAX_LINE);
 
 	ret = regcache_sync_region(chip->regmap, CY8C95X0_OUTPUT,
 				   CY8C95X0_OUTPUT + NBANK(chip));

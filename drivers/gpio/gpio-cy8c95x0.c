@@ -110,6 +110,7 @@ struct cy8c95x0_chip {
 	DECLARE_BITMAP(irq_trig_fall, MAX_LINE);
 	DECLARE_BITMAP(irq_trig_low, MAX_LINE);
 	DECLARE_BITMAP(irq_trig_high, MAX_LINE);
+	DECLARE_BITMAP(push_pull, MAX_LINE);
 	struct irq_chip irq_chip;
 	atomic_t wakeup_path;
 
@@ -346,6 +347,7 @@ static int cy8c95x0_gpio_direction_input(struct gpio_chip *gc, unsigned int off)
 	struct cy8c95x0_chip *chip = gpiochip_get_data(gc);
 	u8 port = cypress_get_bank(chip, off);
 	u8 bit = cy8c95x0_bit_by_port(chip, off);
+	u32 reg_val;
 	int ret;
 
 	mutex_lock(&chip->i2c_lock);
@@ -359,10 +361,17 @@ static int cy8c95x0_gpio_direction_input(struct gpio_chip *gc, unsigned int off)
 	if (ret)
 		goto exit;
 
-	/* Disable driving the pin by forcing it to HighZ. */
-	ret = regmap_write_bits(chip->regmap, CY8C95X0_DRV_HIZ, bit, bit);
-	if (ret)
-		goto exit;
+	if (test_bit(off, chip->push_pull)) {
+		/* 
+		 * Disable driving the pin by forcing it to HighZ. Only setting the
+		 * direction register isn't sufficient in Push-Pull mode.
+		 */
+		ret = regmap_write_bits(chip->regmap, CY8C95X0_DRV_HIZ, bit, bit);
+		if (ret)
+			goto exit;
+		clear_bit(off, chip->push_pull);
+	}
+
 exit:
 	mutex_unlock(&chip->i2c_lock);
 	return ret;
@@ -469,6 +478,7 @@ static int cy8c95x0_gpio_set_pincfg(struct cy8c95x0_chip *chip,
 {
 	u8 port = cypress_get_bank(chip, off);
 	u8 bit = cy8c95x0_bit_by_port(chip, off);
+	unsigned long param = pinconf_to_config_param(config);
 	unsigned int reg;
 	int ret;
 
@@ -480,7 +490,7 @@ static int cy8c95x0_gpio_set_pincfg(struct cy8c95x0_chip *chip,
 		return ret;
 	}
 
-	switch (pinconf_to_config_param(config)) {
+	switch (param) {
 	case PIN_CONFIG_BIAS_PULL_UP:
 		reg = CY8C95X0_DRV_PU;
 		break;
@@ -500,11 +510,22 @@ static int cy8c95x0_gpio_set_pincfg(struct cy8c95x0_chip *chip,
 		reg = CY8C95X0_DRV_PP_FAST;
 		break;
 	}
+
 	/* Writing 1 to one of the drive mode registers will automatically
 	 * clear conflicting set bits in the other drive mode registers.
 	 */
 	ret = regmap_write_bits(chip->regmap, reg, bit, bit);
 	mutex_unlock(&chip->i2c_lock);
+
+	/* The drive mode register overrides the port direction register.
+	 * Keep track if Push-Pull had been enabled to revert the setting
+	 * when changing back to direction input.
+	 */
+	if (param == PIN_CONFIG_DRIVE_PUSH_PULL)
+		set_bit(off, chip->push_pull);
+	else
+		clear_bit(off, chip->push_pull);
+
 	return ret;
 }
 
@@ -846,6 +867,8 @@ static int device_cy8c95x0_init(struct cy8c95x0_chip *chip, u32 invert)
 {
 	DECLARE_BITMAP(val, MAX_LINE);
 	int ret;
+
+	bitmap_zero(chip->push_pull, MAX_LINE);
 
 	ret = regcache_sync_region(chip->regmap, CY8C95X0_OUTPUT,
 				   CY8C95X0_OUTPUT + NBANK(chip));
