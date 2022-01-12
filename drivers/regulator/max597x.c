@@ -62,7 +62,7 @@ enum max597x_regulator_id {
 #define MAX5970_REG_VOLTAGE_L(ch)		(0x03 + (ch) * 4)
 #define MAX5970_REG_VOLTAGE_H(ch)		(0x02 + (ch) * 4)
 #define MAX5970_REG_MON_RANGE			0x18
-#define  MAX5970_MON_MASK			0x3
+#define  MAX5970_MON(reg, ch)			(((reg) >> (ch * 2)) & 3)
 #define MAX5970_REG_CHx_UV_WARN_H(ch)		(0x1A + (ch) * 10)
 #define MAX5970_REG_CHx_UV_WARN_L(ch)		(0x1B + (ch) * 10)
 #define MAX5970_REG_CHx_UV_CRIT_H(ch)		(0x1C + (ch) * 10)
@@ -90,7 +90,7 @@ enum max597x_regulator_id {
 #define  STATUS1_PROT_ALERT_ONLY	2
 
 #define MAX5970_REG_STATUS2		0x33
-#define  MAX5970_IRNG_MASK		0x3
+#define  MAX5970_IRNG(reg, ch)		(((reg) >> (ch * 2)) & 3)
 
 #define MAX5970_REG_STATUS3		0x34
 #define  MAX5970_STATUS3_ALERT		BIT(4)
@@ -529,6 +529,44 @@ static int max597x_parse_dt(struct device *dev, struct max597x_data *data)
 	return 0;
 }
 
+static int max597x_adc_range(struct device *dev,
+			     struct regmap *regmap,
+			     const int ch,
+			     struct max597x_data *data)
+{
+	unsigned int reg;
+	int ret;
+
+	/* Decode current ADC range */
+	ret = regmap_read(regmap, MAX5970_REG_STATUS2, &reg);
+	if (ret)
+		return ret;
+	switch (MAX5970_IRNG(reg, ch)) {
+	case 0:
+		data->irng = 100000; /* 100 mV */
+		break;
+	case 1:
+		data->irng = 50000; /* 50 mV */
+		break;
+	case 2:
+		data->irng = 25000; /* 25 mV */
+		break;
+	default:
+		return -EINVAL;
+	}
+	dev_info(dev, "Current ADC%d full-scale %d mV\n", ch, data->irng / 1000);
+
+	/* Decode current voltage monitor range */
+	ret = regmap_read(regmap, MAX5970_REG_MON_RANGE, &reg);
+	if (ret)
+		return ret;
+
+	data->mon_rng = 16000000 >> MAX5970_MON(reg, ch);
+	dev_info(dev, "Voltage ADC%d limit %d mV\n", ch, data->mon_rng / 1000);
+
+	return 0;
+}
+
 static int max597x_setup_irq(struct device *dev,
 			     int irq,
 			     struct regulator_dev *rdevs[MAX5970_NUM_SWITCHES],
@@ -573,7 +611,6 @@ static int max597x_probe(struct i2c_client *cl, const struct i2c_device_id *id)
 	int num_switches = 0;
 	struct regmap *regmap;
 	struct regulator_bulk_data supplies[MAX5970_NUM_SWITCHES];
-	unsigned int irng, mon_rng;
 	struct iio_dev *indio_dev;
 	struct max597x_iio *priv;
 	int ret;
@@ -593,33 +630,6 @@ static int max597x_probe(struct i2c_client *cl, const struct i2c_device_id *id)
 		dev_err(&cl->dev, "No regmap\n");
 		return -EINVAL;
 	}
-
-	/* Decode current ADC range */
-	ret = regmap_read(regmap, MAX5970_REG_STATUS2, &irng);
-	if (ret)
-		return ret;
-
-	switch (irng & MAX5970_IRNG_MASK) {
-	case 0:
-		irng = 100000; /* 100 mV */
-		break;
-	case 1:
-		irng = 50000; /* 50 mV */
-		break;
-	case 2:
-		irng = 25000; /* 25 mV */
-		break;
-	default:
-		return -EINVAL;
-	}
-	dev_info(&cl->dev, "Current ADC full-scale %d mV\n", 100000 / 1000);
-
-	/* Decode current voltage monitor range */
-	ret = regmap_read(regmap, MAX5970_REG_MON_RANGE, &mon_rng);
-	if (ret)
-		return ret;
-	mon_rng = 16000000 >> (mon_rng & MAX5970_MON_MASK);
-	dev_info(&cl->dev, "Voltage ADC limit %d mV\n", mon_rng / 1000);
 
 	/* registering iio */
 	indio_dev = devm_iio_device_alloc(&cl->dev, sizeof(*priv));
@@ -661,8 +671,6 @@ static int max597x_probe(struct i2c_client *cl, const struct i2c_device_id *id)
 			goto err_regulator_disable;
 		}
 
-		data->irng = irng;
-		data->mon_rng = mon_rng;
 		data->num_switches = num_switches;
 		data->regulator = &regulators[i];
 		data->regmap = regmap;
@@ -671,11 +679,15 @@ static int max597x_probe(struct i2c_client *cl, const struct i2c_device_id *id)
 		if (ret < 0)
 			goto err_regulator_disable;
 
+		ret = max597x_adc_range(&cl->dev, regmap, i, data);
+		if (ret < 0)
+			goto err_regulator_disable;
+
 		/* Set shunt value for IIO backend */
 		priv->shunt_micro_ohms[i] = data->shunt_micro_ohms;
 
 		dev_info(&cl->dev, "Shunt%d ADC upper limit %d mA\n", i,
-			 irng * 1000 / data->shunt_micro_ohms);
+			 data->irng * 1000 / data->shunt_micro_ohms);
 
 		/* Store supply voltage to return only supported output voltage */
 		ret = regulator_get_voltage(supplies[i].consumer);
