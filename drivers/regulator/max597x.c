@@ -40,8 +40,8 @@ struct max597x_data {
 struct max597x_iio {
 	int shunt_micro_ohms[2];
 	struct regmap *regmap;
-	unsigned int irng;
-	unsigned int mon_rng;
+	unsigned int irng[2];
+	unsigned int mon_rng[2];
 };
 
 struct max597x_regulator {
@@ -471,14 +471,14 @@ static int max597x_iio_read_raw(struct iio_dev *iio_dev,
 		case MAX5970_REG_CURRENT_L(0):
 			fallthrough;
 		case MAX5970_REG_CURRENT_L(1):
-			*val = data->irng * 1000; /* in A, convert to mA */
+			*val = data->irng[chan->channel] * 1000; /* in A, convert to mA */
 			*val2 = data->shunt_micro_ohms[chan->channel] * ADC_MASK;
 			return IIO_VAL_FRACTIONAL;
 
 		case MAX5970_REG_VOLTAGE_L(0):
 			fallthrough;
 		case MAX5970_REG_VOLTAGE_L(1):
-			*val = data->mon_rng; /* in uV, convert to mV */
+			*val = data->mon_rng[chan->channel]; /* in uV, convert to mV */
 			*val2 = ADC_MASK * 1000;
 			return IIO_VAL_FRACTIONAL;
 		}
@@ -650,8 +650,6 @@ static int max597x_probe(struct i2c_client *cl, const struct i2c_device_id *id)
 
 	priv = iio_priv(indio_dev);
 	priv->regmap = regmap;
-	priv->irng = irng;
-	priv->mon_rng = mon_rng;
 
 	/* Enable supply regulators */
 	supplies[0].supply = "vss1";
@@ -685,7 +683,8 @@ static int max597x_probe(struct i2c_client *cl, const struct i2c_device_id *id)
 
 		/* Set shunt value for IIO backend */
 		priv->shunt_micro_ohms[i] = data->shunt_micro_ohms;
-
+		priv->irng[i] = data->irng;
+		priv->mon_rng[i] = data->mon_rng;
 		dev_info(&cl->dev, "Shunt%d ADC upper limit %d mA\n", i,
 			 data->irng * 1000 / data->shunt_micro_ohms);
 
