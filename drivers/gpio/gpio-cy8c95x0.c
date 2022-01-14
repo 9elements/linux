@@ -562,14 +562,14 @@ static int cy8c95x0_gpio_get_multiple(struct gpio_chip *gc,
 	if (ret)
 		return ret;
 	
-	bitmap_zero(shiftmask, gc->ngpio);
+	bitmap_zero(shiftmask, MAX_LINE);
 	bitmap_set(shiftmask, 0, 20);
 
 	/* Fill the 4 bit gap of Gport2 */
-	bitmap_shift_right(tmp, reg_val, 4, gc->ngpio);
-	bitmap_replace(tmp, tmp, reg_val, shiftmask, gc->ngpio);
+	bitmap_shift_right(tmp, reg_val, 4, MAX_LINE);
+	bitmap_replace(tmp, tmp, reg_val, shiftmask, MAX_LINE);
 
-	bitmap_replace(bits, bits, tmp, mask, gc->ngpio);
+	bitmap_replace(bits, bits, tmp, mask, MAX_LINE);
 
 	return 0;
 }
