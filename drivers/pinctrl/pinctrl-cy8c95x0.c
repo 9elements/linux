@@ -54,6 +54,8 @@
 #define CY8C95X0_DEVID_(x)	(((x) >> 4) & 0xF)
 
 #define CY8C95X0_PIN_TO_OFFSET(x) (((x) >= 20) ? ((x) + 4) : (x))
+#define CY8C95X0_OFFSET_TO_PIN(x) (((x) >= 20) ? ((x) - 4) : (x))
+
 
 struct cy8c95x0_platform_data {
 	/* number of the first GPIO */
@@ -738,12 +740,12 @@ static void cy8c95x0_irq_bus_sync_unlock(struct irq_data *d)
 	/* Switch direction to input if needed */
 	cy8c95x0_read_regs(chip, CY8C95X0_DIRECTION, reg_direction);
 
-	bitmap_or(irq_mask, chip->irq_trig_fall, chip->irq_trig_raise, gc->ngpio);
-	bitmap_complement(reg_direction, reg_direction, gc->ngpio);
-	bitmap_and(irq_mask, irq_mask, reg_direction, gc->ngpio);
+	bitmap_or(irq_mask, chip->irq_trig_fall, chip->irq_trig_raise, MAX_LINE);
+	bitmap_complement(reg_direction, reg_direction, MAX_LINE);
+	bitmap_and(irq_mask, irq_mask, reg_direction, MAX_LINE);
 
 	/* Look for any newly setup interrupt */
-	for_each_set_bit(level, irq_mask, gc->ngpio)
+	for_each_set_bit(level, irq_mask, MAX_LINE)
 		cy8c95x0_gpio_direction_input(&chip->gpio_chip, level);
 
 	mutex_unlock(&chip->irq_lock);
@@ -813,11 +815,11 @@ static bool cy8c95x0_irq_pending(struct cy8c95x0_chip *chip, unsigned long *pend
 		return false;
 
 	/* Apply filter for rising/falling edge selection */
-	bitmap_replace(new_stat, chip->irq_trig_fall, chip->irq_trig_raise, cur_stat, gc->ngpio);
+	bitmap_replace(new_stat, chip->irq_trig_fall, chip->irq_trig_raise, cur_stat, MAX_LINE);
 
-	bitmap_and(pending, new_stat, trigger, gc->ngpio);
+	bitmap_and(pending, new_stat, trigger, MAX_LINE);
 
-	return !bitmap_empty(pending, gc->ngpio);
+	return !bitmap_empty(pending, MAX_LINE);
 }
 
 static irqreturn_t cy8c95x0_irq_handler(int irq, void *devid)
@@ -825,7 +827,7 @@ static irqreturn_t cy8c95x0_irq_handler(int irq, void *devid)
 	struct cy8c95x0_chip *chip = devid;
 	struct gpio_chip *gc = &chip->gpio_chip;
 	DECLARE_BITMAP(pending, MAX_LINE);
-	int level;
+	int level, pin;
 	bool ret;
 
 	bitmap_zero(pending, MAX_LINE);
@@ -839,19 +841,21 @@ static irqreturn_t cy8c95x0_irq_handler(int irq, void *devid)
 
 	ret = 0;
 
-	for_each_set_bit(level, pending, gc->ngpio) {
-		int nested_irq = irq_find_mapping(gc->irq.domain, level);
+	for_each_set_bit(level, pending, MAX_LINE) {
+		/* Account for 4bit gap in GPort2 */
+		pin = CY8C95X0_OFFSET_TO_PIN(level);
+		int nested_irq = irq_find_mapping(gc->irq.domain, pin);
 
 		if (unlikely(nested_irq <= 0)) {
-			dev_warn_ratelimited(gc->parent, "unmapped interrupt %d\n", level);
+			dev_warn_ratelimited(gc->parent, "unmapped interrupt %d\n", pin);
 			continue;
 		}
 
 		if (test_bit(level, chip->irq_trig_low))
-			while (!cy8c95x0_gpio_get_value(gc, level))
+			while (!cy8c95x0_gpio_get_value(gc, pin))
 				handle_nested_irq(nested_irq);
 		else if (test_bit(level, chip->irq_trig_high))
-			while (cy8c95x0_gpio_get_value(gc, level))
+			while (cy8c95x0_gpio_get_value(gc, pin))
 				handle_nested_irq(nested_irq);
 		else
 			handle_nested_irq(nested_irq);
