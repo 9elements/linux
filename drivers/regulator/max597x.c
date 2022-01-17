@@ -713,7 +713,7 @@ static int max597x_probe(struct i2c_client *cl, const struct i2c_device_id *id)
 
 		ret = max597x_adc_range(&cl->dev, regmap, i, data);
 		if (ret < 0)
-			goto err_regulator_disable;
+			return ret;
 
 		/* Set shunt value for IIO backend */
 		priv->shunt_micro_ohms[i] = data->shunt_micro_ohms;
