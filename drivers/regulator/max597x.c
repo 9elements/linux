@@ -537,14 +537,17 @@ static int max597x_parse_dt(struct device *dev, struct max597x_data *data)
 	struct device_node *regulators;
 	struct of_regulator_match match;
 	u32 shunt_microohms;
-	u8 led_enable;
+	u32 led_enable;
 	int ret;
 
-	if (!led_enable) {
+	ret = of_property_read_u32(dev->of_node, "led-enable", &led_enable);
+	if (!ret) {
 		ret = regmap_update_bits(data->regmap, MAX5970_REG_LED_FLASH,
 					 led_enable, 0);
-		if (ret < 0)
+		if (ret < 0) {
+			dev_err(dev, "max597x: led_enable failed, err %d\n", ret);
 			return ret;
+		}
 	}
 
 	regulators = of_get_child_by_name(dev->of_node, "regulators");
