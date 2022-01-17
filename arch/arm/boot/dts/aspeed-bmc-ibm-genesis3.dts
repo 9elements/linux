@@ -1863,6 +1863,8 @@
 
 &i2c4 { // SMB_SMLINK0_STBY_LVC3
 	status = "okay";
+	multi-master;
+	bus-frequency = <1000000>;
 };
 
 &i2c5 { // BMC_MUX_VR_PCH_CPU
