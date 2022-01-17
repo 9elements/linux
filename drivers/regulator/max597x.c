@@ -110,6 +110,8 @@ enum max597x_regulator_id {
 #define MAX5970_REG_CHXEN		0x3b
 #define  CHXEN(ch)			(3 << ((ch) * 2))
 
+#define MAX5970_REG_LED_FLASH	0x43
+
 #define MAX_REGISTERS			0x49
 #define ADC_MASK			0x3FF
 
@@ -535,7 +537,20 @@ static int max597x_parse_dt(struct device *dev, struct max597x_data *data)
 	struct device_node *regulators;
 	struct of_regulator_match match;
 	u32 shunt_microohms;
+	u8 led_enable;
 	int ret;
+
+	ret = of_property_read_u8(dev->of_node, "led-enable", &led_enable);
+
+	if (ret < 0) {
+		dev_err(dev, "property 'led-enable' not found, err %d\n", ret);
+		return ret;
+	}
+
+	ret = regmap_update_bits(data->regmap, MAX5970_REG_LED_FLASH,
+					led_enable, 0);
+	if (ret < 0)
+		return ret;
 
 	regulators = of_get_child_by_name(dev->of_node, "regulators");
 	if (!regulators) {
