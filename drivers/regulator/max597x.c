@@ -288,9 +288,47 @@ static int max597x_get_status(struct regulator_dev *rdev)
 	return REGULATOR_STATUS_OFF;
 }
 
+static int max597x_enable(struct regulator_dev *rdev)
+{
+	struct max597x_data *data = rdev_get_drvdata(rdev);
+	int ret;
+
+	ret = regulator_is_enabled_regmap(rdev);
+	if (ret < 0)
+		return ret;
+
+	/* Nothing to do */
+	if (ret)
+		return 0;
+
+	ret = regulator_enable(data->parent);
+	if (ret < 0)
+		return ret;
+	return regulator_enable_regmap(rdev);
+}
+
+static int max597x_disable(struct regulator_dev *rdev)
+{
+	struct max597x_data *data = rdev_get_drvdata(rdev);
+	int ret;
+
+	ret = regulator_is_enabled_regmap(rdev);
+	if (ret < 0)
+		return ret;
+
+	/* Nothing to do */
+	if (!ret)
+		return 0;
+
+	ret = regulator_disable_regmap(rdev);
+	if (ret < 0)
+		return ret;
+	return regulator_disable(data->parent);
+}
+
 static const struct regulator_ops max597x_switch_ops = {
-	.enable				= regulator_enable_regmap,
-	.disable			= regulator_disable_regmap,
+	.enable				= max597x_enable,
+	.disable			= max597x_disable,
 	.is_enabled			= regulator_is_enabled_regmap,
 	.get_voltage			= max597x_voltage_op,
 	.get_status			= max597x_get_status,
@@ -610,7 +648,6 @@ static int max597x_probe(struct i2c_client *cl, const struct i2c_device_id *id)
 	struct max597x_data *data;
 	int num_switches = 0;
 	struct regmap *regmap;
-	struct regulator_bulk_data supplies[MAX5970_NUM_SWITCHES];
 	struct iio_dev *indio_dev;
 	struct max597x_iio *priv;
 	int ret;
@@ -651,31 +688,28 @@ static int max597x_probe(struct i2c_client *cl, const struct i2c_device_id *id)
 	priv = iio_priv(indio_dev);
 	priv->regmap = regmap;
 
-	/* Enable supply regulators */
-	supplies[0].supply = "vss1";
-	supplies[1].supply = "vss2";
-
-	ret = devm_regulator_bulk_get(&cl->dev, num_switches, supplies);
-	if (ret < 0)
-		return ret;
-	ret = regulator_bulk_enable(num_switches, supplies);
-	if (ret < 0)
-		return ret;
-
 	for (i = 0; i < num_switches; i++) {
 		data = devm_kzalloc(&cl->dev, sizeof(struct max597x_data), GFP_KERNEL);
-		if (!data) {
-			ret = -ENOMEM;
-			goto err_regulator_disable;
-		}
+		if (!data)
+			return -ENOMEM;
 
 		data->num_switches = num_switches;
 		data->regulator = &regulators[i];
 		data->regmap = regmap;
+		data->parent = devm_regulator_get(&cl->dev, i == 0 ? "vss1": "vss2");
+		if (IS_ERR(data->parent))
+			return PTR_ERR(data->parent);
+
+		/* Store supply voltage to return only supported output voltage */
+		ret = regulator_get_voltage(data->parent);
+		if (ret < 0)
+			return ret;
+
+		data->uV = ret;
 
 		ret = max597x_parse_dt(&cl->dev, data);
 		if (ret < 0)
-			goto err_regulator_disable;
+			return ret;
 
 		ret = max597x_adc_range(&cl->dev, regmap, i, data);
 		if (ret < 0)
@@ -688,13 +722,6 @@ static int max597x_probe(struct i2c_client *cl, const struct i2c_device_id *id)
 		dev_info(&cl->dev, "Shunt%d ADC upper limit %d mA\n", i,
 			 data->irng * 1000 / data->shunt_micro_ohms);
 
-		/* Store supply voltage to return only supported output voltage */
-		ret = regulator_get_voltage(supplies[i].consumer);
-		if (ret < 0)
-			goto err_regulator_disable;
-
-		data->uV = ret;
-
 		config.dev = &cl->dev;
 		config.driver_data = (void *)data;
 		config.regmap = regmap;
@@ -704,8 +731,7 @@ static int max597x_probe(struct i2c_client *cl, const struct i2c_device_id *id)
 		if (IS_ERR(rdev)) {
 			dev_err(&cl->dev, "failed to register regulator %s\n",
 				regulators[i].rdesc.name);
-			ret = PTR_ERR(rdev);
-			goto err_regulator_disable;
+			return PTR_ERR(rdev);
 		}
 		rdevs[i] = rdev;
 	}
@@ -714,20 +740,17 @@ static int max597x_probe(struct i2c_client *cl, const struct i2c_device_id *id)
 		ret = max597x_setup_irq(&cl->dev, cl->irq, rdevs, num_switches, data);
 		if (ret) {
 			dev_err(&cl->dev, "IRQ setup failed");
-			goto err_regulator_disable;
+			return ret;
 		}
 	}
 
 	ret = devm_iio_device_register(&cl->dev, indio_dev);
 	if (ret) {
 		dev_err(&cl->dev, "could not register iio device");
-		goto err_regulator_disable;
+		return ret;
 	}
 
 	return 0;
-
-err_regulator_disable:
-	return regulator_bulk_disable(num_switches, supplies);
 }
 
 static const struct i2c_device_id max597x_table[] = {
