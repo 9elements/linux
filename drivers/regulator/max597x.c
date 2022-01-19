@@ -540,17 +540,12 @@ static int max597x_parse_dt(struct device *dev, struct max597x_data *data)
 	u8 led_enable;
 	int ret;
 
-	ret = of_property_read_u8(dev->of_node, "led-enable", &led_enable);
-
-	if (ret < 0) {
-		dev_err(dev, "property 'led-enable' not found, err %d\n", ret);
-		return ret;
+	if (!led_enable) {
+		ret = regmap_update_bits(data->regmap, MAX5970_REG_LED_FLASH,
+					 led_enable, 0);
+		if (ret < 0)
+			return ret;
 	}
-
-	ret = regmap_update_bits(data->regmap, MAX5970_REG_LED_FLASH,
-					led_enable, 0);
-	if (ret < 0)
-		return ret;
 
 	regulators = of_get_child_by_name(dev->of_node, "regulators");
 	if (!regulators) {
