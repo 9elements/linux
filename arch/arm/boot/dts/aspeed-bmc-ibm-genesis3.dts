@@ -1844,7 +1844,7 @@
 				interrupt-parent = <&smb_pex_vr_ctrl>;
 				interrupts = <39 IRQ_TYPE_LEVEL_LOW>; // M2_SSD2_SSB_ALERT_N
 				vss1-supply = <&p3v3_aux>;
-				led-enable = <1>
+				led-enable = <1>;
 
 				regulators {
 					sw0_smb_m2_ssb_ssd2: SW0 {
