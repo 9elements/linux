@@ -540,7 +540,8 @@ static int max597x_parse_dt(struct device *dev, struct max597x_data *data)
 	u8 led_enable;
 	int ret;
 
-	if (!led_enable) {
+	ret = of_property_read_u8(dev->of_node, "led-enable", &led_enable);
+	if (!ret) {
 		ret = regmap_update_bits(data->regmap, MAX5970_REG_LED_FLASH,
 					 led_enable, 0);
 		if (ret < 0)
