@@ -12,18 +12,18 @@ git fetch
 git checkout ${PREFIX}_base
 git branch -D ${PREFIX}
 
+BRANCHES_TO_MERGE=""
 BRANCHES=$(git branch --list -r |grep $PREFIX|xargs)
+echo "Branches to merge:"
 for b in ${BRANCHES}; do
   if [ "${b}" == "${PREFIX}" ]; then continue; fi
   if [ "${b}" == "${PREFIX}_base" ]; then continue; fi
   if [[ "${b}" =~ "${PREFIX}-"[0-9]* ]]; then continue; fi
-
-  echo "Commits on branch ${b}:"
-  commits=$(git log --oneline ${b}...origin/dev-5.15_base --no-decorate --reverse| cut -d' ' -f1)
-  echo "${commits}"
-  git cherry-pick $(echo ${commits}| xargs) 
-  echo ""
+  BRANCHES_TO_MERGE="${BRANCHES_TO_MERGE} ${b}"
+  echo "${b}"
 done
+echo ""
+git merge --no-edit ${BRANCHES_TO_MERGE}
 git branch -D ${LOCAL_PREFIX}
 git branch ${LOCAL_PREFIX}
 git checkout ${LOCAL_PREFIX}
