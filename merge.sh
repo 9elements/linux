@@ -2,6 +2,12 @@
 
 PREFIX="origin/dev-5.15"
 LOCAL_PREFIX=$(echo ${PREFIX}|sed "s|origin/||")
+
+if [ -d ".git/sequencer" ]; then
+  echo "FATAL ERROR: Cherry-pick or rebase in progress. ABORTING."
+  exit 1
+fi
+
 git fetch
 git checkout ${PREFIX}_base
 git branch -D ${PREFIX}
@@ -21,4 +27,7 @@ done
 git branch -D ${LOCAL_PREFIX}
 git branch ${LOCAL_PREFIX}
 git checkout ${LOCAL_PREFIX}
-git push -u origin HEAD:${LOCAL_PREFIX}
+echo "**************************************"
+echo "Done merging! Now push it\n"
+echo "**************************************"
+
