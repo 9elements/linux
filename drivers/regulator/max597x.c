@@ -30,8 +30,6 @@ struct max597x_data {
 	int num_switches;
 	int shunt_micro_ohms;
 	const struct max597x_regulator *regulator;
-	struct regulator *parent;
-	unsigned int uV;
 	unsigned int irng;
 	unsigned int mon_rng;
 	struct regmap *regmap;
@@ -260,13 +258,6 @@ static int max597x_set_ocp(struct regulator_dev *rdev, int lim_uA,
 	return ret;
 }
 
-static int max597x_voltage_op(struct regulator_dev *rdev)
-{
-	struct max597x_data *data = rdev_get_drvdata(rdev);
-
-	return data->uV;	/* Output is not regulated */
-}
-
 static int max597x_get_status(struct regulator_dev *rdev)
 {
 	int val, ret;
@@ -288,56 +279,17 @@ static int max597x_get_status(struct regulator_dev *rdev)
 	return REGULATOR_STATUS_OFF;
 }
 
-static int max597x_enable(struct regulator_dev *rdev)
-{
-	struct max597x_data *data = rdev_get_drvdata(rdev);
-	int ret;
-
-	ret = regulator_is_enabled_regmap(rdev);
-	if (ret < 0)
-		return ret;
-
-	/* Nothing to do */
-	if (ret)
-		return 0;
-
-	ret = regulator_enable(data->parent);
-	if (ret < 0)
-		return ret;
-	return regulator_enable_regmap(rdev);
-}
-
-static int max597x_disable(struct regulator_dev *rdev)
-{
-	struct max597x_data *data = rdev_get_drvdata(rdev);
-	int ret;
-
-	ret = regulator_is_enabled_regmap(rdev);
-	if (ret < 0)
-		return ret;
-
-	/* Nothing to do */
-	if (!ret)
-		return 0;
-
-	ret = regulator_disable_regmap(rdev);
-	if (ret < 0)
-		return ret;
-	return regulator_disable(data->parent);
-}
-
 static const struct regulator_ops max597x_switch_ops = {
-	.enable				= max597x_enable,
-	.disable			= max597x_disable,
+	.enable				= regulator_enable_regmap,
+	.disable			= regulator_disable_regmap,
 	.is_enabled			= regulator_is_enabled_regmap,
-	.get_voltage			= max597x_voltage_op,
 	.get_status			= max597x_get_status,
 	.set_over_voltage_protection	= max597x_set_ovp,
 	.set_under_voltage_protection	= max597x_set_uvp,
 	.set_over_current_protection	= max597x_set_ocp,
 };
 
-#define MAX597X_SWITCH(_ID, _ereg, _chan) {                      \
+#define MAX597X_SWITCH(_ID, _ereg, _chan, _supply) {             \
 	.rdesc = {                                               \
 		.name            = #_ID,                         \
 		.of_match        = of_match_ptr(#_ID),           \
@@ -346,6 +298,7 @@ static const struct regulator_ops max597x_switch_ops = {
 		.type            = REGULATOR_VOLTAGE,            \
 		.id              = MAX597X_##_ID,                \
 		.owner           = THIS_MODULE,                  \
+		.supply_name     = _supply,                      \
 		.enable_reg      = _ereg,                        \
 		.enable_mask     = CHXEN((_chan)),               \
 	},                                                       \
@@ -353,8 +306,8 @@ static const struct regulator_ops max597x_switch_ops = {
 }
 
 static const struct max597x_regulator regulators[] = {
-	MAX597X_SWITCH(SW0, MAX5970_REG_CHXEN, 0),
-	MAX597X_SWITCH(SW1, MAX5970_REG_CHXEN, 1),
+	MAX597X_SWITCH(SW0, MAX5970_REG_CHXEN, 0, "vss1"),
+	MAX597X_SWITCH(SW1, MAX5970_REG_CHXEN, 1, "vss2"),
 };
 
 static int max597x_regmap_read_clear(struct regmap *map, unsigned int reg,
@@ -696,17 +649,7 @@ static int max597x_probe(struct i2c_client *cl, const struct i2c_device_id *id)
 		data->num_switches = num_switches;
 		data->regulator = &regulators[i];
 		data->regmap = regmap;
-		data->parent = devm_regulator_get(&cl->dev, i == 0 ? "vss1": "vss2");
-		if (IS_ERR(data->parent))
-			return PTR_ERR(data->parent);
-
-		/* Store supply voltage to return only supported output voltage */
-		ret = regulator_get_voltage(data->parent);
-		if (ret < 0)
-			return ret;
-
-		data->uV = ret;
-
+	
 		ret = max597x_parse_dt(&cl->dev, data);
 		if (ret < 0)
 			return ret;
