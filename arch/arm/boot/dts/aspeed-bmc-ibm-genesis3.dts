@@ -2138,9 +2138,9 @@
 	p1v2_bmc_aux_mon: pmic@60 {
 		compatible = "maxim,max8952";
 		reg = <0x60>;
-		max8952,default-mode = <0>;
-		max8952,dvs-mode-microvolt = <1200000>, <1200000>,
-						<1200000>, <1200000>;
+		max8952,default-mode = <3>;
+		max8952,dvs-mode-microvolt = <1100000>, <1100000>,
+						<1100000>, <1100000>;
 		regulator-always-on;
 		regulator-boot-on;
 	};
