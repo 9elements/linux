@@ -15,7 +15,7 @@
 #include "pmbus.h"
 
 #if IS_ENABLED(CONFIG_SENSORS_XDPE112_REGULATOR)
-static const struct regulator_desc xdpe112_reg_desc[] = {
+static struct regulator_desc xdpe112_reg_desc[] = {
 #ifdef PMBUS_REGULATOR_VOUT_CMD
 	PMBUS_REGULATOR_VOUT_CMD("vout", 0),
 	PMBUS_REGULATOR_VOUT_CMD("vout", 1),
@@ -55,6 +55,12 @@ static int xdpe112_probe(struct i2c_client *client)
 
 	if (client->dev.of_node->full_name)
 		strlcpy(client->name, client->dev.of_node->full_name, I2C_NAME_SIZE);
+
+	// Fixme: merge into PMBUS macro
+#if IS_ENABLED(CONFIG_SENSORS_XDPE112_REGULATOR)
+	xdpe112_reg_desc[0].supply_name = "vdrv";
+	xdpe112_reg_desc[1].supply_name = "vdrv";
+#endif
 
 	return pmbus_do_probe(client, &xdpe112_info);
 }
