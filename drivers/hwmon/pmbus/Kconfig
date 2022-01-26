@@ -48,6 +48,22 @@ config SENSORS_ADM1275
 	  This driver can also be built as a module. If so, the module will
 	  be called adm1275.
 
+config SENSORS_BCM6123
+	tristate "Vicor BCM6123 Compatible Power Supplies"
+	help
+	  If you say yes here you get hardware monitoring support for Vicor
+	  BCM6123 Power Supplies.
+
+	  This driver can also be built as a module. If so, the module will
+	  be called bcm6123.
+
+config SENSORS_BCM6123_REGULATOR
+	bool "Regulator support for BCM6123 and compatibles"
+	depends on SENSORS_BCM6123 && REGULATOR
+	help
+	  If you say yes here you get regulator support for Vicor BCM6123
+	  Power Supplies.
+
 config SENSORS_BEL_PFE
 	tristate "Bel PFE Compatible Power Supplies"
 	help
@@ -123,13 +139,19 @@ config SENSORS_IR36021
 	  be called ir36021.
 
 config SENSORS_IR38064
-	tristate "Infineon IR38064"
+	tristate "Infineon IR38x6x"
 	help
 	  If you say yes here you get hardware monitoring support for Infineon
-	  IR38064.
+	  IR38064 and IR38263.
 
 	  This driver can also be built as a module. If so, the module will
 	  be called ir38064.
+
+config SENSORS_IR38064_REGULATOR
+	bool "Regulator support for IR38064 and compatibles"
+	depends on SENSORS_IR38064 && REGULATOR
+	help
+	  Uses the IR38064 or compatible as regulator.
 
 config SENSORS_IRPS5401
 	tristate "Infineon IRPS5401"
@@ -173,8 +195,8 @@ config SENSORS_LTC2978_REGULATOR
 	depends on SENSORS_LTC2978 && REGULATOR
 	help
 	  If you say yes here you get regulator support for Linear Technology
-	  LTC3880, LTC3883, LTC3884, LTC3886, LTC3887, LTC3889, LTC7880, 
-	  LTM4644, LTM4675, LTM4676, LTM4677, LTM4678, LTM4680, LTM4686, 
+	  LTC3880, LTC3883, LTC3884, LTC3886, LTC3887, LTC3889, LTC7880,
+	  LTM4644, LTM4675, LTM4676, LTM4677, LTM4678, LTM4680, LTM4686,
 	  and LTM4700.
 
 config SENSORS_LTC3815
@@ -285,6 +307,15 @@ config SENSORS_PIM4328
 	  This driver can also be built as a module. If so, the module will
 	  be called pim4328.
 
+config SENSORS_PLI1209BC
+	tristate "Vicor PLI1209BC"
+	help
+	  If you say yes here you get hardware monitoring support for Vicor
+	  PLI1209BC Digital Supervisor
+
+	  This driver can also be built as a module. If so, the module will
+	  be called pli1209bc.
+
 config SENSORS_PM6764TR
 	tristate "ST PM6764TR"
 	help
@@ -359,6 +390,21 @@ config SENSORS_UCD9200
 
 	  This driver can also be built as a module. If so, the module will
 	  be called ucd9200.
+
+config SENSORS_XDPE112
+	tristate "Infineon XDPE112 family"
+	help
+	  If you say yes here you get hardware monitoring support for Infineon
+	  XDPE11280, device.
+
+	  This driver can also be built as a module. If so, the module will
+	  be called xdpe11280.
+
+config SENSORS_XDPE112_REGULATOR
+	bool "Regulator support for XDPE112 and compatibles"
+	depends on SENSORS_XDPE112 && REGULATOR
+	help
+	  Uses the xdpe11280 or compatible as regulator.
 
 config SENSORS_XDPE122
 	tristate "Infineon XDPE122 family"
