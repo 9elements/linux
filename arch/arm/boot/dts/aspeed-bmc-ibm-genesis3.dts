@@ -1233,8 +1233,6 @@
 					pvcore_nic2: vout0 {
 						regulator-compatible = "vout0";
 						regulator-name = "pvcore_nic2";
-						regulator-min-microvolt = <900000>;
-						regulator-max-microvolt = <1000000>;
 						regulator-enable-ramp-delay = <2000>;
 						vin-supply = <&p12v_a>;
 					};
@@ -1253,8 +1251,6 @@
 					pvcore_nic1: vout0 {
 						regulator-compatible = "vout0";
 						regulator-name = "pvcore_nic1";
-						regulator-min-microvolt = <900000>;
-						regulator-max-microvolt = <1000000>;
 						regulator-enable-ramp-delay = <2000>;
 						vin-supply = <&p12v_a>;
 					};
@@ -1278,8 +1274,6 @@
 					p3v3_nic: vout0 {
 						regulator-compatible = "vout0";
 						regulator-name = "p3v3_nic";
-						regulator-min-microvolt = <3200000>;
-						regulator-max-microvolt = <3400000>;
 						regulator-enable-ramp-delay = <2000>;
 						vin-supply = <&p12v_a>;
 						vbus-supply = <&p3v3_aux>;
@@ -1299,8 +1293,6 @@
 					p1v2_nic: vout0 {
 						regulator-compatible = "vout0";
 						regulator-name = "p1v2_nic";
-						regulator-min-microvolt = <1164000>;
-						regulator-max-microvolt = <1236000>;
 						regulator-enable-ramp-delay = <2000>;
 						vin-supply = <&p12v_a>;
 						vbus-supply = <&p3v3_aux>;
@@ -1320,8 +1312,6 @@
 					p1v8_nic: vout0 {
 						regulator-compatible = "vout0";
 						regulator-name = "p1v8_nic";
-						regulator-min-microvolt = <1746000>;
-						regulator-max-microvolt = <1854000>;
 						regulator-enable-ramp-delay = <2000>;
 						vin-supply = <&p12v_a>;
 						vbus-supply = <&p3v3_aux>;
@@ -1452,8 +1442,6 @@
 					pvnn_pch_aux: vout0 {
 						regulator-compatible = "vout0";
 						regulator-name = "pvnn_pch_aux";
-						regulator-min-microvolt = <800000>;
-						regulator-max-microvolt = <1050000>;
 						regulator-enable-ramp-delay = <2000>;
 						vin-supply = <&p12v_a>;
 					};
@@ -1473,8 +1461,6 @@
 					p1v05_pch_aux: vout0 {
 						regulator-compatible = "vout0";
 						regulator-name = "p1v05_pch_aux";
-						regulator-min-microvolt = <1050000>;
-						regulator-max-microvolt = <1050000>;
 						regulator-enable-ramp-delay = <2000>;
 						vin-supply = <&p12v_a>;
 					};
@@ -1494,8 +1480,6 @@
 					p1v8_pch_aux: vout0 {
 						regulator-compatible = "vout0";
 						regulator-name = "p1v8_pch_aux";
-						regulator-min-microvolt = <1800000>;
-						regulator-max-microvolt = <1800000>;
 						regulator-enable-ramp-delay = <2000>;
 						vin-supply = <&p12v_a>;
 					};
@@ -1622,8 +1606,6 @@
 					pvccio_cpu2: vout0 {
 						regulator-compatible = "vout0";
 						regulator-name = "pvccio_cpu2";
-						regulator-min-microvolt = <900000>;
-						regulator-max-microvolt = <1100000>;
 						regulator-enable-ramp-delay = <200>;
 						vin-supply = <&p12v_a>;
 					};
@@ -1780,8 +1762,6 @@
 					pvccio_cpu1: vout0 {
 						regulator-compatible = "vout0";
 						regulator-name = "pvccio_cpu1";
-						regulator-min-microvolt = <900000>;
-						regulator-max-microvolt = <1100000>;
 						regulator-enable-ramp-delay = <200>;
 						vin-supply = <&p12v_a>;
 					};
@@ -2212,8 +2192,6 @@
 					pvccio_cpu0: vout0 {
 						regulator-compatible = "vout0";
 						regulator-name = "pvccio_cpu0";
-						regulator-min-microvolt = <900000>;
-						regulator-max-microvolt = <1100000>;
 						regulator-enable-ramp-delay = <200>;
 						vin-supply = <&p12v_a>;
 					};
@@ -2625,8 +2603,6 @@
 					pvccio_cpu3: vout0 {
 						regulator-compatible = "vout0";
 						regulator-name = "pvccio_cpu3";
-						regulator-min-microvolt = <900000>;
-						regulator-max-microvolt = <1100000>;
 						regulator-enable-ramp-delay = <200>;
 						vin-supply = <&p12v_a>;
 					};
@@ -3170,8 +3146,6 @@
 							p5v_aux: vout0 {
 								regulator-compatible = "vout0";
 								regulator-name = "p5v_aux";
-								regulator-min-microvolt = <5000000>;
-								regulator-max-microvolt = <5000000>;
 								regulator-enable-ramp-delay = <2000>;
 								vin-supply = <&p12v_a>;
 								vbus-supply = <&p3v3_bmc_aux>;
@@ -3195,8 +3169,6 @@
 								regulator-compatible = "vout0";
 								vin-supply = <&p12v_a>;
 								regulator-name = "p3v3_aux";
-								regulator-min-microvolt = <3300000>;
-								regulator-max-microvolt = <3300000>;
 								// 2msec for regulator + 18msec for board capacitance
 								// Note: Every IC has a PTC which slowly charges the bypass cap.
 								regulator-enable-ramp-delay = <200000>;
