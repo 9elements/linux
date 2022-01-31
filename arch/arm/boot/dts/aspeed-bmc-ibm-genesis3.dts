@@ -1179,7 +1179,7 @@
 			#address-cells = <1>;
 			#size-cells = <0>;
 			reg = <0>;
-			smb_pex_nic: gpo@20 { // PEX for NIC 1 & 2
+			smb_pex_nic: U62160@20 {
 				#address-cells = <1>;
 				#size-cells = <0>;
 				compatible = "cypress,cy8c9540";
@@ -1491,7 +1491,7 @@
 			#size-cells = <0>;
 			reg = <4>;
 
-			gpio_exp_cpu03_fault: mcp23017@20 {
+			gpio_exp_cpu03_fault: U24604@20 {
 				#address-cells = <1>;
 				#size-cells = <0>;
 				compatible = "microchip,mcp23017";
@@ -1520,7 +1520,7 @@
 			#size-cells = <0>;
 			reg = <5>;
 
-			gpio_exp_cpu12_fault: mcp23017@20 {
+			gpio_exp_cpu12_fault: U24605@20 {
 				#address-cells = <1>;
 				#size-cells = <0>;
 				compatible = "microchip,mcp23017";
@@ -1564,7 +1564,7 @@
 			#address-cells = <1>;
 			#size-cells = <0>;
 			reg = <0>;
-			smb_pex_cpu2_event: gpo@20 {
+			smb_pex_cpu2_event: U62100@20 {
 				#address-cells = <1>;
 				#size-cells = <0>;
 				compatible = "cypress,cy8c9520";
@@ -1719,7 +1719,7 @@
 			#address-cells = <1>;
 			#size-cells = <0>;
 			reg = <0>;
-			smb_pex_cpu1_event: gpo@20 {
+			smb_pex_cpu1_event: U62090@20 {
 				#address-cells = <1>;
 				#size-cells = <0>;
 				compatible = "cypress,cy8c9520";
@@ -1951,7 +1951,7 @@
 			#size-cells = <0>;
 			reg = <5>;
 
-			smb_pex_rssd_01_16: gpo@20 {
+			smb_pex_rssd_01_16: U62140@20 {
 				#address-cells = <1>;
 				#size-cells = <0>;
 				compatible = "cypress,cy8c9560";
@@ -2144,7 +2144,7 @@
 			#address-cells = <1>;
 			#size-cells = <0>;
 			reg = <0>;
-			smb_pex_cpu0_event: gpo@20 {
+			smb_pex_cpu0_event: U62080@20 {
 				#address-cells = <1>;
 				#size-cells = <0>;
 				compatible = "cypress,cy8c9520";
@@ -2377,7 +2377,7 @@
 			#size-cells = <0>;
 			reg = <5>;
 
-			smb_pex_rssd17_32: gpo@20 {
+			smb_pex_rssd17_32: U62150@20 {
 				#address-cells = <1>;
 				#size-cells = <0>;
 				compatible = "cypress,cy8c9560";
@@ -2557,7 +2557,7 @@
 			#address-cells = <1>;
 			#size-cells = <0>;
 			reg = <0>;
-			smb_pex_cpu3_event: gpo@20 {
+			smb_pex_cpu3_event: U62110@20 {
 				#address-cells = <1>;
 				#size-cells = <0>;
 				compatible = "cypress,cy8c9520";
@@ -2718,7 +2718,7 @@
 			#address-cells = <1>;
 			#size-cells = <0>;
 			reg = <0>;
-			smb_pex_vr_ctrl: gpo@20 {
+			smb_pex_vr_ctrl: U62120@20 {
 				#address-cells = <1>;
 				#size-cells = <0>;
 				compatible = "cypress,cy8c9540";
@@ -2759,7 +2759,7 @@
 			#address-cells = <1>;
 			#size-cells = <0>;
 			reg = <1>;
-			bmc_pex_irq: gpo@20 {
+			bmc_pex_irq: U60000@20 {
 				#address-cells = <1>;
 				#size-cells = <0>;
 				compatible = "cypress,cy8c9520";
@@ -2808,7 +2808,7 @@
 					#size-cells = <0>;
 					reg = <0>;
 
-					smb_svc_pex_rssd01_16: gpo@20 {
+					smb_svc_pex_rssd01_16: U65200@20 {
 						#address-cells = <1>;
 						#size-cells = <0>;
 						compatible = "cypress,cy8c9560";
@@ -2866,7 +2866,7 @@
 					#size-cells = <0>;
 					reg = <1>;
 
-					smb_svc_pex_rssd17_32: gpo@20 {
+					smb_svc_pex_rssd17_32: U65300@20 {
 						#address-cells = <1>;
 						#size-cells = <0>;
 						compatible = "cypress,cy8c9560";
@@ -2929,7 +2929,7 @@
 					#size-cells = <0>;
 					reg = <3>;
 
-					smb_svc_pex_fan_alert: gpo@20 {
+					smb_svc_pex_fan_alert: U65600@20 {
 						#address-cells = <1>;
 						#size-cells = <0>;
 						compatible = "cypress,cy8c9560";
@@ -2985,7 +2985,7 @@
 					#size-cells = <0>;
 					reg = <4>;
 
-					smb_svc_pex_cpu03_led: gpo@20 {
+					smb_svc_pex_cpu03_led: U65400@20 {
 						#address-cells = <1>;
 						#size-cells = <0>;
 						compatible = "cypress,cy8c9560";
@@ -3044,7 +3044,7 @@
 					#size-cells = <0>;
 					reg = <5>;
 
-					smb_svc_pex_cpu12_led: gpo@20 {
+					smb_svc_pex_cpu12_led: U65500@20 {
 						#address-cells = <1>;
 						#size-cells = <0>;
 						compatible = "cypress,cy8c9560";
