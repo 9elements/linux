@@ -8,6 +8,7 @@
 #include <linux/i2c.h>
 #include <linux/module.h>
 #include <linux/pmbus.h>
+#include <linux/regulator/driver.h>
 #include "pmbus.h"
 
 /*
@@ -19,6 +20,18 @@
 static struct pmbus_platform_data pli1209bc_plat_data = {
 	.flags = PMBUS_NO_CAPABILITY,
 };
+
+#if IS_ENABLED(CONFIG_SENSORS_PLI1209BC_REGULATOR)
+static const struct regulator_desc pli1209bc_reg_desc = {
+	.name = "vout0",
+	.id = 1,
+	.of_match = of_match_ptr("vout0"),
+	.regulators_node = of_match_ptr("regulators"),
+	.ops = &pmbus_regulator_ops,
+	.type = REGULATOR_VOLTAGE,
+	.owner = THIS_MODULE,
+};
+#endif
 
 static struct pmbus_driver_info pli1209bc_info = {
 	.pages = 2,
@@ -48,7 +61,11 @@ static struct pmbus_driver_info pli1209bc_info = {
 	    | PMBUS_HAVE_IIN | PMBUS_HAVE_IOUT
 	    | PMBUS_HAVE_PIN | PMBUS_HAVE_POUT
 	    | PMBUS_HAVE_TEMP | PMBUS_HAVE_STATUS_TEMP
-	    | PMBUS_HAVE_STATUS_IOUT | PMBUS_HAVE_STATUS_INPUT
+	    | PMBUS_HAVE_STATUS_IOUT | PMBUS_HAVE_STATUS_INPUT,
+#if IS_ENABLED(CONFIG_SENSORS_PLI1209BC_REGULATOR)
+	.num_regulators = 1,
+	.reg_desc = &pli1209bc_reg_desc,
+#endif
 };
 
 static int pli1209bc_probe(struct i2c_client *client)
