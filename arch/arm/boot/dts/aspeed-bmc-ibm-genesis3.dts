@@ -3220,15 +3220,13 @@
 					#address-cells = <1>;
 					#size-cells = <0>;
 					reg = <4>;
-					bcm6123_p12v_a: regulator@5f {
-						compatible = "vicor,bcm6123";
+					pli1209bc_p12v_a: regulator@5f {
+						compatible = "vicor,pli1209bc";
 						reg = <0x5f>;
 						regulators {
 							p12v_a: vout0 {
 								regulator-compatible = "vout0";
 								regulator-name = "bcm0";
-								regulator-min-microvolt = <12000000>;
-								regulator-max-microvolt = <12000000>;
 								regulator-always-on;
 								regulator-boot-on;
 							};
@@ -3239,15 +3237,13 @@
 					#address-cells = <1>;
 					#size-cells = <0>;
 					reg = <5>;
-					bcm6123_p12v_b: regulator@5f {
-						compatible = "vicor,bcm6123";
+					pli1209bc_p12v_b: regulator@5f {
+						compatible = "vicor,pli1209bc";
 						reg = <0x5f>;
 						regulators {
 							p12v_b: vout0 {
 								regulator-compatible = "vout0";
 								regulator-name = "bcm1";
-								regulator-min-microvolt = <12000000>;
-								regulator-max-microvolt = <12000000>;
 								regulator-boot-on;
 							};
 						};
@@ -3257,15 +3253,13 @@
 					#address-cells = <1>;
 					#size-cells = <0>;
 					reg = <6>;
-					bcm6123_p12v_c: regulator@5f {
-						compatible = "vicor,bcm6123";
+					pli1209bc_p12v_c: regulator@5f {
+						compatible = "vicor,pli1209bc";
 						reg = <0x5f>;
 						regulators {
 							p12v_c: vout0 {
 								regulator-compatible = "vout0";
 								regulator-name = "bcm2";
-								regulator-min-microvolt = <12000000>;
-								regulator-max-microvolt = <12000000>;
 								regulator-boot-on;
 							};
 						};
@@ -3275,15 +3269,13 @@
 					#address-cells = <1>;
 					#size-cells = <0>;
 					reg = <7>;
-					bcm6123_p12v_d: regulator@5f {
-						compatible = "vicor,bcm6123";
+					pli1209bc_p12v_d: regulator@5f {
+						compatible = "vicor,pli1209bc";
 						reg = <0x5f>;
 						regulators {
 							p12v_d: vout0 {
 								regulator-compatible = "vout0";
 								regulator-name = "bcm3";
-								regulator-min-microvolt = <12000000>;
-								regulator-max-microvolt = <12000000>;
 								regulator-boot-on;
 							};
 						};
