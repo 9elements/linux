@@ -1577,7 +1577,8 @@
 				interrupt-controller;
 				vdd-supply = <&p3v3_aux>;
 				ngpios = <17>;
-				gpio-reserved-ranges = <7 1>, <10 1>;
+				//FIXME: Used by unit testing. Uncomment on release.
+				//gpio-reserved-ranges = <7 1>, <10 1>;
 
 				gpio-line-names =
 				/* GPORT0 */ "RST_LVC3_CPU2_RESET_N", "PWRGD_LVC3_CPU2_PWRGOOD",
@@ -1732,7 +1733,8 @@
 				interrupt-controller;
 				vdd-supply = <&p3v3_aux>;
 				ngpios = <19>;
-				gpio-reserved-ranges = <5 3>, <10 1>;
+				//FIXME: Used by unit testing. Uncomment on release.
+				//gpio-reserved-ranges = <5 3>, <10 1>;
 
 				gpio-line-names =
 				/* GPORT0 */
@@ -3057,7 +3059,8 @@
 						interrupt-controller;
 						vdd-supply = <&p3v3_bmc_aux>;
 						ngpios = <59>;
-						gpio-reserved-ranges = <6 1>, <18 1>, <39 1>;
+						//FIXME: Used by unit testing. Uncomment on release.
+						//gpio-reserved-ranges = <6 1>, <18 1>, <39 1>;
 
 						gpio-line-names =
 						/* GPORT 0 */
