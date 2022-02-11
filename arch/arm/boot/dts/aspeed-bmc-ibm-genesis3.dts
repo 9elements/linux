@@ -3227,8 +3227,8 @@
 						compatible = "vicor,pli1209bc";
 						reg = <0x5f>;
 						regulators {
-							p12v_a: vout0 {
-								regulator-compatible = "vout0";
+							p12v_a: vout2 {
+								regulator-compatible = "vout2";
 								regulator-name = "bcm0";
 								regulator-always-on;
 								regulator-boot-on;
@@ -3244,8 +3244,8 @@
 						compatible = "vicor,pli1209bc";
 						reg = <0x5f>;
 						regulators {
-							p12v_b: vout0 {
-								regulator-compatible = "vout0";
+							p12v_b: vout2 {
+								regulator-compatible = "vout2";
 								regulator-name = "bcm1";
 								regulator-boot-on;
 							};
@@ -3260,8 +3260,8 @@
 						compatible = "vicor,pli1209bc";
 						reg = <0x5f>;
 						regulators {
-							p12v_c: vout0 {
-								regulator-compatible = "vout0";
+							p12v_c: vout2 {
+								regulator-compatible = "vout2";
 								regulator-name = "bcm2";
 								regulator-boot-on;
 							};
@@ -3276,8 +3276,8 @@
 						compatible = "vicor,pli1209bc";
 						reg = <0x5f>;
 						regulators {
-							p12v_d: vout0 {
-								regulator-compatible = "vout0";
+							p12v_d: vout2 {
+								regulator-compatible = "vout2";
 								regulator-name = "bcm3";
 								regulator-boot-on;
 							};
