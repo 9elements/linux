@@ -280,10 +280,18 @@ static const struct i2c_device_id pmbus_id[] = {
 
 MODULE_DEVICE_TABLE(i2c, pmbus_id);
 
+static const struct of_device_id __maybe_unused pmbus_of_match[] = {
+	{.compatible = "pmbus"},
+	{.compatible = "infineon,xdpe11280"},
+	{}
+};
+MODULE_DEVICE_TABLE(of, pmbus_of_match);
+
 /* This is the driver that will be inserted */
 static struct i2c_driver pmbus_driver = {
 	.driver = {
 		   .name = "pmbus",
+		   .of_match_table = of_match_ptr(pmbus_of_match),
 		   },
 	.probe_new = pmbus_probe,
 	.id_table = pmbus_id,
