@@ -171,6 +171,11 @@ static const struct irq_state pmbus_irq_status_byte[] = {
 		0,
 	},
 	{
+		PB_STATUS_OFF,
+		REGULATOR_EVENT_DISABLE,
+		0,
+	},
+	{
 		PB_STATUS_NONE_ABOVE,
 		REGULATOR_EVENT_FAIL,
 		REGULATOR_ERROR_FAIL,
