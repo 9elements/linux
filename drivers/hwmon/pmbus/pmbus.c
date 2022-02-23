@@ -216,11 +216,6 @@ static int pmbus_probe(struct i2c_client *client)
 	return pmbus_do_probe(client, info);
 }
 
-static const struct pmbus_device_info pmbus_info_two = {
-	.pages = 2,
-	.flags = 0
-};
-
 static const struct pmbus_device_info pmbus_info_one = {
 	.pages = 1,
 	.flags = 0
@@ -274,7 +269,6 @@ static const struct i2c_device_id pmbus_id[] = {
 	{"tps544c20", (kernel_ulong_t)&pmbus_info_one},
 	{"tps544c25", (kernel_ulong_t)&pmbus_info_one},
 	{"udt020", (kernel_ulong_t)&pmbus_info_one},
-	{"xdpe11280", (kernel_ulong_t)&pmbus_info_two},
 	{}
 };
 
