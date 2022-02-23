@@ -9,15 +9,30 @@
 #include <linux/module.h>
 #include <linux/init.h>
 #include <linux/err.h>
+#include <linux/regulator/driver.h>
 #include <linux/slab.h>
 #include <linux/mutex.h>
 #include <linux/i2c.h>
 #include <linux/pmbus.h>
 #include "pmbus.h"
 
+#if IS_ENABLED(CONFIG_SENSORS_PMBUS_REGULATOR)
+static const struct regulator_desc pmbus_one_reg_desc[] = {
+	PMBUS_REGULATOR("vout", 0),
+};
+
+static const struct regulator_desc pmbus_two_reg_desc[] = {
+	PMBUS_REGULATOR("vout", 0),
+	PMBUS_REGULATOR("vout", 1),
+};
+#endif /* CONFIG_SENSORS_PMBUS_REGULATOR */
+
 struct pmbus_device_info {
 	int pages;
 	u32 flags;
+	/* Regulator functionality, if supported by this chip driver. */
+	int num_regulators;
+	const struct regulator_desc *reg_desc;
 };
 
 static const struct i2c_device_id pmbus_id[];
@@ -186,8 +201,25 @@ static int pmbus_probe(struct i2c_client *client)
 	info->identify = pmbus_identify;
 	dev->platform_data = pdata;
 
+#if IS_ENABLED(CONFIG_SENSORS_PMBUS_REGULATOR)
+	info->num_regulators = device_info->pages;
+	switch (info->num_regulators) {
+	case 1:
+		info->reg_desc = pmbus_one_reg_desc;
+		break;
+	case 2:
+		info->reg_desc = pmbus_two_reg_desc;
+		break;
+	}
+#endif /* CONFIG_SENSORS_PMBUS_REGULATOR */
+
 	return pmbus_do_probe(client, info);
 }
+
+static const struct pmbus_device_info pmbus_info_two = {
+	.pages = 2,
+	.flags = 0
+};
 
 static const struct pmbus_device_info pmbus_info_one = {
 	.pages = 1,
@@ -242,15 +274,24 @@ static const struct i2c_device_id pmbus_id[] = {
 	{"tps544c20", (kernel_ulong_t)&pmbus_info_one},
 	{"tps544c25", (kernel_ulong_t)&pmbus_info_one},
 	{"udt020", (kernel_ulong_t)&pmbus_info_one},
+	{"xdpe11280", (kernel_ulong_t)&pmbus_info_two},
 	{}
 };
 
 MODULE_DEVICE_TABLE(i2c, pmbus_id);
 
+static const struct of_device_id __maybe_unused pmbus_of_match[] = {
+	{.compatible = "pmbus"},
+	{.compatible = "infineon,xdpe11280"},
+	{}
+};
+MODULE_DEVICE_TABLE(of, pmbus_of_match);
+
 /* This is the driver that will be inserted */
 static struct i2c_driver pmbus_driver = {
 	.driver = {
 		   .name = "pmbus",
+		   .of_match_table = of_match_ptr(pmbus_of_match),
 		   },
 	.probe_new = pmbus_probe,
 	.id_table = pmbus_id,

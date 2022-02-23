@@ -10,6 +10,8 @@
 #include <linux/init.h>
 #include <linux/kernel.h>
 #include <linux/module.h>
+#include <linux/regulator/driver.h>
+
 #include "pmbus.h"
 
 #define XDPE122_PROT_VR12_5MV		0x01 /* VR12.0 mode, 5-mV DAC */
@@ -26,6 +28,9 @@ static int xdpe122_read_word_data(struct i2c_client *client, int page,
 	s16 exponent;
 	s32 mantissa;
 	int ret;
+
+	if (info->format[PSC_VOLTAGE_OUT] == linear)
+		return -ENODATA;
 
 	switch (reg) {
 	case PMBUS_VOUT_OV_FAULT_LIMIT:
@@ -75,8 +80,18 @@ static int xdpe122_read_word_data(struct i2c_client *client, int page,
 static int xdpe122_identify(struct i2c_client *client,
 			    struct pmbus_driver_info *info)
 {
-	u8 vout_params;
+	u8 vout_mode, vout_params;
 	int i, ret;
+
+	ret = pmbus_read_byte_data(client, 0, PMBUS_VOUT_MODE);
+	if (ret < 0)
+		return ret;
+
+	vout_mode = ret >> 5;
+	if (vout_mode == 0) {
+		info->format[PSC_VOLTAGE_OUT] = linear;
+		return 0;
+	}
 
 	for (i = 0; i < XDPE122_PAGE_NUM; i++) {
 		/* Read the register with VOUT scaling value.*/
@@ -107,6 +122,11 @@ static int xdpe122_identify(struct i2c_client *client,
 	return 0;
 }
 
+static const struct regulator_desc xdpe122_reg_desc[] = {
+	PMBUS_REGULATOR("vout", 0),
+	PMBUS_REGULATOR("vout", 1),
+};
+
 static struct pmbus_driver_info xdpe122_info = {
 	.pages = XDPE122_PAGE_NUM,
 	.format[PSC_VOLTAGE_IN] = linear,
@@ -125,6 +145,10 @@ static struct pmbus_driver_info xdpe122_info = {
 		PMBUS_HAVE_POUT | PMBUS_HAVE_PIN | PMBUS_HAVE_STATUS_INPUT,
 	.identify = xdpe122_identify,
 	.read_word_data = xdpe122_read_word_data,
+#if IS_ENABLED(CONFIG_SENSORS_XDPE122_REGULATOR)
+	.num_regulators = 2,
+	.reg_desc = xdpe122_reg_desc,
+#endif
 };
 
 static int xdpe122_probe(struct i2c_client *client)
@@ -140,6 +164,7 @@ static int xdpe122_probe(struct i2c_client *client)
 }
 
 static const struct i2c_device_id xdpe122_id[] = {
+	{"xdpe11280", 0},
 	{"xdpe12254", 0},
 	{"xdpe12284", 0},
 	{}
@@ -148,6 +173,7 @@ static const struct i2c_device_id xdpe122_id[] = {
 MODULE_DEVICE_TABLE(i2c, xdpe122_id);
 
 static const struct of_device_id __maybe_unused xdpe122_of_match[] = {
+	{.compatible = "infineon,xdpe11280"},
 	{.compatible = "infineon,xdpe12254"},
 	{.compatible = "infineon,xdpe12284"},
 	{}
