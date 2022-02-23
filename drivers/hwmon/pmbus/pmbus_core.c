@@ -2537,10 +2537,14 @@ static int pmbus_regulator_is_enabled(struct regulator_dev *rdev)
 {
 	struct device *dev = rdev_get_dev(rdev);
 	struct i2c_client *client = to_i2c_client(dev->parent);
+	struct pmbus_data *data = i2c_get_clientdata(client);
 	u8 page = rdev_get_id(rdev);
 	int ret;
 
+	mutex_lock(&data->update_lock);
 	ret = pmbus_read_byte_data(client, page, PMBUS_OPERATION);
+	mutex_unlock(&data->update_lock);
+
 	if (ret < 0)
 		return ret;
 
@@ -2551,11 +2555,17 @@ static int _pmbus_regulator_on_off(struct regulator_dev *rdev, bool enable)
 {
 	struct device *dev = rdev_get_dev(rdev);
 	struct i2c_client *client = to_i2c_client(dev->parent);
+	struct pmbus_data *data = i2c_get_clientdata(client);
 	u8 page = rdev_get_id(rdev);
+	int ret;
 
-	return pmbus_update_byte_data(client, page, PMBUS_OPERATION,
-				      PB_OPERATION_CONTROL_ON,
-				      enable ? PB_OPERATION_CONTROL_ON : 0);
+	mutex_lock(&data->update_lock);
+	ret = pmbus_update_byte_data(client, page, PMBUS_OPERATION,
+				     PB_OPERATION_CONTROL_ON,
+				     enable ? PB_OPERATION_CONTROL_ON : 0);
+	mutex_unlock(&data->update_lock);
+
+	return ret;
 }
 
 static int pmbus_regulator_enable(struct regulator_dev *rdev)
@@ -2576,7 +2586,10 @@ static int pmbus_regulator_get_status(struct regulator_dev *rdev)
 	u8 page = rdev_get_id(rdev);
 	int status, status2;
 
+	mutex_lock(&data->update_lock);
 	status = pmbus_get_status(client, page, PMBUS_STATUS_WORD);
+	mutex_unlock(&data->update_lock);
+
 	if (status < 0)
 		return status;
 
@@ -2588,7 +2601,9 @@ static int pmbus_regulator_get_status(struct regulator_dev *rdev)
 
 	if (status & PB_STATUS_VOUT_OV &&
 	    data->info->func[page] & PMBUS_HAVE_STATUS_VOUT) {
+		mutex_lock(&data->update_lock);
 		status2 = _pmbus_read_byte_data(client, page, PMBUS_STATUS_VOUT);
+		mutex_unlock(&data->update_lock);
 		if (status2 < 0)
 			return status2;
 		if (status2 & PB_VOLTAGE_OV_FAULT ||
@@ -2597,7 +2612,9 @@ static int pmbus_regulator_get_status(struct regulator_dev *rdev)
 	}
 	if (status & PB_STATUS_IOUT_OC &&
 	    data->info->func[page] & PMBUS_HAVE_STATUS_IOUT) {
+		mutex_lock(&data->update_lock);
 		status2 = _pmbus_read_byte_data(client, page, PMBUS_STATUS_IOUT);
+		mutex_unlock(&data->update_lock);
 		if (status2 < 0)
 			return status2;
 		if (status2 & PB_POUT_OP_FAULT ||
@@ -2608,7 +2625,9 @@ static int pmbus_regulator_get_status(struct regulator_dev *rdev)
 	}
 	if (status & PB_STATUS_VIN_UV &&
 	    data->info->func[page] & PMBUS_HAVE_STATUS_INPUT) {
+		mutex_lock(&data->update_lock);
 		status2 = _pmbus_read_byte_data(client, page, PMBUS_STATUS_INPUT);
+		mutex_unlock(&data->update_lock);
 		if (status2 < 0)
 			return status2;
 		if (status2 & PB_IIN_OC_FAULT ||
@@ -2618,7 +2637,9 @@ static int pmbus_regulator_get_status(struct regulator_dev *rdev)
 	}
 	if (status & PB_STATUS_TEMPERATURE &&
 	    data->info->func[page] & PMBUS_HAVE_STATUS_TEMP) {
+		mutex_lock(&data->update_lock);
 		status2 = _pmbus_read_byte_data(client, page, PMBUS_STATUS_TEMPERATURE);
+		mutex_unlock(&data->update_lock);
 		if (status2 < 0)
 			return status2;
 		if (status2 & PB_TEMP_UT_FAULT ||
@@ -2683,6 +2704,7 @@ static int pmbus_fault_handler(int irq, struct regulator_irq_data *rid,
 			       unsigned long *dev_mask)
 {
 	struct regulator_err_state *stat;
+	struct pmbus_data *data;
 	struct device *dev;
 	struct i2c_client *client;
 	int status;
@@ -2696,18 +2718,26 @@ static int pmbus_fault_handler(int irq, struct regulator_irq_data *rid,
 		stat  = &rid->states[i];
 		dev = rdev_get_dev(stat->rdev);
 		client = to_i2c_client(dev->parent);
+		data = i2c_get_clientdata(client);
 		page = rdev_get_id(stat->rdev);
 
+		mutex_lock(&data->update_lock);
 		status = pmbus_irq_subhandler(client, stat, dev_mask);
-		if (status < 0)
+		if (status < 0) {
+			mutex_unlock(&data->update_lock);
 			return REGULATOR_FAILED_RETRY;
+		}
 
 		status = pmbus_read_status_byte(client, page);
-		if (status < 0)
+		if (status < 0) {
+			mutex_unlock(&data->update_lock);
 			return REGULATOR_FAILED_RETRY;
+		}
 
 		if (status & ~(PB_STATUS_OFF | PB_STATUS_BUSY))
 			pmbus_clear_fault_page(client, page);
+
+		mutex_unlock(&data->update_lock);
 	}
 
 	return REGULATOR_ERROR_CLEARED;
