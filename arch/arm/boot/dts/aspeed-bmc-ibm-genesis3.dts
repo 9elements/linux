@@ -1620,6 +1620,10 @@
 			xdpe_pvccin_pvccsa_cpu2@40 {
 				compatible = "infineon,xdpe11280";
 				reg = <0x40>;
+				// using SMB_VR_CPU2_PVCCIN_ALERT
+				interrupt-parent = <&smb_pex_cpu2_event>;
+				interrupts = <14 IRQ_TYPE_LEVEL_LOW>;
+
 				vdrv-supply = <&p5v>;
 				regulators {
 					pvccin_cpu2: vout0 {
@@ -1644,6 +1648,9 @@
 			xdpe_pvddq_npq_pvpp_npq_cpu2@40 {
 				compatible = "infineon,xdpe11280";
 				reg = <0x40>;
+				// using SMB_VR_CPU2_NPQ_ALERT
+				interrupt-parent = <&smb_pex_cpu2_event>;
+				interrupts = <11 IRQ_TYPE_LEVEL_LOW>;
 				vdrv-supply = <&p5v>;
 				regulators {
 					pvddq_npq: vout0 {
@@ -1668,6 +1675,9 @@
 			xdpe_pvddq_rst_pvpp_rst_cpu2@40 {
 				compatible = "infineon,xdpe11280";
 				reg = <0x40>;
+				// using SMB_VR_CPU2_RST_ALERT
+				interrupt-parent = <&smb_pex_cpu2_event>;
+				interrupts = <16 IRQ_TYPE_LEVEL_LOW>;
 				vdrv-supply = <&p5v>;
 				regulators {
 					pvddq_rst: vout0 {
@@ -1792,6 +1802,9 @@
 			xdpe_pvddq_klm_pvpp_klm_cpu1@40 {
 				compatible = "infineon,xdpe11280";
 				reg = <0x40>;
+				// using SMB_VR_CPU1_KLM_ALERT
+				interrupt-parent = <&smb_pex_cpu1_event>;
+				interrupts = <0 IRQ_TYPE_LEVEL_LOW>;
 				vdrv-supply = <&p5v>;
 				regulators {
 					pvddq_klm: vout0 {
@@ -1816,6 +1829,9 @@
 			xdpe_pvccin_pvccsa_cpu1@40 {
 				compatible = "infineon,xdpe11280";
 				reg = <0x40>;
+				// using SMB_VR_CPU1_PVCCIN_ALERT
+				interrupt-parent = <&smb_pex_cpu1_event>;
+				interrupts = <1 IRQ_TYPE_LEVEL_LOW>;
 				vdrv-supply = <&p5v>;
 				regulators {
 					pvccin_cpu1: vout0 {
@@ -1840,6 +1856,9 @@
 			xdpe_pvddq_ghj_pvpp_ghj_cpu1@40 {
 				compatible = "infineon,xdpe11280";
 				reg = <0x40>;
+				// using SMB_VR_CPU1_GHJ_ALERT
+				interrupt-parent = <&smb_pex_cpu1_event>;
+				interrupts = <2 IRQ_TYPE_LEVEL_LOW>;
 				vdrv-supply = <&p5v>;
 				regulators {
 					pvddq_ghj: vout0 {
@@ -2207,6 +2226,9 @@
 			xdpe_pvccin_pvccsa_cpu0@40 {
 				compatible = "infineon,xdpe11280";
 				reg = <0x40>;
+				// using SMB_VR_CPU0_PVCCIN_ALERT
+				interrupt-parent = <&smb_pex_cpu0_event>;
+				interrupts = <2 IRQ_TYPE_LEVEL_LOW>;
 				vdrv-supply = <&p5v>;
 				regulators {
 					pvccin_cpu0: vout0 {
@@ -2231,6 +2253,9 @@
 			xdpe_pvddq_def_pvpp_def_cpu0@40 {
 				compatible = "infineon,xdpe11280";
 				reg = <0x40>;
+				// using SMB_VR_CPU0_DEF_ALERT
+				interrupt-parent = <&smb_pex_cpu0_event>;
+				interrupts = <3 IRQ_TYPE_LEVEL_LOW>;
 				vdrv-supply = <&p5v>;
 				regulators {
 					pvddq_def: vout0 {
@@ -2255,6 +2280,9 @@
 			xdpe_pvddq_abc_pvpp_abc_cpu0@40 {
 				compatible = "infineon,xdpe11280";
 				reg = <0x40>;
+				// using SMB_VR_CPU0_ABC_ALERT
+				interrupt-parent = <&smb_pex_cpu0_event>;
+				interrupts = <0 IRQ_TYPE_LEVEL_LOW>;
 				vdrv-supply = <&p5v>;
 				regulators {
 					pvddq_abc: vout0 {
@@ -2618,6 +2646,9 @@
 			xdpe_pvddq_uvw_pvpp_uvw_cpu3@40 {
 				compatible = "infineon,xdpe11280";
 				reg = <0x40>;
+				// using SMB_VR_CPU3_UVW_ALERT
+				interrupt-parent = <&smb_pex_cpu3_event>;
+				interrupts = <12 IRQ_TYPE_LEVEL_LOW>;
 				vdrv-supply = <&p5v>;
 				regulators {
 					pvddq_uvw: vout0 {
@@ -2647,6 +2678,9 @@
 			xdpe_pvccin_pvccsa_cpu3@40 {
 				compatible = "infineon,xdpe11280";
 				reg = <0x40>;
+				// using SMB_VR_CPU3_PVCCIN_ALERT
+				interrupt-parent = <&smb_pex_cpu3_event>;
+				interrupts = <11 IRQ_TYPE_LEVEL_LOW>;
 				vdrv-supply = <&p5v>;
 				regulators {
 					pvccin_cpu3: vout0 {
@@ -2671,6 +2705,9 @@
 			xdpe_pvddq_xyz_pvpp_xyz_cpu3@40 {
 				compatible = "infineon,xdpe11280";
 				reg = <0x40>;
+				// using SMB_VR_CPU3_XYZ_ALERT
+				interrupt-parent = <&smb_pex_cpu3_event>;
+				interrupts = <10 IRQ_TYPE_LEVEL_LOW>;
 				vdrv-supply = <&p5v>;
 				regulators {
 					pvddq_xyz: vout0 {
