@@ -991,6 +991,19 @@
 	};
 };
 
+&peci0 {
+	status = "okay";
+};
+
+&vuart {
+	status = "okay";
+};
+
+&lpc_snoop {
+	status = "okay";
+	snoop-ports = <0x80>, <0x81>;
+};
+
 &fmc {
 	status = "okay";
 	flash@0 {
