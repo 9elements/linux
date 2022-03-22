@@ -4,6 +4,7 @@
 #include <dt-bindings/gpio/aspeed-gpio.h>
 #include <dt-bindings/input/input.h>
 #include <dt-bindings/interrupt-controller/irq.h>
+#include <dt-bindings/i2c/i2c.h>
 #include "aspeed-g5.dtsi"
 
 / {
@@ -1428,6 +1429,13 @@
 	status = "okay";
 	multi-master;
 	bus-frequency = <1000000>;
+
+	//Set bmc' slave address;
+	bmc_slave@10 {
+		compatible = "ipmb-dev";
+		reg = <(0x10 | I2C_OWN_SLAVE_ADDRESS)>;
+		i2c-protocol;
+	};
 };
 
 &i2c5 { // BMC_MUX_VR_PCH_CPU
