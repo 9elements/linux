@@ -524,7 +524,7 @@ static int max597x_probe(struct i2c_client *cl, const struct i2c_device_id *id)
 		}
 	}
 
-	return ret;
+	return max597x_iio_configure(&cl->dev, chip, regmap, irng, mon_rng, shunt_micro_ohms);
 }
 
 static const struct i2c_device_id max597x_table[] = {
