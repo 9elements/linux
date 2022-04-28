@@ -1020,6 +1020,7 @@
 		m25p,fast-read;
 		label = "alt-bmc";
 		spi-max-frequency = <50000000>;
+#include "openbmc-flash-layout-alt.dtsi"
 	};
 };
 
