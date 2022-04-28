@@ -604,7 +604,7 @@ static ssize_t aspeed_smc_read(struct spi_nor *nor, loff_t from, size_t len,
 	 * read offset. Use the "User mode" of the controller to
 	 * perform the read.
 	 */
-	if (from >= chip->ahb_window_size) {
+	if (1 || from >= chip->ahb_window_size) {
 		aspeed_smc_read_user(nor, from, len, read_buf);
 		goto out;
 	}
