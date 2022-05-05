@@ -66,6 +66,7 @@ static const struct i2c_device_id ir38064_id[] = {
 	{"ir38064", 0},
 	{"ir38164", 0},
 	{"ir38263", 0},
+	{"tda38640", 0},
 	{}
 };
 
@@ -77,6 +78,7 @@ static const struct of_device_id ir38064_of_match[] = {
 	{ .compatible = "infineon,ir38064" },
 	{ .compatible = "infineon,ir38164" },
 	{ .compatible = "infineon,ir38263" },
+	{ .compatible = "infineon,tda38640" },
 	{ },
 };
 MODULE_DEVICE_TABLE(of, ir38064_of_match);
