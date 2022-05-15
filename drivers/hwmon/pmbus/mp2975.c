@@ -35,6 +35,9 @@
 #define MP2975_MFR_OVP_TH_SET		0xe5
 #define MP2975_MFR_UVP_SET		0xe6
 
+
+#define MP2973_MFR_RESO_SET		0xc7
+
 #define MP2975_VOUT_FORMAT		BIT(15)
 #define MP2975_VID_STEP_SEL_R1		BIT(4)
 #define MP2975_IMVP9_EN_R1		BIT(13)
@@ -48,6 +51,13 @@
 #define MP2975_SENSE_AMPL_UNIT		1
 #define MP2975_SENSE_AMPL_HALF		2
 #define MP2975_VIN_UV_LIMIT_UNIT	8
+
+#define MP2973_VOUT_FORMAT_R1		GENMASK(7, 6)
+#define MP2973_VOUT_FORMAT_R2		GENMASK(4, 3)
+#define MP2973_VOUT_FORMAT_DIRECT_R1	BIT(7)
+#define MP2973_VOUT_FORMAT_LINEAR_R1	BIT(6)
+#define MP2973_VOUT_FORMAT_DIRECT_R2	BIT(4)
+#define MP2973_VOUT_FORMAT_LINEAR_R2	BIT(3)
 
 #define MP2975_PAGE_NUM		2
 
@@ -608,14 +618,34 @@ mp2975_set_vout_format(struct i2c_client *client,
 {
 	int ret;
 
-	ret = i2c_smbus_read_word_data(client, MP2975_MFR_DC_LOOP_CTRL);
-	if (ret < 0)
-		return ret;
 	/* Enable DIRECT VOUT format 1mV/LSB */
-	ret &= ~MP2975_VOUT_FORMAT;
-	ret = i2c_smbus_write_word_data(client, MP2975_MFR_DC_LOOP_CTRL, ret);
-	if (ret < 0)
-		return ret;
+
+	if (data->chip_id == mp2975) {
+		ret = i2c_smbus_read_word_data(client, MP2975_MFR_DC_LOOP_CTRL);
+		if (ret < 0)
+			return ret;
+		ret &= ~MP2975_VOUT_FORMAT;
+		ret = i2c_smbus_write_word_data(client, MP2975_MFR_DC_LOOP_CTRL, ret);
+		if (ret < 0)
+			return ret;
+	} else {
+		ret = i2c_smbus_read_word_data(client, MP2973_MFR_RESO_SET);
+		if (ret < 0)
+			return ret;
+
+		if (page == 0) {
+			ret &= ~MP2973_VOUT_FORMAT_R1;
+			ret |= MP2973_VOUT_FORMAT_DIRECT_R1;
+		} else {
+			ret &= ~MP2973_VOUT_FORMAT_R2;
+			ret |= MP2973_VOUT_FORMAT_DIRECT_R2;
+		}
+
+		ret = i2c_smbus_write_word_data(client, MP2973_MFR_RESO_SET, ret);
+		if (ret < 0)
+			return ret;
+
+	}
 	return 0;
 }
 
