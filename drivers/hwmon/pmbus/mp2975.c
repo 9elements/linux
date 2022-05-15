@@ -10,6 +10,7 @@
 #include <linux/init.h>
 #include <linux/kernel.h>
 #include <linux/module.h>
+#include <linux/of_device.h>
 #include "pmbus.h"
 
 /* Vendor specific registers. */
@@ -52,12 +53,20 @@
 #define MP2975_MAX_PHASE_RAIL2	4
 #define MP2975_PAGE_NUM		2
 
+#define MP2973_MAX_PHASE_RAIL1  14
+#define MP2973_MAX_PHASE_RAIL2	6
+
 #define MP2975_RAIL2_FUNC	(PMBUS_HAVE_VOUT | PMBUS_HAVE_STATUS_VOUT | \
 				 PMBUS_HAVE_IOUT | PMBUS_HAVE_STATUS_IOUT | \
 				 PMBUS_HAVE_POUT | PMBUS_PHASE_VIRTUAL)
 
+enum chips {
+	mp2975, mp2973
+};
+
 struct mp2975_data {
 	struct pmbus_driver_info info;
+	enum chips chip_id;
 	int vout_scale;
 	int vid_step[MP2975_PAGE_NUM];
 	int vref[MP2975_PAGE_NUM];
@@ -67,6 +76,14 @@ struct mp2975_data {
 	int vout_format[MP2975_PAGE_NUM];
 	int curr_sense_gain[MP2975_PAGE_NUM];
 };
+
+static const struct i2c_device_id mp2975_id[] = {
+	{"mp2973", mp2973},
+	{"mp2975", mp2975},
+	{}
+};
+
+MODULE_DEVICE_TABLE(i2c, mp2975_id);
 
 #define to_mp2975_data(x)  container_of(x, struct mp2975_data, info)
 
@@ -326,9 +343,9 @@ static int mp2975_read_word_data(struct i2c_client *client, int page,
 	return ret;
 }
 
-static int mp2975_identify_multiphase_rail2(struct i2c_client *client)
+static int mp2975_identify_multiphase_rail2(struct i2c_client *client, struct mp2975_data *data)
 {
-	int ret;
+	int ret, max_phases;
 
 	/*
 	 * Identify multiphase for rail 2 - could be from 0 to 4.
@@ -343,8 +360,18 @@ static int mp2975_identify_multiphase_rail2(struct i2c_client *client)
 	if (ret < 0)
 		return ret;
 
+	switch (data->chip_id) {
+		case mp2975:
+			max_phases = MP2975_MAX_PHASE_RAIL2;
+			break;
+		case mp2973:
+			max_phases = MP2973_MAX_PHASE_RAIL2;
+			break;
+		default:
+			return -EINVAL;
+	}
 	ret &= GENMASK(2, 0);
-	return (ret >= 4) ? 4 : ret;
+	return (ret >= max_phases) ? max_phases : ret;
 }
 
 static void mp2975_set_phase_rail1(struct pmbus_driver_info *info)
@@ -369,7 +396,7 @@ static int
 mp2975_identify_multiphase(struct i2c_client *client, struct mp2975_data *data,
 			   struct pmbus_driver_info *info)
 {
-	int num_phases2, ret;
+	int num_phases2, ret, max_phases_r1, max_phases_r2;
 
 	ret = i2c_smbus_write_byte_data(client, PMBUS_PAGE, 2);
 	if (ret < 0)
@@ -379,6 +406,19 @@ mp2975_identify_multiphase(struct i2c_client *client, struct mp2975_data *data,
 	ret = i2c_smbus_read_word_data(client, MP2975_MFR_VR_MULTI_CONFIG_R1);
 	if (ret <= 0)
 		return ret;
+
+	switch (data->chip_id) {
+		case mp2975:
+			max_phases_r1 = MP2975_MAX_PHASE_RAIL1;
+			max_phases_r2 = MP2975_MAX_PHASE_RAIL2;
+			break;
+		case mp2973:
+			max_phases_r1 = MP2973_MAX_PHASE_RAIL1;
+			max_phases_r2 = MP2975_MAX_PHASE_RAIL2;
+			break;
+		default:
+			return -EINVAL;
+	}
 
 	info->phases[0] = ret & GENMASK(3, 0);
 
@@ -390,12 +430,12 @@ mp2975_identify_multiphase(struct i2c_client *client, struct mp2975_data *data,
 	 * 1 operates with 1-phase DCM. When rail 2 phase count is configured
 	 * as 0, rail 2 is disabled.
 	 */
-	if (info->phases[0] > MP2975_MAX_PHASE_RAIL1)
+	if (info->phases[0] > max_phases_r1)
 		return -EINVAL;
 
 	mp2975_set_phase_rail1(info);
-	num_phases2 = min(MP2975_MAX_PHASE_RAIL1 - info->phases[0],
-			  MP2975_MAX_PHASE_RAIL2);
+	num_phases2 = min(max_phases_r1 - info->phases[0],
+			  max_phases_r2);
 	if (info->phases[1] && info->phases[1] <= num_phases2)
 		mp2975_set_phase_rail2(info, num_phases2);
 
@@ -694,8 +734,13 @@ static int mp2975_probe(struct i2c_client *client)
 	memcpy(&data->info, &mp2975_info, sizeof(*info));
 	info = &data->info;
 
+	if (client->dev.of_node)
+		data->chip_id = (enum chips)of_device_get_match_data(&client->dev);
+	else
+		data->chip_id = i2c_match_id(mp2975_id, client)->driver_data;
+
 	/* Identify multiphase configuration for rail 2. */
-	ret = mp2975_identify_multiphase_rail2(client);
+	ret = mp2975_identify_multiphase_rail2(client, data);
 	if (ret < 0)
 		return ret;
 
@@ -739,15 +784,9 @@ static int mp2975_probe(struct i2c_client *client)
 	return pmbus_do_probe(client, info);
 }
 
-static const struct i2c_device_id mp2975_id[] = {
-	{"mp2975", 0},
-	{}
-};
-
-MODULE_DEVICE_TABLE(i2c, mp2975_id);
-
 static const struct of_device_id __maybe_unused mp2975_of_match[] = {
-	{.compatible = "mps,mp2975"},
+	{.compatible = "mps,mp2973", .data = (void *)mp2973},
+	{.compatible = "mps,mp2975", .data = (void *)mp2975},
 	{}
 };
 MODULE_DEVICE_TABLE(of, mp2975_of_match);
