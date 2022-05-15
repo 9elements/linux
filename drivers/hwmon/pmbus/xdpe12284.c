@@ -167,6 +167,7 @@ static const struct i2c_device_id xdpe122_id[] = {
 	{"xdpe11280", 0},
 	{"xdpe12254", 0},
 	{"xdpe12284", 0},
+	{"xdpe15284", 0},
 	{}
 };
 
@@ -176,6 +177,7 @@ static const struct of_device_id __maybe_unused xdpe122_of_match[] = {
 	{.compatible = "infineon,xdpe11280"},
 	{.compatible = "infineon,xdpe12254"},
 	{.compatible = "infineon,xdpe12284"},
+	{.compatible = "infineon,xdpe15284"},
 	{}
 };
 MODULE_DEVICE_TABLE(of, xdpe122_of_match);
