@@ -1039,6 +1039,7 @@
 // FIXME: This is not upstream yet
 &espi_ctrl {
 	status = "okay";
+	flash,size = <0x2000000>;
 };
 
 &pinctrl {
