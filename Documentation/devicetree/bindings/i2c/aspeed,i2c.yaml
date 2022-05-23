@@ -44,6 +44,12 @@ properties:
     description: frequency of the bus clock in Hz defaults to 100 kHz when not
       specified
 
+  i2c-clk-high-min-percent:
+    minimum: 1
+    maximum: 100
+    default: 50
+    description: a minimum percentage of clock high
+
 required:
   - reg
   - compatible
