@@ -8,8 +8,8 @@
 #include "aspeed-g6.dtsi"
 
 / {
-	model = "IBM Gen-3";
-	compatible = "aspeed,ast2500";
+	model = "IBM SBP1";
+	compatible = "aspeed,ast2600";
 
 	chosen {
 		stdout-path = &uart5;
@@ -125,18 +125,18 @@
 		compatible = "iio-hwmon";
 		// Voltage sensors top to down
 		io-channels = <&p12v_vd 0>, <&p5v_aux_vd 0>, <&p5v_bmc_aux_vd 0>, <&p3v3_aux_vd 0>,
-			<&p3v3_bmc_aux_vd 0>, <&p1v8_bmc_aux_vd 0>, <&adc1 12>, <&adc0 2>, <&adc1 8>,
+			<&p3v3_bmc_aux_vd 0>, <&p1v8_bmc_aux_vd 0>, <&adc1 4>, <&adc0 2>, <&adc1 0>,
 			<&p2V5_aux_vd 0>;
 	};
 
 	iio-hwmon-rtcbat {
 		compatible = "iio-hwmon";
-		io-channels = <&rtc_bat_vd 0>;
+		io-channels = <&adc1 7>;
 	};
 
 	p12v_vd: voltage_divider1 {
 		compatible = "voltage-divider";
-		io-channels = <&adc1 11>;
+		io-channels = <&adc1 3>;
 		#io-channel-cells = <1>;
 
 		/* Scale the system voltage by 1127/127 to fit the ADC range.
@@ -148,7 +148,7 @@
 
 	p5v_aux_vd: voltage_divider2 {
 		compatible = "voltage-divider";
-		io-channels = <&adc1 13>;
+		io-channels = <&adc1 5>;
 		#io-channel-cells = <1>;
 
 		/* Scale the system voltage by 1365/365 to fit the ADC range.
@@ -172,7 +172,7 @@
 
 	p3v3_aux_vd: voltage_divider4 {
 		compatible = "voltage-divider";
-		io-channels = <&adc1 15>;
+		io-channels = <&adc1 2>;
 		#io-channel-cells = <1>;
 
 		/* Scale the system voltage by 1698/698 to fit the ADC range.
@@ -208,7 +208,7 @@
 
 	p2V5_aux_vd: voltage_divider7 {
 		compatible = "voltage-divider";
-		io-channels = <&adc1 9>;
+		io-channels = <&adc1 1>;
 		#io-channel-cells = <1>;
 
 		/* Scale the system voltage by 2100/1100 to fit the ADC range.
@@ -216,18 +216,6 @@
 		 */
 		output-ohms = <11>;
 		full-ohms = <21>;
-	};
-
-	rtc_bat_vd: voltage_divider8 {
-		compatible = "voltage-divider";
-		io-channels = <&adc1 10>;
-		#io-channel-cells = <1>;
-
-		/* Scale the system voltage by 231/100 to fit the ADC range.
-		 * Use small nominator to prevent integer overflow.
-		 */
-		output-ohms = <100>;
-		full-ohms = <231>;
 	};
 
 	thermistor0: thermal-sensor0 {
@@ -300,6 +288,14 @@
 		regulator-max-microvolt = <3300000>;
 		regulator-always-on;
 		regulator-boot-on;
+	};
+
+	p1v8_bmc_aux: fixedregulator-p1v8_bmc_aux {
+		compatible = "regulator-fixed";
+		regulator-name = "p1v8_bmc_aux";
+		regulator-min-microvolt = <1800000>;
+		regulator-max-microvolt = <1800000>;
+		regulator-always-on;
 	};
 
 	p1v2_bmc_aux: fixedregulator-p1v2_bmc_aux {
@@ -1022,58 +1018,55 @@
 	pinctrl-0 = <&pinctrl_vgahs_default &pinctrl_vgavs_default>;
 };
 
+&mdio0 {
+	status = "okay";
+
+	reset-gpios = <&gpio0 ASPEED_GPIO(V, 7) GPIO_ACTIVE_LOW>;
+	reset-assert-us = <10000>;
+	reset-deassert-us = <300>;
+
+	ethphy0: ethernet-phy@0 {
+		compatible = "ethernet-phy-ieee802.3-c22";
+		reg = <0>;
+	};
+};
+
+&mdio1 {
+	status = "okay";
+
+	reset-gpios = <&gpio0 ASPEED_GPIO(G, 2) GPIO_ACTIVE_LOW>;
+	reset-assert-us = <10000>;
+	reset-deassert-us = <300>;
+
+	ethphy1: ethernet-phy@0 {
+		compatible = "ethernet-phy-ieee802.3-c22";
+		reg = <0>;
+	};
+};
+
 &mac0 {
 	status = "okay";
 
-	pinctrl-names = "default";
-	pinctrl-0 = <&pinctrl_rgmii1_default &pinctrl_mdio1_default>;
-
-	phy-handle = <&phy3>;
 	phy-mode = "rgmii";
+	phy-handle = <&ethphy0>;
 
-	mdio {
-		#address-cells = <1>;
-		#size-cells = <0>;
-
-		reset-gpios = <&gpio0 ASPEED_GPIO(V, 7) GPIO_ACTIVE_LOW>;
-		reset-assert-us = <10000>;
-		reset-deassert-us = <300>;
-
-		/* Microchip KSZ9131RNX PHY */
-		phy3: ethernet-phy@3 {
-			compatible = "ethernet-phy-ieee802.3-c22";
-			reg = <3>;
-		};
-	};
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_rgmii1_default>;
 };
 
 &mac1 {
 	status = "okay";
 
-	pinctrl-names = "default";
-	pinctrl-0 = <&pinctrl_rgmii2_default &pinctrl_mdio2_default>;
-
-	phy-handle = <&phy0>;
 	phy-mode = "rgmii";
+	phy-handle = <&ethphy1>;
 
-	mdio {
-		#address-cells = <1>;
-		#size-cells = <0>;
-
-		reset-gpios = <&gpio0 ASPEED_GPIO(G, 2) GPIO_ACTIVE_LOW>;
-		reset-assert-us = <10000>;
-		reset-deassert-us = <300>;
-
-		/* Microchip KSZ9131RNX PHY */
-		phy0: ethernet-phy@0 {
-			compatible = "ethernet-phy-ieee802.3-c22";
-			reg = <0>;
-		};
-	};
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_rgmii2_default>;
 };
 
 &adc0 {
 	status = "okay";
+	vref-supply = <&p1v8_bmc_aux>;
 
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_adc0_default
@@ -1088,6 +1081,8 @@
 
 &adc1 {
 	status = "okay";
+	vref-supply = <&p1v8_bmc_aux>;
+	aspeed,battery-sensing;
 
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_adc8_default

@@ -69,7 +69,7 @@
 			#address-cells = <1>;
 			#size-cells = <0>;
 			reg = <2>;
-			xdpe_pvccinfaon_pvccfa_cpu0@40 {
+			xdpe_pvccinfaon_pvccfa_cpu0@58 {
 				compatible = "infineon,xdpe11280";
 				reg = <0x58>;
 				// using  SMB_VR_PVCCINFAON_CPU0_ALERT_N
@@ -112,7 +112,7 @@
 			#address-cells = <1>;
 			#size-cells = <0>;
 			reg = <3>;
-			xdpe_pvccin_pvccfa_cpu0@40 {
+			xdpe_pvccin_pvccfa_cpu0@58 {
 				compatible = "mps,mp2973";
 				reg = <0x58>;
 				// using SMB_VR_PVCCIN_CPU0_ALERT_N
