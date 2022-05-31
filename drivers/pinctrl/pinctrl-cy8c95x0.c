@@ -512,9 +512,8 @@ out:
 	return ret;
 }
 
-static int cy8c95x0_gpio_direction_input(struct gpio_chip *gc, unsigned int off)
+static int cy8c95x0_direction_input(struct cy8c95x0_pinctrl *chip, unsigned int off)
 {
-	struct cy8c95x0_pinctrl *chip = gpiochip_get_data(gc);
 	u8 port = cypress_get_port(chip, off);
 	u8 bit = cypress_get_pin_mask(chip, off);
 	int ret;
@@ -545,10 +544,15 @@ out:
 	return ret;
 }
 
-static int cy8c95x0_gpio_direction_output(struct gpio_chip *gc,
-					  unsigned int off, int val)
+static int cy8c95x0_gpio_direction_input(struct gpio_chip *gc, unsigned int off)
 {
 	struct cy8c95x0_pinctrl *chip = gpiochip_get_data(gc);
+	return cy8c95x0_direction_input(chip, off);
+}
+
+static int cy8c95x0_direction_output(struct cy8c95x0_pinctrl *chip,
+				     unsigned int off, int val)
+{
 	u8 port = cypress_get_port(chip, off);
 	u8 outreg = CY8C95X0_OUTPUT_(port);
 	u8 bit = cypress_get_pin_mask(chip, off);
@@ -572,6 +576,13 @@ out:
 	mutex_unlock(&chip->i2c_lock);
 
 	return ret;
+}
+
+static int cy8c95x0_gpio_direction_output(struct gpio_chip *gc,
+					  unsigned int off, int val)
+{
+	struct cy8c95x0_pinctrl *chip = gpiochip_get_data(gc);
+	return cy8c95x0_direction_output(chip, off, val);
 }
 
 static int cy8c95x0_gpio_get_value(struct gpio_chip *gc, unsigned int off)
@@ -777,17 +788,16 @@ out:
 	return ret;
 }
 
-static int cy8c95x0_gpio_set_config(struct gpio_chip *gc, unsigned int offset,
-				    unsigned long config)
+static int cy8c95x0_set_config(struct cy8c95x0_pinctrl *chip, unsigned int offset,
+			       unsigned long config)
 {
-	struct cy8c95x0_pinctrl *chip = gpiochip_get_data(gc);
 	unsigned long arg = pinconf_to_config_argument(config);
 
 	switch (pinconf_to_config_param(config)) {
 	case PIN_CONFIG_INPUT_ENABLE:
-		return cy8c95x0_gpio_direction_input(gc, offset);
+		return cy8c95x0_direction_input(chip, offset);
 	case PIN_CONFIG_OUTPUT:
-		return cy8c95x0_gpio_direction_output(gc, offset, arg);
+		return cy8c95x0_direction_output(chip, offset, arg);
 	case PIN_CONFIG_MODE_PWM:
 	case PIN_CONFIG_BIAS_PULL_UP:
 	case PIN_CONFIG_BIAS_PULL_DOWN:
@@ -799,6 +809,13 @@ static int cy8c95x0_gpio_set_config(struct gpio_chip *gc, unsigned int offset,
 	default:
 		return -ENOTSUPP;
 	}
+}
+
+static int cy8c95x0_gpio_set_config(struct gpio_chip *gc, unsigned int offset,
+				    unsigned long config)
+{
+	struct cy8c95x0_pinctrl *chip = gpiochip_get_data(gc);
+	return cy8c95x0_set_config(chip, offset, config);
 }
 
 static int cy8c95x0_gpio_get_multiple(struct gpio_chip *gc,
@@ -1124,7 +1141,7 @@ static int cy8c95x0_pinconf_set(struct pinctrl_dev *pctldev, unsigned int pin,
 		return -EINVAL;
 
 	for (i = 0; i < num_configs; i++) {
-		ret = cy8c95x0_gpio_set_pincfg(chip, pin, configs[i]);
+		ret = cy8c95x0_set_config(chip, pin, configs[i]);
 		if (ret)
 			return ret;
 	}
