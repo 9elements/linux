@@ -988,7 +988,7 @@
 		m25p,fast-read;
 		label = "bmc";
 		spi-max-frequency = <50000000>;
-#include "openbmc-flash-layout.dtsi"
+#include "openbmc-flash-layout-64.dtsi"
 	};
 
 	flash@1 {
@@ -996,7 +996,7 @@
 		m25p,fast-read;
 		label = "alt-bmc";
 		spi-max-frequency = <50000000>;
-#include "openbmc-flash-layout-alt.dtsi"
+#include "openbmc-flash-layout-64-alt.dtsi"
 	};
 };
 
