@@ -10,6 +10,7 @@
 #include <linux/bitops.h>
 #include <linux/device.h>
 #include <linux/err.h>
+#include <linux/leds.h>
 #include <linux/module.h>
 #include <linux/io.h>
 #include <linux/of.h>
@@ -28,6 +29,12 @@ struct max597x_data {
 	unsigned int irng;
 	unsigned int mon_rng;
 	struct regmap *regmap;
+};
+
+struct max597x_led {
+	struct regmap *regmap;
+	struct led_classdev led;
+	unsigned int index;
 };
 
 static int max597x_uvp_ovp_check_mode(struct regulator_dev *rdev, int severity)
@@ -198,13 +205,13 @@ static int max597x_get_status(struct regulator_dev *rdev)
 }
 
 static const struct regulator_ops max597x_switch_ops = {
-	.enable				= regulator_enable_regmap,
-	.disable			= regulator_disable_regmap,
-	.is_enabled			= regulator_is_enabled_regmap,
-	.get_status			= max597x_get_status,
-	.set_over_voltage_protection	= max597x_set_ovp,
-	.set_under_voltage_protection	= max597x_set_uvp,
-	.set_over_current_protection	= max597x_set_ocp,
+	.enable = regulator_enable_regmap,
+	.disable = regulator_disable_regmap,
+	.is_enabled = regulator_is_enabled_regmap,
+	.get_status = max597x_get_status,
+	.set_over_voltage_protection = max597x_set_ovp,
+	.set_under_voltage_protection = max597x_set_uvp,
+	.set_over_current_protection = max597x_set_ocp,
 };
 
 #define MAX597X_SWITCH(_ID, _ereg, _chan, _supply) {     \
@@ -311,10 +318,14 @@ static int max597x_irq_handler(int irq, struct regulator_irq_data *rid,
 	for (i = 0; i < d->num_switches; i++) {
 		stat = &rid->states[i];
 
-		if ((val & MAX5970_CB_IFAULTF(i)) || (val & MAX5970_CB_IFAULTS(i))) {
+		if ((val & MAX5970_CB_IFAULTF(i))
+		    || (val & MAX5970_CB_IFAULTS(i))) {
 			*dev_mask |= 1 << i;
-			stat->notifs |= REGULATOR_EVENT_OVER_CURRENT | REGULATOR_EVENT_DISABLE;
-			stat->errors |= REGULATOR_ERROR_OVER_CURRENT | REGULATOR_ERROR_FAIL;
+			stat->notifs |=
+			    REGULATOR_EVENT_OVER_CURRENT |
+			    REGULATOR_EVENT_DISABLE;
+			stat->errors |=
+			    REGULATOR_ERROR_OVER_CURRENT | REGULATOR_ERROR_FAIL;
 
 			/* Clear the sub-IRQ status */
 			regulator_disable_regmap(stat->rdev);
@@ -339,17 +350,20 @@ static int max597x_led_enable(struct device *dev, struct regmap *regmap)
 		ret = regmap_update_bits(regmap, MAX5970_REG_LED_FLASH,
 					 led_enable, 0);
 		if (ret < 0) {
-			dev_err(dev, "max597x: led_enable failed, err %d\n", ret);
+			dev_err(dev, "max597x: led_enable failed, err %d\n",
+				ret);
 			return ret;
 		}
 	}
 	return 0;
 }
 
-static int max597x_parse_dt(struct device *dev, const struct regulator_desc *desc,
-			    u32 *shunt_micro_ohms)
+static int max597x_parse_dt(struct device *dev,
+			    const struct regulator_desc *desc,
+			    u32 * shunt_micro_ohms)
 {
 	struct device_node *node;
+	struct property *child;
 	struct of_regulator_match match;
 	int ret;
 
@@ -369,10 +383,13 @@ static int max597x_parse_dt(struct device *dev, const struct regulator_desc *des
 	}
 
 	if (match.of_node) {
-		ret = of_property_read_u32(match.of_node, "shunt-resistor-micro-ohms",
-					   shunt_micro_ohms);
+		ret =
+		    of_property_read_u32(match.of_node,
+					 "shunt-resistor-micro-ohms",
+					 shunt_micro_ohms);
 		if (ret < 0) {
-			dev_err(dev, "property 'shunt-resistor-micro-ohms' not found, err %d\n",
+			dev_err(dev,
+				"property 'shunt-resistor-micro-ohms' not found, err %d\n",
 				ret);
 			return ret;
 		}
@@ -382,7 +399,7 @@ static int max597x_parse_dt(struct device *dev, const struct regulator_desc *des
 }
 
 static int max597x_adc_range(struct regmap *regmap, const int ch,
-			     u32 *irng, u32 *mon_rng)
+			     u32 * irng, u32 * mon_rng)
 {
 	unsigned int reg;
 	int ret;
@@ -393,13 +410,13 @@ static int max597x_adc_range(struct regmap *regmap, const int ch,
 		return ret;
 	switch (MAX5970_IRNG(reg, ch)) {
 	case 0:
-		*irng = 100000; /* 100 mV */
+		*irng = 100000;	/* 100 mV */
 		break;
 	case 1:
-		*irng = 50000; /* 50 mV */
+		*irng = 50000;	/* 50 mV */
 		break;
 	case 2:
-		*irng = 25000; /* 25 mV */
+		*irng = 25000;	/* 25 mV */
 		break;
 	default:
 		return -EINVAL;
@@ -418,8 +435,7 @@ static int max597x_adc_range(struct regmap *regmap, const int ch,
 static int max597x_setup_irq(struct device *dev,
 			     int irq,
 			     struct regulator_dev *rdevs[MAX5970_NUM_SWITCHES],
-			     int num_switches,
-			     struct max597x_data *data)
+			     int num_switches, struct max597x_data *data)
 {
 	struct regulator_irq_desc max597x_notif = {
 		.name = "max597x-irq",
@@ -427,12 +443,11 @@ static int max597x_setup_irq(struct device *dev,
 		.data = data,
 	};
 	int errs = REGULATOR_ERROR_UNDER_VOLTAGE |
-		   REGULATOR_ERROR_UNDER_VOLTAGE_WARN |
-		   REGULATOR_ERROR_OVER_VOLTAGE_WARN |
-		   REGULATOR_ERROR_REGULATION_OUT |
-		   REGULATOR_ERROR_OVER_CURRENT |
-		   REGULATOR_ERROR_OVER_CURRENT_WARN |
-		   REGULATOR_ERROR_FAIL;
+	    REGULATOR_ERROR_UNDER_VOLTAGE_WARN |
+	    REGULATOR_ERROR_OVER_VOLTAGE_WARN |
+	    REGULATOR_ERROR_REGULATION_OUT |
+	    REGULATOR_ERROR_OVER_CURRENT |
+	    REGULATOR_ERROR_OVER_CURRENT_WARN | REGULATOR_ERROR_FAIL;
 	void *irq_helper;
 
 	/* Register notifiers - can fail if IRQ is not given */
@@ -449,6 +464,22 @@ static int max597x_setup_irq(struct device *dev,
 	return 0;
 }
 
+static int max597x_led_set_brightness(struct led_classdev *cdev,
+				      enum led_brightness brightness)
+{
+	struct max597x_led *led = cdev->driver_data;
+	int ret, val;
+
+	if (!led || !led->regmap)
+		return -1;
+
+	ret = regmap_update_bits(led->regmap, MAX5970_REG_LED_FLASH,
+				 1 << led->index, ~brightness << led->index);
+	if (ret < 0)
+		dev_err(cdev->dev, "failed to set brightness %d\n", ret);
+	return ret;
+}
+
 static int max597x_probe(struct i2c_client *cl, const struct i2c_device_id *id)
 {
 	struct regulator_config config = { };
@@ -457,9 +488,11 @@ static int max597x_probe(struct i2c_client *cl, const struct i2c_device_id *id)
 	struct max597x_data *data;
 	int num_switches = 0;
 	struct regmap *regmap;
+	struct max597x_led *led;
 	int ret, i;
 	enum max597x_chip_type chip = id->driver_data;
-	u32 irng[MAX5970_NUM_SWITCHES] = { }, mon_rng[MAX5970_NUM_SWITCHES] = { };
+	u32 irng[MAX5970_NUM_SWITCHES] = { }, mon_rng[MAX5970_NUM_SWITCHES] =
+	    { };
 	u32 shunt_micro_ohms[MAX5970_NUM_SWITCHES] = { };
 
 	switch (chip) {
@@ -478,7 +511,9 @@ static int max597x_probe(struct i2c_client *cl, const struct i2c_device_id *id)
 	}
 
 	for (i = 0; i < num_switches; i++) {
-		data = devm_kzalloc(&cl->dev, sizeof(struct max597x_data), GFP_KERNEL);
+		data =
+		    devm_kzalloc(&cl->dev, sizeof(struct max597x_data),
+				 GFP_KERNEL);
 		if (!data)
 			return -ENOMEM;
 
@@ -502,8 +537,7 @@ static int max597x_probe(struct i2c_client *cl, const struct i2c_device_id *id)
 		config.driver_data = (void *)data;
 		config.regmap = regmap;
 		rdev = devm_regulator_register(&cl->dev,
-					       &regulators[i],
-					       &config);
+					       &regulators[i], &config);
 		if (IS_ERR(rdev)) {
 			dev_err(&cl->dev, "failed to register regulator %s\n",
 				regulators[i].name);
@@ -511,44 +545,82 @@ static int max597x_probe(struct i2c_client *cl, const struct i2c_device_id *id)
 		}
 		rdevs[i] = rdev;
 	}
-
+	/* Enable led based on devicetree setting. */
 	ret = max597x_led_enable(&cl->dev, regmap);
 	if (ret)
-		return ret;
+		dev_err(&cl->dev, "Failed to enable led, %d", ret);
+
+	for (i = 0; i < 4; i++) {
+		const char *name;
+		led = devm_kzalloc(&cl->dev, sizeof(struct max597x_led),
+				   GFP_KERNEL);
+		of_property_read_string_index(cl->dev.of_node, "leds", i,
+					      &led->led.name);
+		if (!led->led.name || !strcmp(led->led.name, "")) {
+			devm_kfree(&cl->dev, led);
+			continue;
+		}
+		led->led.max_brightness = 1;
+		led->led.brightness_set_blocking = max597x_led_set_brightness;
+		led->led.default_trigger = "none";
+		led->index = i;
+		led->regmap = regmap;
+		ret = led_classdev_register(&cl->dev, &led->led);
+		if (ret) {
+			dev_err(&cl->dev, "Error in initializing led%d", i);
+			devm_kfree(&cl->dev, led);
+			continue;
+		}
+		led->led.driver_data = led;
+		ret = of_property_read_string_index(cl->dev.of_node, "leds-state", i,
+					      &name);
+		if(ret)
+			continue;
+		if(!strcmp(name, "on")) {
+			dev_info(led->led.dev, "Enabled led%d",i);
+			led_set_brightness(&led->led, 1);
+		}
+	}
 
 	if (cl->irq) {
-		ret = max597x_setup_irq(&cl->dev, cl->irq, rdevs, num_switches, data);
+		ret =
+		    max597x_setup_irq(&cl->dev, cl->irq, rdevs, num_switches,
+				      data);
 		if (ret) {
 			dev_err(&cl->dev, "IRQ setup failed");
 			return ret;
 		}
 	}
 
-	return max597x_iio_configure(&cl->dev, chip, regmap, irng, mon_rng, shunt_micro_ohms);
+	return max597x_iio_configure(&cl->dev, chip, regmap, irng, mon_rng,
+				     shunt_micro_ohms);
 }
 
 static const struct i2c_device_id max597x_table[] = {
-	{ .name = "max5970", MAX597x_TYPE_MAX5970 },
-	{ .name = "max5978", MAX597x_TYPE_MAX5978 },
+	{.name = "max5970", MAX597x_TYPE_MAX5970},
+	{.name = "max5978", MAX597x_TYPE_MAX5978},
 	{},
 };
+
 MODULE_DEVICE_TABLE(i2c, max597x_table);
 
 static const struct of_device_id max597x_of_match[] = {
-	{ .compatible = "maxim,max5970", .data = (void *)MAX597x_TYPE_MAX5970 },
-	{ .compatible = "maxim,max5978", .data = (void *)MAX597x_TYPE_MAX5978 },
+	{.compatible = "maxim,max5970",.data = (void *)MAX597x_TYPE_MAX5970},
+	{.compatible = "maxim,max5978",.data = (void *)MAX597x_TYPE_MAX5978},
 	{},
 };
+
 MODULE_DEVICE_TABLE(of, max597x_of_match);
 
 static struct i2c_driver max597x_driver = {
 	.id_table = max597x_table,
 	.driver = {
-		.name	= "max597x",
-		.of_match_table	= of_match_ptr(max597x_of_match),
-	},
-	.probe	= max597x_probe,
+		   .name = "max597x",
+		   .of_match_table = of_match_ptr(max597x_of_match),
+		   },
+	.probe = max597x_probe,
 };
+
 module_i2c_driver(max597x_driver);
 
 MODULE_AUTHOR("Patrick Rudolph <patrick.rudolph@9elements.com>");
