@@ -72,7 +72,7 @@ struct led_classdev {
 	unsigned int brightness;
 	unsigned int max_brightness;
 	int			 flags;
-
+	void            *driver_data;
 	/* Lower 16 bits reflect status */
 #define LED_SUSPENDED		BIT(0)
 #define LED_UNREGISTERING	BIT(1)
