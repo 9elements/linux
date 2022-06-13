@@ -768,6 +768,15 @@ static u32 aspeed_smc_chip_set_segment(struct aspeed_smc_chip *chip)
 		goto out;
 
 	/*
+	 * AST2500 can't read CS1 if its base is not at spacing of 64MB
+	 * w.r.t. CS0 when flash size is less than 64MB.
+	 * Hence make sure its aligned to 64MB if flash size is
+	 * less than 64MB.
+	 */
+	if (size < SZ_64M && controller->info == &fmc_2500_info)
+		size = SZ_64M;
+
+	/*
 	 * The AST2500 SPI controller has a HW bug when the CE0 chip
 	 * size reaches 128MB. Enforce a size limit of 120MB to
 	 * prevent the controller from using bogus settings in the
