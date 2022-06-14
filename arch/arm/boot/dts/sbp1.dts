@@ -12,8 +12,8 @@
 	compatible = "aspeed,ast2600";
 
 	chosen {
-		stdout-path = &uart5;
-		bootargs = "console=tty4 console=ttyS4,115200 earlycon";
+		stdout-path = &uart1;
+		bootargs = "console=tty0 console=ttyS0,115200 earlycon";
 	};
 
 	// 512MB
@@ -1000,7 +1000,7 @@
 	};
 };
 
-&uart5 {
+&uart1 {
 	status = "okay";
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_txd1_default
