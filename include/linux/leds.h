@@ -128,6 +128,8 @@ struct led_classdev {
 	int (*pattern_clear)(struct led_classdev *led_cdev);
 
 	struct device		*dev;
+	void		*driver_data;	/* Driver data, set and get with
+					   dev_set_drvdata/dev_get_drvdata */
 	const struct attribute_group	**groups;
 
 	struct list_head	 node;			/* LED Device list */
