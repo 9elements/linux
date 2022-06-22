@@ -22,6 +22,9 @@ struct max597x_data {
 	int irq;
 	int num_switches;
 	struct regmap *regmap;
+	u32 irng[MAX5970_NUM_SWITCHES];
+	u32 mon_rng[MAX5970_NUM_SWITCHES];
+	u32 shunt_micro_ohms[MAX5970_NUM_SWITCHES];
 };
 
 enum max597x_chip_type {

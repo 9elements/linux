@@ -547,7 +547,7 @@ config REGULATOR_MAX1586
 	  for PXA27x chips to control VCC_CORE and VCC_USIM voltages.
 
 config REGULATOR_MAX597X
-	tristate "Maxim 597x power switch and monitor"
+	tristate "Maxim 597x Power Switch and Monitor"
 	depends on I2C
 	depends on OF
 	depends on MFD_MAX597X

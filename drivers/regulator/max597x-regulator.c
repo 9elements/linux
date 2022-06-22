@@ -7,20 +7,11 @@
  * Author: Patrick Rudolph <patrick.rudolph@9elements.com>
  */
 
-#include <linux/bitops.h>
-#include <linux/device.h>
-#include <linux/err.h>
-#include <linux/module.h>
-#include <linux/io.h>
-#include <linux/of.h>
 #include <linux/i2c.h>
+#include <linux/mfd/max597x.h>
+#include <linux/platform_device.h>
 #include <linux/regmap.h>
 #include <linux/regulator/driver.h>
-#include <linux/regulator/machine.h>
-#include <linux/regulator/of_regulator.h>
-#include <linux/platform_device.h>
-
-#include <linux/mfd/max597x.h>
 
 struct max597x_regulator {
 	int num_switches, mon_rng, irng, shunt_micro_ohms, lim_uA;
@@ -303,6 +294,7 @@ static int max597x_irq_handler(int irq, struct regulator_irq_data *rid,
 		}
 	}
 
+	/* Clear fault status bits to capture further events. */
 	ret = max597x_regmap_read_clear(d->regmap, MAX5970_REG_FAULT1, &val);
 	if (ret)
 		return REGULATOR_FAILED_RETRY;
@@ -321,6 +313,7 @@ static int max597x_irq_handler(int irq, struct regulator_irq_data *rid,
 		}
 	}
 
+	/* Clear fault status bits to capture further events. */
 	ret = max597x_regmap_read_clear(d->regmap, MAX5970_REG_FAULT2, &val);
 	if (ret)
 		return REGULATOR_FAILED_RETRY;
@@ -498,5 +491,5 @@ module_platform_driver(max597x_regulator_driver);
 
 
 MODULE_AUTHOR("Patrick Rudolph <patrick.rudolph@9elements.com>");
-MODULE_DESCRIPTION("MAX5970_hot-swap controller driver");
+MODULE_DESCRIPTION("MAX5970 Power Switch & Monitor driver");
 MODULE_LICENSE("GPL v2");
