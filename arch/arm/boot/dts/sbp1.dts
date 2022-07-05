@@ -1094,6 +1094,12 @@
 		     &pinctrl_adc15_default>;
 };
 
+&kcs3 {
+	// BMC KCS channel 3
+	status = "okay";
+	aspeed,lpc-io-reg = <0xca2>;
+};
+
 &gpio0 {
 	status = "okay";
 	gpio-line-names =
