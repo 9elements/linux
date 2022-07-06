@@ -235,7 +235,7 @@
 			channel@0 {
 				reg = <0>;
 				pwm-polarity = <1>;
-				pulses-per-revolution = <2>;
+				pulses-per-revolution = <1>;
 				rpm-range = <16000>;
 				pwm-init = <90>;
 				maxim,disable-therm-full-speed;
@@ -243,7 +243,7 @@
 			channel@1 {
 				reg = <1>;
 				pwm-polarity = <1>;
-				pulses-per-revolution = <2>;
+				pulses-per-revolution = <1>;
 				rpm-range = <16000>;
 				pwm-init = <90>;
 				maxim,disable-therm-full-speed;
@@ -265,7 +265,7 @@
 			channel@0 {
 				reg = <0>;
 				pwm-polarity = <1>;
-				pulses-per-revolution = <2>;
+				pulses-per-revolution = <1>;
 				rpm-range = <16000>;
 				pwm-init = <90>;
 				maxim,disable-therm-full-speed;
@@ -273,7 +273,7 @@
 			channel@1 {
 				reg = <1>;
 				pwm-polarity = <1>;
-				pulses-per-revolution = <2>;
+				pulses-per-revolution = <1>;
 				rpm-range = <16000>;
 				pwm-init = <90>;
 				maxim,disable-therm-full-speed;
@@ -295,7 +295,7 @@
 			channel@0 {
 				reg = <0>;
 				pwm-polarity = <1>;
-				pulses-per-revolution = <2>;
+				pulses-per-revolution = <1>;
 				rpm-range = <16000>;
 				pwm-init = <90>;
 				maxim,disable-therm-full-speed;
@@ -303,7 +303,7 @@
 			channel@1 {
 				reg = <1>;
 				pwm-polarity = <1>;
-				pulses-per-revolution = <2>;
+				pulses-per-revolution = <1>;
 				rpm-range = <16000>;
 				pwm-init = <90>;
 				maxim,disable-therm-full-speed;
@@ -325,7 +325,7 @@
 			channel@0 {
 				reg = <0>;
 				pwm-polarity = <1>;
-				pulses-per-revolution = <2>;
+				pulses-per-revolution = <1>;
 				rpm-range = <16000>;
 				pwm-init = <90>;
 				maxim,disable-therm-full-speed;
@@ -333,7 +333,7 @@
 			channel@1 {
 				reg = <1>;
 				pwm-polarity = <1>;
-				pulses-per-revolution = <2>;
+				pulses-per-revolution = <1>;
 				rpm-range = <16000>;
 				pwm-init = <90>;
 				maxim,disable-therm-full-speed;
@@ -355,7 +355,7 @@
 			channel@0 {
 				reg = <0>;
 				pwm-polarity = <1>;
-				pulses-per-revolution = <2>;
+				pulses-per-revolution = <1>;
 				rpm-range = <16000>;
 				pwm-init = <90>;
 				maxim,disable-therm-full-speed;
@@ -363,7 +363,7 @@
 			channel@1 {
 				reg = <1>;
 				pwm-polarity = <1>;
-				pulses-per-revolution = <2>;
+				pulses-per-revolution = <1>;
 				rpm-range = <16000>;
 				pwm-init = <90>;
 				maxim,disable-therm-full-speed;
@@ -385,7 +385,7 @@
 			channel@0 {
 				reg = <0>;
 				pwm-polarity = <1>;
-				pulses-per-revolution = <2>;
+				pulses-per-revolution = <1>;
 				rpm-range = <16000>;
 				pwm-init = <90>;
 				maxim,disable-therm-full-speed;
@@ -393,7 +393,7 @@
 			channel@1 {
 				reg = <1>;
 				pwm-polarity = <1>;
-				pulses-per-revolution = <2>;
+				pulses-per-revolution = <1>;
 				rpm-range = <16000>;
 				pwm-init = <90>;
 				maxim,disable-therm-full-speed;
@@ -415,7 +415,7 @@
 			channel@0 {
 				reg = <0>;
 				pwm-polarity = <1>;
-				pulses-per-revolution = <2>;
+				pulses-per-revolution = <1>;
 				rpm-range = <16000>;
 				pwm-init = <90>;
 				maxim,disable-therm-full-speed;
@@ -423,7 +423,7 @@
 			channel@1 {
 				reg = <1>;
 				pwm-polarity = <1>;
-				pulses-per-revolution = <2>;
+				pulses-per-revolution = <1>;
 				rpm-range = <16000>;
 				pwm-init = <90>;
 				maxim,disable-therm-full-speed;
@@ -445,7 +445,7 @@
 			channel@0 {
 				reg = <0>;
 				pwm-polarity = <1>;
-				pulses-per-revolution = <2>;
+				pulses-per-revolution = <1>;
 				rpm-range = <16000>;
 				pwm-init = <90>;
 				maxim,disable-therm-full-speed;
@@ -453,7 +453,7 @@
 			channel@1 {
 				reg = <1>;
 				pwm-polarity = <1>;
-				pulses-per-revolution = <2>;
+				pulses-per-revolution = <1>;
 				rpm-range = <16000>;
 				pwm-init = <90>;
 				maxim,disable-therm-full-speed;
@@ -478,7 +478,7 @@
 			channel@0 {
 				reg = <0>;
 				pwm-polarity = <1>;
-				pulses-per-revolution = <2>;
+				pulses-per-revolution = <1>;
 				rpm-range = <16000>;
 				pwm-init = <90>;
 				maxim,disable-therm-full-speed;
@@ -486,7 +486,7 @@
 			channel@1 {
 				reg = <1>;
 				pwm-polarity = <1>;
-				pulses-per-revolution = <2>;
+				pulses-per-revolution = <1>;
 				rpm-range = <16000>;
 				pwm-init = <90>;
 				maxim,disable-therm-full-speed;
@@ -508,7 +508,7 @@
 			channel@0 {
 				reg = <0>;
 				pwm-polarity = <1>;
-				pulses-per-revolution = <2>;
+				pulses-per-revolution = <1>;
 				rpm-range = <16000>;
 				pwm-init = <90>;
 				maxim,disable-therm-full-speed;
@@ -516,7 +516,7 @@
 			channel@1 {
 				reg = <1>;
 				pwm-polarity = <1>;
-				pulses-per-revolution = <2>;
+				pulses-per-revolution = <1>;
 				rpm-range = <16000>;
 				pwm-init = <90>;
 				maxim,disable-therm-full-speed;
@@ -538,7 +538,7 @@
 			channel@0 {
 				reg = <0>;
 				pwm-polarity = <1>;
-				pulses-per-revolution = <2>;
+				pulses-per-revolution = <1>;
 				rpm-range = <16000>;
 				pwm-init = <90>;
 				maxim,disable-therm-full-speed;
@@ -546,7 +546,7 @@
 			channel@1 {
 				reg = <1>;
 				pwm-polarity = <1>;
-				pulses-per-revolution = <2>;
+				pulses-per-revolution = <1>;
 				rpm-range = <16000>;
 				pwm-init = <90>;
 				maxim,disable-therm-full-speed;
@@ -568,7 +568,7 @@
 			channel@0 {
 				reg = <0>;
 				pwm-polarity = <1>;
-				pulses-per-revolution = <2>;
+				pulses-per-revolution = <1>;
 				rpm-range = <16000>;
 				pwm-init = <90>;
 				maxim,disable-therm-full-speed;
@@ -576,7 +576,7 @@
 			channel@1 {
 				reg = <1>;
 				pwm-polarity = <1>;
-				pulses-per-revolution = <2>;
+				pulses-per-revolution = <1>;
 				rpm-range = <16000>;
 				pwm-init = <90>;
 				maxim,disable-therm-full-speed;
@@ -598,7 +598,7 @@
 			channel@0 {
 				reg = <0>;
 				pwm-polarity = <1>;
-				pulses-per-revolution = <2>;
+				pulses-per-revolution = <1>;
 				rpm-range = <16000>;
 				pwm-init = <90>;
 				maxim,disable-therm-full-speed;
@@ -606,7 +606,7 @@
 			channel@1 {
 				reg = <1>;
 				pwm-polarity = <1>;
-				pulses-per-revolution = <2>;
+				pulses-per-revolution = <1>;
 				rpm-range = <16000>;
 				pwm-init = <90>;
 				maxim,disable-therm-full-speed;
@@ -628,7 +628,7 @@
 			channel@0 {
 				reg = <0>;
 				pwm-polarity = <1>;
-				pulses-per-revolution = <2>;
+				pulses-per-revolution = <1>;
 				rpm-range = <16000>;
 				pwm-init = <90>;
 				maxim,disable-therm-full-speed;
@@ -636,7 +636,7 @@
 			channel@1 {
 				reg = <1>;
 				pwm-polarity = <1>;
-				pulses-per-revolution = <2>;
+				pulses-per-revolution = <1>;
 				rpm-range = <16000>;
 				pwm-init = <90>;
 				maxim,disable-therm-full-speed;
@@ -658,7 +658,7 @@
 			channel@0 {
 				reg = <0>;
 				pwm-polarity = <1>;
-				pulses-per-revolution = <2>;
+				pulses-per-revolution = <1>;
 				rpm-range = <16000>;
 				pwm-init = <90>;
 				maxim,disable-therm-full-speed;
@@ -666,7 +666,7 @@
 			channel@1 {
 				reg = <1>;
 				pwm-polarity = <1>;
-				pulses-per-revolution = <2>;
+				pulses-per-revolution = <1>;
 				rpm-range = <16000>;
 				pwm-init = <90>;
 				maxim,disable-therm-full-speed;
@@ -688,7 +688,7 @@
 			channel@0 {
 				reg = <0>;
 				pwm-polarity = <1>;
-				pulses-per-revolution = <2>;
+				pulses-per-revolution = <1>;
 				rpm-range = <16000>;
 				pwm-init = <90>;
 				maxim,disable-therm-full-speed;
@@ -696,7 +696,7 @@
 			channel@1 {
 				reg = <1>;
 				pwm-polarity = <1>;
-				pulses-per-revolution = <2>;
+				pulses-per-revolution = <1>;
 				rpm-range = <16000>;
 				pwm-init = <90>;
 				maxim,disable-therm-full-speed;
@@ -721,7 +721,7 @@
 			channel@0 {
 				reg = <0x00>;
 				pwm-polarity = <1>;
-				pulses-per-revolution = <2>;
+				pulses-per-revolution = <1>;
 				rpm-range = <16000>;
 				pwm-init = <90>;
 				maxim,disable-therm-full-speed;
@@ -729,7 +729,7 @@
 			channel@1 {
 				reg = <1>;
 				pwm-polarity = <1>;
-				pulses-per-revolution = <2>;
+				pulses-per-revolution = <1>;
 				rpm-range = <16000>;
 				pwm-init = <90>;
 				maxim,disable-therm-full-speed;
@@ -751,7 +751,7 @@
 			channel@0 {
 				reg = <0>;
 				pwm-polarity = <1>;
-				pulses-per-revolution = <2>;
+				pulses-per-revolution = <1>;
 				rpm-range = <16000>;
 				pwm-init = <90>;
 				maxim,disable-therm-full-speed;
@@ -759,7 +759,7 @@
 			channel@1 {
 				reg = <1>;
 				pwm-polarity = <1>;
-				pulses-per-revolution = <2>;
+				pulses-per-revolution = <1>;
 				rpm-range = <16000>;
 				pwm-init = <90>;
 				maxim,disable-therm-full-speed;
@@ -781,7 +781,7 @@
 			channel@0 {
 				reg = <0>;
 				pwm-polarity = <1>;
-				pulses-per-revolution = <2>;
+				pulses-per-revolution = <1>;
 				rpm-range = <16000>;
 				pwm-init = <90>;
 				maxim,disable-therm-full-speed;
@@ -789,7 +789,7 @@
 			channel@1 {
 				reg = <1>;
 				pwm-polarity = <1>;
-				pulses-per-revolution = <2>;
+				pulses-per-revolution = <1>;
 				rpm-range = <16000>;
 				pwm-init = <90>;
 				maxim,disable-therm-full-speed;
@@ -811,7 +811,7 @@
 			channel@0 {
 				reg = <0>;
 				pwm-polarity = <1>;
-				pulses-per-revolution = <2>;
+				pulses-per-revolution = <1>;
 				rpm-range = <16000>;
 				pwm-init = <90>;
 				maxim,disable-therm-full-speed;
@@ -819,7 +819,7 @@
 			channel@1 {
 				reg = <1>;
 				pwm-polarity = <1>;
-				pulses-per-revolution = <2>;
+				pulses-per-revolution = <1>;
 				rpm-range = <16000>;
 				pwm-init = <90>;
 				maxim,disable-therm-full-speed;
@@ -841,7 +841,7 @@
 			channel@0 {
 				reg = <0>;
 				pwm-polarity = <1>;
-				pulses-per-revolution = <2>;
+				pulses-per-revolution = <1>;
 				rpm-range = <16000>;
 				pwm-init = <90>;
 				maxim,disable-therm-full-speed;
@@ -849,7 +849,7 @@
 			channel@1 {
 				reg = <1>;
 				pwm-polarity = <1>;
-				pulses-per-revolution = <2>;
+				pulses-per-revolution = <1>;
 				rpm-range = <16000>;
 				pwm-init = <90>;
 				maxim,disable-therm-full-speed;
@@ -871,7 +871,7 @@
 			channel@0 {
 				reg = <0>;
 				pwm-polarity = <1>;
-				pulses-per-revolution = <2>;
+				pulses-per-revolution = <1>;
 				rpm-range = <16000>;
 				pwm-init = <90>;
 				maxim,disable-therm-full-speed;
@@ -879,7 +879,7 @@
 			channel@1 {
 				reg = <1>;
 				pwm-polarity = <1>;
-				pulses-per-revolution = <2>;
+				pulses-per-revolution = <1>;
 				rpm-range = <16000>;
 				pwm-init = <90>;
 				maxim,disable-therm-full-speed;
@@ -901,7 +901,7 @@
 			channel@0 {
 				reg = <0>;
 				pwm-polarity = <1>;
-				pulses-per-revolution = <2>;
+				pulses-per-revolution = <1>;
 				rpm-range = <16000>;
 				pwm-init = <90>;
 				maxim,disable-therm-full-speed;
@@ -909,7 +909,7 @@
 			channel@1 {
 				reg = <1>;
 				pwm-polarity = <1>;
-				pulses-per-revolution = <2>;
+				pulses-per-revolution = <1>;
 				rpm-range = <16000>;
 				pwm-init = <90>;
 				maxim,disable-therm-full-speed;
@@ -931,7 +931,7 @@
 			channel@0 {
 				reg = <0>;
 				pwm-polarity = <1>;
-				pulses-per-revolution = <2>;
+				pulses-per-revolution = <1>;
 				rpm-range = <16000>;
 				pwm-init = <90>;
 				maxim,disable-therm-full-speed;
@@ -939,7 +939,7 @@
 			channel@1 {
 				reg = <1>;
 				pwm-polarity = <1>;
-				pulses-per-revolution = <2>;
+				pulses-per-revolution = <1>;
 				rpm-range = <16000>;
 				pwm-init = <90>;
 				maxim,disable-therm-full-speed;
