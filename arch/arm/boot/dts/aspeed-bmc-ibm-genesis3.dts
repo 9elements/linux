@@ -40,6 +40,38 @@
 		power {
 			gpios = <&gpio ASPEED_GPIO(H, 1) GPIO_ACTIVE_LOW>;
 		};
+		id_dwr_frnt_p {
+			label = "LED_ID_DWR_FRNT_P";
+			gpios = <&smb_svc_pex_cpu03_led 35 GPIO_ACTIVE_HIGH>;
+		};
+		pwr_dwr_frnt {
+			label = "LED_PWR_DWR_FRNT";
+			gpios = <&smb_svc_pex_cpu03_led 41 GPIO_ACTIVE_HIGH>;
+		};
+		pwr_dwr_back {
+			label = "LED_PWR_DWR_BACK";
+			gpios = <&smb_pex_vr_ctrl 34 GPIO_ACTIVE_LOW>;
+		};
+		id_dwr_back_p {
+			label = "LED_ID_DWR_BACK_P";
+			gpios = <&smb_pex_vr_ctrl 35 GPIO_ACTIVE_LOW>;
+		};
+		id_cpu0 {
+			label = "LED_ID_CPU0";
+			gpios = <&smb_svc_pex_cpu03_led 48 GPIO_ACTIVE_LOW>;
+		};
+		id_cpu1 {
+			label = "LED_ID_CPU1";
+			gpios = <&smb_svc_pex_cpu12_led 58 GPIO_ACTIVE_LOW>;
+		};
+		id_cpu2 {
+			label = "LED_ID_CPU2";
+			gpios = <&smb_svc_pex_cpu12_led 5 GPIO_ACTIVE_LOW>;
+		};
+		id_cpu3 {
+			label = "LED_ID_CPU3";
+			gpios = <&smb_svc_pex_cpu03_led 22 GPIO_ACTIVE_LOW>;
+		};
 	};
 
 	iio-hwmon-fan-ssbs {
