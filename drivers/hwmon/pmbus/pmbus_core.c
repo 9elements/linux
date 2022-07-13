@@ -2607,6 +2607,16 @@ static int pmbus_regulator_get_status(struct regulator_dev *rdev)
 	if (status < 0)
 		return status;
 
+	if (status & PB_STATUS_OFF)
+		return REGULATOR_STATUS_OFF;
+
+	/* Even when a fault has happened, POWER_GOOD_N is not set.
+	 * Thus the output voltage is still within an acceptable range.
+	 */
+	if (!(status & PB_STATUS_POWER_GOOD_N) &&
+	    (data->info->func[page] & PMBUS_HAVE_PGOOD))
+		return REGULATOR_STATUS_ON;
+
 	if (status & PB_STATUS_VIN_UV ||
 	    status & PB_STATUS_IOUT_OC ||
 	    status & PB_STATUS_VOUT_OV ||
@@ -2661,7 +2671,8 @@ static int pmbus_regulator_get_status(struct regulator_dev *rdev)
 			return REGULATOR_STATUS_ERROR;
 	}
 
-	if (status & PB_STATUS_OFF)
+	if ((status & PB_STATUS_POWER_GOOD_N) &&
+	    (data->info->func[page] & PMBUS_HAVE_PGOOD))
 		return REGULATOR_STATUS_OFF;
 
 	return REGULATOR_STATUS_ON;
