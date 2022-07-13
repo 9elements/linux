@@ -132,7 +132,7 @@ static const int pmbus_fan_command_registers[] = {
 };
 
 struct irq_state {
-	u8 mask;
+	u16 mask;
 	unsigned long notifs;
 	unsigned long errors;
 };
@@ -175,6 +175,14 @@ static const struct irq_state pmbus_irq_status_byte[] = {
 		REGULATOR_EVENT_FAIL,
 		REGULATOR_ERROR_FAIL,
 	},
+};
+
+static const struct irq_state pmbus_irq_status_word[] = {
+	{
+		PB_STATUS_POWER_GOOD_N,
+		REGULATOR_EVENT_REGULATION_OUT,
+		REGULATOR_EVENT_REGULATION_OUT,
+	}
 };
 
 static const struct irq_state pmbus_irq_status_iout[] = {
@@ -250,6 +258,12 @@ static const struct irq_req2state pmbus_irq_regs[] = {
 		PMBUS_STATUS_BYTE,
 		ARRAY_SIZE(pmbus_irq_status_byte),
 		pmbus_irq_status_byte,
+	},
+	{
+		PMBUS_HAVE_PGOOD,
+		PMBUS_STATUS_WORD,
+		ARRAY_SIZE(pmbus_irq_status_word),
+		pmbus_irq_status_word,
 	},
 	{
 		PMBUS_HAVE_STATUS_IOUT,
@@ -2710,7 +2724,11 @@ static int pmbus_irq_subhandler(struct i2c_client *client,
 	for (i = 0; i < ARRAY_SIZE(pmbus_irq_regs); i++) {
 		if (!(data->info->func[page] & pmbus_irq_regs[i].func))
 			continue;
-		ret = _pmbus_read_byte_data(client, page, pmbus_irq_regs[i].reg);
+
+		if (pmbus_irq_regs[i].reg == PMBUS_STATUS_WORD)
+			ret = pmbus_get_status(client, page, PMBUS_STATUS_WORD);
+		else
+			ret = _pmbus_read_byte_data(client, page, pmbus_irq_regs[i].reg);
 		if (ret < 0)
 			return ret;
 		states = pmbus_irq_regs[i].states;
