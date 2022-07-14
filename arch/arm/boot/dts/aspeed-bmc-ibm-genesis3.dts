@@ -1335,6 +1335,8 @@
 						regulator-enable-ramp-delay = <2000>;
 						vin-supply = <&p12v_a>;
 						vbus-supply = <&p3v3_aux>;
+						/* BUG: Keep always powered to prevent I2C bus lock-up */
+						regulator-always-on;
 					};
 				};
 			};
