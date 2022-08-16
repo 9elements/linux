@@ -46,7 +46,7 @@
 		};
 		pwr_dwr_frnt {
 			label = "LED_PWR_DWR_FRNT";
-			gpios = <&smb_svc_pex_cpu03_led 41 GPIO_ACTIVE_HIGH>;
+			gpios = <&smb_svc_pex_cpu03_led 41 GPIO_ACTIVE_LOW>;
 		};
 		pwr_dwr_back {
 			label = "LED_PWR_DWR_BACK";
@@ -54,7 +54,7 @@
 		};
 		id_dwr_back_p {
 			label = "LED_ID_DWR_BACK_P";
-			gpios = <&smb_pex_vr_ctrl 35 GPIO_ACTIVE_LOW>;
+			gpios = <&smb_pex_vr_ctrl 35 GPIO_ACTIVE_HIGH>;
 		};
 		id_cpu0 {
 			label = "LED_ID_CPU0";
