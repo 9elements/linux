@@ -513,51 +513,51 @@
 		};
 
 		// FAN ID LEDs
-		id_dimm_fan_asm01 {
+		id_fan_asm01 {
 			label = "LED_ID_FAN_ASM01";
 			gpios = <&smb_svc_pex_rssd01_16 32 GPIO_ACTIVE_LOW>;
 		};
-		id_dimm_fan_asm02 {
+		id_fan_asm02 {
 			label = "LED_ID_FAN_ASM02";
 			gpios = <&smb_svc_pex_rssd01_16 33 GPIO_ACTIVE_LOW>;
 		};
-		id_dimm_fan_asm03 {
+		id_fan_asm03 {
 			label = "LED_ID_FAN_ASM03";
 			gpios = <&smb_svc_pex_rssd01_16 34 GPIO_ACTIVE_LOW>;
 		};
-		id_dimm_fan_asm04 {
+		id_fan_asm04 {
 			label = "LED_ID_FAN_ASM04";
 			gpios = <&smb_svc_pex_rssd01_16 35 GPIO_ACTIVE_LOW>;
 		};
-		id_dimm_fan_asm05 {
+		id_fan_asm05 {
 			label = "LED_ID_FAN_ASM05";
 			gpios = <&smb_svc_pex_rssd01_16 36 GPIO_ACTIVE_LOW>;
 		};
-		id_dimm_fan_asm06 {
+		id_fan_asm06 {
 			label = "LED_ID_FAN_ASM06";
 			gpios = <&smb_svc_pex_rssd01_16 37 GPIO_ACTIVE_LOW>;
 		};
-		id_dimm_fan_asm07 {
+		id_fan_asm07 {
 			label = "LED_ID_FAN_ASM07";
 			gpios = <&smb_svc_pex_rssd17_32 32 GPIO_ACTIVE_LOW>;
 		};
-		id_dimm_fan_asm08 {
+		id_fan_asm08 {
 			label = "LED_ID_FAN_ASM08";
 			gpios = <&smb_svc_pex_rssd17_32 33 GPIO_ACTIVE_LOW>;
 		};
-		id_dimm_fan_asm09 {
+		id_fan_asm09 {
 			label = "LED_ID_FAN_ASM09";
 			gpios = <&smb_svc_pex_rssd17_32 34 GPIO_ACTIVE_LOW>;
 		};
-		id_dimm_fan_asm10 {
+		id_fan_asm10 {
 			label = "LED_ID_FAN_ASM10";
 			gpios = <&smb_svc_pex_rssd17_32 35 GPIO_ACTIVE_LOW>;
 		};
-		id_dimm_fan_asm11 {
+		id_fan_asm11 {
 			label = "LED_ID_FAN_ASM11";
 			gpios = <&smb_svc_pex_rssd17_32 36 GPIO_ACTIVE_LOW>;
 		};
-		id_dimm_fan_asm12 {
+		id_fan_asm12 {
 			label = "LED_ID_FAN_ASM12";
 			gpios = <&smb_svc_pex_rssd17_32 37 GPIO_ACTIVE_LOW>;
 		};
