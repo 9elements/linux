@@ -43,6 +43,7 @@
 		id_dwr_frnt_p {
 			label = "LED_ID_DWR_FRNT_P";
 			gpios = <&smb_svc_pex_cpu03_led 35 GPIO_ACTIVE_HIGH>;
+			default-state = "on";
 		};
 		pwr_dwr_frnt {
 			label = "LED_PWR_DWR_FRNT";
@@ -55,6 +56,7 @@
 		id_dwr_back_p {
 			label = "LED_ID_DWR_BACK_P";
 			gpios = <&smb_pex_vr_ctrl 35 GPIO_ACTIVE_HIGH>;
+			default-state = "on";
 		};
 		id_cpu0 {
 			label = "LED_ID_CPU0";
