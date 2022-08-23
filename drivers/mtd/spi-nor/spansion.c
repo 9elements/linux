@@ -285,6 +285,9 @@ static void spansion_post_sfdp_fixups(struct spi_nor *nor)
 	/* No small sector erase for 4-byte command set */
 	nor->erase_opcode = SPINOR_OP_SE;
 	nor->mtd.erasesize = nor->info->sector_size;
+	if (nor->info->flags & SPI_NOR_DUAL_READ)
+		nor->params->hwcaps.mask |= SNOR_HWCAPS_READ_1_1_2;
+
 }
 
 static const struct spi_nor_fixups spansion_fixups = {
