@@ -1693,19 +1693,18 @@
 				interrupt-parent = <&smb_pex_cpu2_event>;
 				interrupts = <14 IRQ_TYPE_LEVEL_LOW>;
 
-				vdrv-supply = <&p5v>;
 				regulators {
 					pvccin_cpu2: vout0 {
 						regulator-compatible = "vout0";
 						regulator-name = "pvccin_cpu2";
 						regulator-enable-ramp-delay = <200>;
-						vin-supply = <&p12v_a>;
+						vin-supply = <&p5v>;
 					};
 					pvccsa_cpu2: vout1 {
 						regulator-compatible = "vout1";
 						regulator-name = "pvccsa_cpu2";
 						regulator-enable-ramp-delay = <200>;
-						vin-supply = <&p12v_a>;
+						vin-supply = <&p5v>;
 					};
 				};
 			};
@@ -1720,19 +1719,18 @@
 				// using SMB_VR_CPU2_NPQ_ALERT
 				interrupt-parent = <&smb_pex_cpu2_event>;
 				interrupts = <11 IRQ_TYPE_LEVEL_LOW>;
-				vdrv-supply = <&p5v>;
 				regulators {
 					pvddq_npq: vout0 {
 						regulator-compatible = "vout0";
 						regulator-name = "pvddq_npq";
 						regulator-enable-ramp-delay = <200>;
-						vin-supply = <&p12v_a>;
+						vin-supply = <&p5v>;
 					};
 					pvpp_npq: vout1 {
 						regulator-compatible = "vout1";
 						regulator-name = "pvpp_npq";
 						regulator-enable-ramp-delay = <200>;
-						vin-supply = <&p12v_a>;
+						vin-supply = <&p5v>;
 					};
 				};
 			};
@@ -1747,19 +1745,18 @@
 				// using SMB_VR_CPU2_RST_ALERT
 				interrupt-parent = <&smb_pex_cpu2_event>;
 				interrupts = <16 IRQ_TYPE_LEVEL_LOW>;
-				vdrv-supply = <&p5v>;
 				regulators {
 					pvddq_rst: vout0 {
 						regulator-compatible = "vout0";
 						regulator-name = "pvddq_rst";
 						regulator-enable-ramp-delay = <200>;
-						vin-supply = <&p12v_a>;
+						vin-supply = <&p5v>;
 					};
 					pvpp_rst: vout1 {
 						regulator-compatible = "vout1";
 						regulator-name = "pvpp_rst";
 						regulator-enable-ramp-delay = <200>;
-						vin-supply = <&p12v_a>;
+						vin-supply = <&p5v>;
 					};
 				};
 			};
@@ -1874,19 +1871,18 @@
 				// using SMB_VR_CPU1_KLM_ALERT
 				interrupt-parent = <&smb_pex_cpu1_event>;
 				interrupts = <0 IRQ_TYPE_LEVEL_LOW>;
-				vdrv-supply = <&p5v>;
 				regulators {
 					pvddq_klm: vout0 {
 						regulator-compatible = "vout0";
 						regulator-name = "pvddq_klm";
 						regulator-enable-ramp-delay = <200>;
-						vin-supply = <&p12v_a>;
+						vin-supply = <&p5v>;
 					};
 					pvpp_klm: vout1 {
 						regulator-compatible = "vout1";
 						regulator-name = "pvpp_klm";
 						regulator-enable-ramp-delay = <200>;
-						vin-supply = <&p12v_a>;
+						vin-supply = <&p5v>;
 					};
 				};
 			};
@@ -1901,19 +1897,18 @@
 				// using SMB_VR_CPU1_PVCCIN_ALERT
 				interrupt-parent = <&smb_pex_cpu1_event>;
 				interrupts = <1 IRQ_TYPE_LEVEL_LOW>;
-				vdrv-supply = <&p5v>;
 				regulators {
 					pvccin_cpu1: vout0 {
 						regulator-compatible = "vout0";
 						regulator-name = "pvccin_cpu1";
 						regulator-enable-ramp-delay = <200>;
-						vin-supply = <&p12v_a>;
+						vin-supply = <&p5v>;
 					};
 					pvccsa_cpu1: vout1 {
 						regulator-compatible = "vout1";
 						regulator-name = "pvccsa_cpu1";
 						regulator-enable-ramp-delay = <200>;
-						vin-supply = <&p12v_a>;
+						vin-supply = <&p5v>;
 					};
 				};
 			};
@@ -1928,19 +1923,18 @@
 				// using SMB_VR_CPU1_GHJ_ALERT
 				interrupt-parent = <&smb_pex_cpu1_event>;
 				interrupts = <2 IRQ_TYPE_LEVEL_LOW>;
-				vdrv-supply = <&p5v>;
 				regulators {
 					pvddq_ghj: vout0 {
 						regulator-compatible = "vout0";
 						regulator-name = "pvddq_ghj";
 						regulator-enable-ramp-delay = <200>;
-						vin-supply = <&p12v_a>;
+						vin-supply = <&p5v>;
 					};
 					pvpp_ghj: vout1 {
 						regulator-compatible = "vout1";
 						regulator-name = "pvpp_ghj";
 						regulator-enable-ramp-delay = <200>;
-						vin-supply = <&p12v_a>;
+						vin-supply = <&p5v>;
 					};
 				};
 			};
@@ -2298,19 +2292,18 @@
 				// using SMB_VR_CPU0_PVCCIN_ALERT
 				interrupt-parent = <&smb_pex_cpu0_event>;
 				interrupts = <2 IRQ_TYPE_LEVEL_LOW>;
-				vdrv-supply = <&p5v>;
 				regulators {
 					pvccin_cpu0: vout0 {
 						regulator-compatible = "vout0";
 						regulator-name = "pvccin_cpu0";
 						regulator-enable-ramp-delay = <200>;
-						vin-supply = <&p12v_a>;
+						vin-supply = <&p5v>;
 					};
 					pvccsa_cpu0: vout1 {
 						regulator-compatible = "vout1";
 						regulator-name = "pvccsa_cpu0";
 						regulator-enable-ramp-delay = <200>;
-						vin-supply = <&p12v_a>;
+						vin-supply = <&p5v>;
 					};
 				};
 			};
@@ -2325,19 +2318,18 @@
 				// using SMB_VR_CPU0_DEF_ALERT
 				interrupt-parent = <&smb_pex_cpu0_event>;
 				interrupts = <3 IRQ_TYPE_LEVEL_LOW>;
-				vdrv-supply = <&p5v>;
 				regulators {
 					pvddq_def: vout0 {
 						regulator-compatible = "vout0";
 						regulator-name = "pvddq_def";
 						regulator-enable-ramp-delay = <200>;
-						vin-supply = <&p12v_a>;
+						vin-supply = <&p5v>;
 					};
 					pvpp_def: vout1 {
 						regulator-compatible = "vout1";
 						regulator-name = "pvpp_def";
 						regulator-enable-ramp-delay = <200>;
-						vin-supply = <&p12v_a>;
+						vin-supply = <&p5v>;
 					};
 				};
 			};
@@ -2352,19 +2344,18 @@
 				// using SMB_VR_CPU0_ABC_ALERT
 				interrupt-parent = <&smb_pex_cpu0_event>;
 				interrupts = <0 IRQ_TYPE_LEVEL_LOW>;
-				vdrv-supply = <&p5v>;
 				regulators {
 					pvddq_abc: vout0 {
 						regulator-compatible = "vout0";
 						regulator-name = "pvddq_abc";
 						regulator-enable-ramp-delay = <200>;
-						vin-supply = <&p12v_a>;
+						vin-supply = <&p5v>;
 					};
 					pvpp_abc: vout1 {
 						regulator-compatible = "vout1";
 						regulator-name = "pvpp_abc";
 						regulator-enable-ramp-delay = <200>;
-						vin-supply = <&p12v_a>;
+						vin-supply = <&p5v>;
 					};
 				};
 			};
@@ -2718,19 +2709,18 @@
 				// using SMB_VR_CPU3_UVW_ALERT
 				interrupt-parent = <&smb_pex_cpu3_event>;
 				interrupts = <12 IRQ_TYPE_LEVEL_LOW>;
-				vdrv-supply = <&p5v>;
 				regulators {
 					pvddq_uvw: vout0 {
 						regulator-compatible = "vout0";
 						regulator-name = "pvddq_uvw";
 						regulator-enable-ramp-delay = <200>;
-						vin-supply = <&p12v_a>;
+						vin-supply = <&p5v>;
 					};
 					pvpp_uvw: vout1 {
 						regulator-compatible = "vout1";
 						regulator-name = "pvpp_uvw";
 						regulator-enable-ramp-delay = <200>;
-						vin-supply = <&p12v_a>;
+						vin-supply = <&p5v>;
 					};
 				};
 			};
@@ -2750,19 +2740,18 @@
 				// using SMB_VR_CPU3_PVCCIN_ALERT
 				interrupt-parent = <&smb_pex_cpu3_event>;
 				interrupts = <11 IRQ_TYPE_LEVEL_LOW>;
-				vdrv-supply = <&p5v>;
 				regulators {
 					pvccin_cpu3: vout0 {
 						regulator-compatible = "vout0";
 						regulator-name = "pvccin_cpu3";
 						regulator-enable-ramp-delay = <200>;
-						vin-supply = <&p12v_a>;
+						vin-supply = <&p5v>;
 					};
 					pvccsa_cpu3: vout1 {
 						regulator-compatible = "vout1";
 						regulator-name = "pvccsa_cpu3";
 						regulator-enable-ramp-delay = <200>;
-						vin-supply = <&p12v_a>;
+						vin-supply = <&p5v>;
 					};
 				};
 			};
@@ -2777,19 +2766,18 @@
 				// using SMB_VR_CPU3_XYZ_ALERT
 				interrupt-parent = <&smb_pex_cpu3_event>;
 				interrupts = <10 IRQ_TYPE_LEVEL_LOW>;
-				vdrv-supply = <&p5v>;
 				regulators {
 					pvddq_xyz: vout0 {
 						regulator-compatible = "vout0";
 						regulator-name = "pvddq_xyz";
 						regulator-enable-ramp-delay = <200>;
-						vin-supply = <&p12v_a>;
+						vin-supply = <&p5v>;
 					};
 					pvpp_xyz: vout1 {
 						regulator-compatible = "vout1";
 						regulator-name = "pvpp_xyz";
 						regulator-enable-ramp-delay = <200>;
-						vin-supply = <&p12v_a>;
+						vin-supply = <&p5v>;
 					};
 				};
 			};
