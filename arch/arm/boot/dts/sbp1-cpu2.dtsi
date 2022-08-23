@@ -111,7 +111,7 @@
 			#address-cells = <1>;
 			#size-cells = <0>;
 			reg = <3>;
-			xdpe_pvccin_pvccfa_cpu2@58 {
+			mp2973_pvccin_pvccfa_cpu2@58 {
 				compatible = "mps,mp2973";
 				reg = <0x58>;
 				// using SMB_VR_PVCCIN_CPU2_ALERT
