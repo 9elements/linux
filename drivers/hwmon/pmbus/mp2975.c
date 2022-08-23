@@ -68,6 +68,11 @@ struct mp2975_data {
 	int curr_sense_gain[MP2975_PAGE_NUM];
 };
 
+static const struct regulator_desc __maybe_unused mp2975_reg_desc[] = {
+	PMBUS_REGULATOR("vout", 0),
+	PMBUS_REGULATOR("vout", 1),
+};
+
 #define to_mp2975_data(x)  container_of(x, struct mp2975_data, info)
 
 static int mp2975_read_byte_data(struct i2c_client *client, int page, int reg)
@@ -678,6 +683,10 @@ static struct pmbus_driver_info mp2975_info = {
 		PMBUS_HAVE_PIN | PMBUS_HAVE_STATUS_INPUT | PMBUS_PHASE_VIRTUAL,
 	.read_byte_data = mp2975_read_byte_data,
 	.read_word_data = mp2975_read_word_data,
+#if IS_ENABLED(CONFIG_SENSORS_MP2975_REGULATOR)
+	.num_regulators = 1,
+	.reg_desc = mp2975_reg_desc,
+#endif
 };
 
 static int mp2975_probe(struct i2c_client *client)
@@ -704,6 +713,8 @@ static int mp2975_probe(struct i2c_client *client)
 		data->info.pages = MP2975_PAGE_NUM;
 		data->info.phases[1] = ret;
 		data->info.func[1] = MP2975_RAIL2_FUNC;
+		if (CONFIG_SENSORS_MP2975_REGULATOR)
+			data->info.num_regulators = MP2975_PAGE_NUM;
 	}
 
 	/* Identify multiphase configuration. */
