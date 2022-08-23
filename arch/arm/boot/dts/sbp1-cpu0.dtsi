@@ -76,19 +76,18 @@
 				interrupt-parent = <&smb_pex_cpu0_event>;
 				interrupts = <9 IRQ_TYPE_LEVEL_LOW>;
 
-				vdrv-supply = <&p5v>;
 				regulators {
 					pvccinfaon_cpu0: vout0 {
 						regulator-compatible = "vout0";
 						regulator-name = "pvccinfaon_cpu0";
 						regulator-enable-ramp-delay = <200>;
-						vin-supply = <&p12v_a>;
+						vin-supply = <&p5v>;
 					};
 					pvccfa_ehv_cpu0: vout1 {
 						regulator-compatible = "vout1";
 						regulator-name = "pvccfa_ehv_cpu0";
 						regulator-enable-ramp-delay = <200>;
-						vin-supply = <&p12v_a>;
+						vin-supply = <&p5v>;
 					};
 				};
 			};
@@ -119,19 +118,18 @@
 				interrupt-parent = <&smb_pex_cpu0_event>;
 				interrupts = <12 IRQ_TYPE_LEVEL_LOW>;
 
-				vdrv-supply = <&p5v>;
 				regulators {
 					pvccin_cpu0: vout0 {
 						regulator-compatible = "vout0";
 						regulator-name = "pvccin_cpu0";
 						regulator-enable-ramp-delay = <200>;
-						vin-supply = <&p12v_a>;
+						vin-supply = <&p5v>;
 					};
 					pvccfa_ehv_fivra_cpu0: vout1 {
 						regulator-compatible = "vout1";
 						regulator-name = "pvccfa_ehv_fivra_cpu0";
 						regulator-enable-ramp-delay = <200>;
-						vin-supply = <&p12v_a>;
+						vin-supply = <&p5v>;
 					};
 				};
 			};
