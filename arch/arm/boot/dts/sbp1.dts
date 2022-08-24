@@ -1706,8 +1706,13 @@
 				regulator-oc-protection-microamp = <2800000>;
 				interrupt-parent = <&smb_pex_vr_ctrl>;
 				interrupts = <30 IRQ_TYPE_LEVEL_LOW>; // M2_SSD1_SSB_ALERT_N
-				led-enable = <1>;
-
+					leds {
+						power {
+							label = "m2_ssb_ssd1:green:power";
+							reg = <0>;
+							default-state = "off";
+						};
+					};
 				regulators {
 					sw0_smb_m2_ssb_ssd1: SW0 {
 						regulator-compatible = "SW0";
@@ -1740,8 +1745,13 @@
 				interrupt-parent = <&smb_pex_vr_ctrl>;
 				interrupts = <39 IRQ_TYPE_LEVEL_LOW>; // M2_SSD2_SSB_ALERT_N
 				vss1-supply = <&p3v3_aux>;
-				led-enable = <1>;
-
+				leds {
+					power {
+						label = "m2_ssb_ssd2:green:power";
+						reg = <0>;
+						default-state = "off";
+					};
+				};
 				regulators {
 					sw0_smb_m2_ssb_ssd2: SW0 {
 						regulator-compatible = "SW0";
