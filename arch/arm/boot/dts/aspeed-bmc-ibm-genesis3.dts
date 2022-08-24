@@ -1422,8 +1422,13 @@
 				regulator-oc-protection-microamp = <2800000>;
 				interrupt-parent = <&smb_pex_vr_ctrl>;
 				interrupts = <30 IRQ_TYPE_LEVEL_LOW>; // M2_SSD1_SSB_ALERT_N
-				led-enable = <1>;
-
+				leds {
+					power {
+						label = "m2_ssb_ssd1:green:power";
+						reg = <0>;
+						default-state = "off";
+					};
+				};
 				regulators {
 					sw0_smb_m2_ssb_ssd1: SW0 {
 						regulator-compatible = "SW0";
@@ -1456,8 +1461,13 @@
 				interrupt-parent = <&smb_pex_vr_ctrl>;
 				interrupts = <39 IRQ_TYPE_LEVEL_LOW>; // M2_SSD2_SSB_ALERT_N
 				vss1-supply = <&p3v3_aux>;
-				led-enable = <1>;
-
+				leds {
+					power {
+						label = "m2_ssb_ssd2:green:power";
+						reg = <0>;
+						default-state = "off";
+					};
+				};
 				regulators {
 					sw0_smb_m2_ssb_ssd2: SW0 {
 						regulator-compatible = "SW0";
@@ -4058,8 +4068,13 @@
 			vss1-supply = <&p3v3_aux>;
 			vss2-supply = <&p12v_a>;
 			shunt-resistor-micro-ohms = <100000 4500000>;
-			led-enable = <1>;
-
+			leds {
+				power {
+					label = "rssd19:green:power";
+					reg = <0>;
+					default-state = "off";
+				};
+			};
 			regulators {
 				sw0_ssb_rssd19: SW0 {
 					vss1-supply = <&p3v3_aux>;
@@ -4096,8 +4111,13 @@
 			vss1-supply = <&p3v3_aux>;
 			vss2-supply = <&p12v_a>;
 			shunt-resistor-micro-ohms = <100000 4500000>;
-			led-enable = <1>;
-
+			leds {
+				power {
+					label = "rssd18:green:power";
+					reg = <0>;
+					default-state = "off";
+				};
+			};
 			regulators {
 				sw0_ssb_rssd18: SW0 {
 					vss1-supply = <&p3v3_aux>;
@@ -4134,8 +4154,13 @@
 			vss1-supply = <&p3v3_aux>;
 			vss2-supply = <&p12v_a>;
 			shunt-resistor-micro-ohms = <100000 4500000>;
-			led-enable = <1>;
-
+			leds {
+				power {
+					label = "rssd17:green:power";
+					reg = <0>;
+					default-state = "off";
+				};
+			};
 			regulators {
 				sw0_ssb_rssd17: SW0 {
 					vss1-supply = <&p3v3_aux>;
@@ -4172,8 +4197,13 @@
 			vss1-supply = <&p3v3_aux>;
 			vss2-supply = <&p12v_a>;
 			shunt-resistor-micro-ohms = <100000 4500000>;
-			led-enable = <1>;
-
+			leds {
+				power {
+					label = "rssd20:green:power";
+					reg = <0>;
+					default-state = "off";
+				};
+			};
 			regulators {
 				sw0_ssb_rssd20: SW0 {
 					vss1-supply = <&p3v3_aux>;
@@ -4210,8 +4240,13 @@
 			vss1-supply = <&p3v3_aux>;
 			vss2-supply = <&p12v_a>;
 			shunt-resistor-micro-ohms = <100000 4500000>;
-			led-enable = <1>;
-
+			leds {
+				power {
+					label = "rssd21:green:power";
+					reg = <0>;
+					default-state = "off";
+				};
+			};
 			regulators {
 				sw0_ssb_rssd21: SW0 {
 					vss1-supply = <&p3v3_aux>;
@@ -4248,8 +4283,13 @@
 			vss1-supply = <&p3v3_aux>;
 			vss2-supply = <&p12v_a>;
 			shunt-resistor-micro-ohms = <100000 4500000>;
-			led-enable = <1>;
-
+			leds {
+				power {
+					label = "rssd22:green:power";
+					reg = <0>;
+					default-state = "off";
+				};
+			};
 			regulators {
 				sw0_ssb_rssd22: SW0 {
 					vss1-supply = <&p3v3_aux>;
@@ -4286,8 +4326,13 @@
 			vss1-supply = <&p3v3_aux>;
 			vss2-supply = <&p12v_a>;
 			shunt-resistor-micro-ohms = <100000 4500000>;
-			led-enable = <1>;
-
+			leds {
+				power {
+					label = "rssd24:green:power";
+					reg = <0>;
+					default-state = "off";
+				};
+			};
 			regulators {
 				sw0_ssb_rssd24: SW0 {
 					vss1-supply = <&p3v3_aux>;
@@ -4324,8 +4369,13 @@
 			vss1-supply = <&p3v3_aux>;
 			vss2-supply = <&p12v_a>;
 			shunt-resistor-micro-ohms = <100000 4500000>;
-			led-enable = <1>;
-
+			leds {
+				power {
+					label = "rssd23:green:power";
+					reg = <0>;
+					default-state = "off";
+				};
+			};
 			regulators {
 				sw0_ssb_rssd23: SW0 {
 					vss1-supply = <&p3v3_aux>;
@@ -4365,8 +4415,13 @@
 			vss1-supply = <&p3v3_aux>;
 			vss2-supply = <&p12v_a>;
 			shunt-resistor-micro-ohms = <100000 4500000>;
-			led-enable = <1>;
-
+			leds {
+				power {
+					label = "rssd25:green:power";
+					reg = <0>;
+					default-state = "off";
+				};
+			};
 			regulators {
 				sw0_ssb_rssd25: SW0 {
 					vss1-supply = <&p3v3_aux>;
@@ -4403,8 +4458,13 @@
 			vss1-supply = <&p3v3_aux>;
 			vss2-supply = <&p12v_a>;
 			shunt-resistor-micro-ohms = <100000 4500000>;
-			led-enable = <1>;
-
+			leds {
+				power {
+					label = "rssd26:green:power";
+					reg = <0>;
+					default-state = "off";
+				};
+			};
 			regulators {
 				sw0_ssb_rssd26: SW0 {
 					vss1-supply = <&p3v3_aux>;
@@ -4441,8 +4501,13 @@
 			vss1-supply = <&p3v3_aux>;
 			vss2-supply = <&p12v_a>;
 			shunt-resistor-micro-ohms = <100000 4500000>;
-			led-enable = <1>;
-
+			leds {
+				power {
+					label = "rssd27:green:power";
+					reg = <0>;
+					default-state = "off";
+				};
+			};
 			regulators {
 				sw0_ssb_rssd27: SW0 {
 					vss1-supply = <&p3v3_aux>;
@@ -4479,8 +4544,13 @@
 			vss1-supply = <&p3v3_aux>;
 			vss2-supply = <&p12v_a>;
 			shunt-resistor-micro-ohms = <100000 4500000>;
-			led-enable = <1>;
-
+			leds {
+				power {
+					label = "rssd32:green:power";
+					reg = <0>;
+					default-state = "off";
+				};
+			};
 			regulators {
 				sw0_ssb_rssd32: SW0 {
 					vss1-supply = <&p3v3_aux>;
@@ -4517,8 +4587,13 @@
 			vss1-supply = <&p3v3_aux>;
 			vss2-supply = <&p12v_a>;
 			shunt-resistor-micro-ohms = <100000 4500000>;
-			led-enable = <1>;
-
+			leds {
+				power {
+					label = "rssd31:green:power";
+					reg = <0>;
+					default-state = "off";
+				};
+			};
 			regulators {
 				sw0_ssb_rssd31: SW0 {
 					vss1-supply = <&p3v3_aux>;
@@ -4555,8 +4630,13 @@
 			vss1-supply = <&p3v3_aux>;
 			vss2-supply = <&p12v_a>;
 			shunt-resistor-micro-ohms = <100000 4500000>;
-			led-enable = <1>;
-
+			leds {
+				power {
+					label = "rssd30:green:power";
+					reg = <0>;
+					default-state = "off";
+				};
+			};
 			regulators {
 				sw0_ssb_rssd30: SW0 {
 					vss1-supply = <&p3v3_aux>;
@@ -4593,8 +4673,13 @@
 			vss1-supply = <&p3v3_aux>;
 			vss2-supply = <&p12v_a>;
 			shunt-resistor-micro-ohms = <100000 4500000>;
-			led-enable = <1>;
-
+			leds {
+				power {
+					label = "rssd29:green:power";
+					reg = <0>;
+					default-state = "off";
+				};
+			};
 			regulators {
 				sw0_ssb_rssd29: SW0 {
 					vss1-supply = <&p3v3_aux>;
@@ -4631,8 +4716,13 @@
 			vss1-supply = <&p3v3_aux>;
 			vss2-supply = <&p12v_a>;
 			shunt-resistor-micro-ohms = <100000 4500000>;
-			led-enable = <1>;
-
+			leds {
+				power {
+					label = "rssd28:green:power";
+					reg = <0>;
+					default-state = "off";
+				};
+			};
 			regulators {
 				sw0_ssb_rssd28: SW0 {
 					vss1-supply = <&p3v3_aux>;
@@ -5401,8 +5491,13 @@
 			vss1-supply = <&p3v3_aux>;
 			vss2-supply = <&p12v_a>;
 			shunt-resistor-micro-ohms = <100000 4500000>;
-			led-enable = <1>;
-
+			leds {
+				power {
+					label = "rssd03:green:power";
+					reg = <0>;
+					default-state = "off";
+				};
+			};
 			regulators {
 				sw0_ssb_rssd03: SW0 {
 					vss1-supply = <&p3v3_aux>;
@@ -5439,8 +5534,13 @@
 			vss1-supply = <&p3v3_aux>;
 			vss2-supply = <&p12v_a>;
 			shunt-resistor-micro-ohms = <100000 4500000>;
-			led-enable = <1>;
-
+			leds {
+				power {
+					label = "rssd02:green:power";
+					reg = <0>;
+					default-state = "off";
+				};
+			};
 			regulators {
 				sw0_ssb_rssd02: SW0 {
 					vss1-supply = <&p3v3_aux>;
@@ -5477,8 +5577,14 @@
 			vss1-supply = <&p3v3_aux>;
 			vss2-supply = <&p12v_a>;
 			shunt-resistor-micro-ohms = <100000 4500000>;
-			led-enable = <1>;
 
+			leds {
+				power {
+					label = "rssd01:green:power";
+					reg = <0>;
+					default-state = "off";
+				};
+			};
 			regulators {
 				sw0_ssb_rssd01: SW0 {
 					vss1-supply = <&p3v3_aux>;
@@ -5515,8 +5621,13 @@
 			vss1-supply = <&p3v3_aux>;
 			vss2-supply = <&p12v_a>;
 			shunt-resistor-micro-ohms = <100000 4500000>;
-			led-enable = <1>;
-
+			leds {
+				power {
+					label = "rssd04:green:power";
+					reg = <0>;
+					default-state = "off";
+				};
+			};
 			regulators {
 				sw0_ssb_rssd04: SW0 {
 					vss1-supply = <&p3v3_aux>;
@@ -5553,8 +5664,13 @@
 			vss1-supply = <&p3v3_aux>;
 			vss2-supply = <&p12v_a>;
 			shunt-resistor-micro-ohms = <100000 4500000>;
-			led-enable = <1>;
-
+			leds {
+				power {
+					label = "rssd05:green:power";
+					reg = <0>;
+					default-state = "off";
+				};
+			};
 			regulators {
 				sw0_ssb_rssd05: SW0 {
 					vss1-supply = <&p3v3_aux>;
@@ -5591,8 +5707,13 @@
 			vss1-supply = <&p3v3_aux>;
 			vss2-supply = <&p12v_a>;
 			shunt-resistor-micro-ohms = <100000 4500000>;
-			led-enable = <1>;
-
+			leds {
+				power {
+					label = "rssd08:green:power";
+					reg = <0>;
+					default-state = "off";
+				};
+			};
 			regulators {
 				sw0_ssb_rssd08: SW0 {
 					vss1-supply = <&p3v3_aux>;
@@ -5629,8 +5750,13 @@
 			vss1-supply = <&p3v3_aux>;
 			vss2-supply = <&p12v_a>;
 			shunt-resistor-micro-ohms = <100000 4500000>;
-			led-enable = <1>;
-
+			leds {
+				power {
+					label = "rssd07:green:power";
+					reg = <0>;
+					default-state = "off";
+				};
+			};
 			regulators {
 				sw0_ssb_rssd07: SW0 {
 					vss1-supply = <&p3v3_aux>;
@@ -5667,8 +5793,13 @@
 			vss1-supply = <&p3v3_aux>;
 			vss2-supply = <&p12v_a>;
 			shunt-resistor-micro-ohms = <100000 4500000>;
-			led-enable = <1>;
-
+			leds {
+				power {
+					label = "rssd06:green:power";
+					reg = <0>;
+					default-state = "off";
+				};
+			};
 			regulators {
 				sw0_ssb_rssd06: SW0 {
 					vss1-supply = <&p3v3_aux>;
@@ -5708,8 +5839,13 @@
 			vss1-supply = <&p3v3_aux>;
 			vss2-supply = <&p12v_a>;
 			shunt-resistor-micro-ohms = <100000 4500000>;
-			led-enable = <1>;
-
+			leds {
+				power {
+					label = "rssd14:green:power";
+					reg = <0>;
+					default-state = "off";
+				};
+			};
 			regulators {
 				sw0_ssb_rssd14: SW0 {
 					vss1-supply = <&p3v3_aux>;
@@ -5746,8 +5882,13 @@
 			vss1-supply = <&p3v3_aux>;
 			vss2-supply = <&p12v_a>;
 			shunt-resistor-micro-ohms = <100000 4500000>;
-			led-enable = <1>;
-
+			leds {
+				power {
+					label = "rssd13:green:power";
+					reg = <0>;
+					default-state = "off";
+				};
+			};
 			regulators {
 				sw0_ssb_rssd13: SW0 {
 					vss1-supply = <&p3v3_aux>;
@@ -5784,8 +5925,13 @@
 			vss1-supply = <&p3v3_aux>;
 			vss2-supply = <&p12v_a>;
 			shunt-resistor-micro-ohms = <100000 4500000>;
-			led-enable = <1>;
-
+			leds {
+				power {
+					label = "rssd12:green:power";
+					reg = <0>;
+					default-state = "off";
+				};
+			};
 			regulators {
 				sw0_ssb_rssd12: SW0 {
 					vss1-supply = <&p3v3_aux>;
@@ -5822,8 +5968,13 @@
 			vss1-supply = <&p3v3_aux>;
 			vss2-supply = <&p12v_a>;
 			shunt-resistor-micro-ohms = <100000 4500000>;
-			led-enable = <1>;
-
+			leds {
+				power {
+					label = "rssd11:green:power";
+					reg = <0>;
+					default-state = "off";
+				};
+			};
 			regulators {
 				sw0_ssb_rssd11: SW0 {
 					vss1-supply = <&p3v3_aux>;
@@ -5860,8 +6011,13 @@
 			vss1-supply = <&p3v3_aux>;
 			vss2-supply = <&p12v_a>;
 			shunt-resistor-micro-ohms = <100000 4500000>;
-			led-enable = <1>;
-
+			leds {
+				power {
+					label = "rssd10:green:power";
+					reg = <0>;
+					default-state = "off";
+				};
+			};
 			regulators {
 				sw0_ssb_rssd10: SW0 {
 					vss1-supply = <&p3v3_aux>;
@@ -5898,8 +6054,13 @@
 			vss1-supply = <&p3v3_aux>;
 			vss2-supply = <&p12v_a>;
 			shunt-resistor-micro-ohms = <100000 4500000>;
-			led-enable = <1>;
-
+			leds {
+				power {
+					label = "rssd09:green:power";
+					reg = <0>;
+					default-state = "off";
+				};
+			};
 			regulators {
 				sw0_ssb_rssd09: SW0 {
 					vss1-supply = <&p3v3_aux>;
@@ -5936,8 +6097,13 @@
 			vss1-supply = <&p3v3_aux>;
 			vss2-supply = <&p12v_a>;
 			shunt-resistor-micro-ohms = <100000 4500000>;
-			led-enable = <1>;
-
+			leds {
+				power {
+					label = "rssd15:green:power";
+					reg = <0>;
+					default-state = "off";
+				};
+			};
 			regulators {
 				sw0_ssb_rssd15: SW0 {
 					vss1-supply = <&p3v3_aux>;
@@ -5974,8 +6140,13 @@
 			vss1-supply = <&p3v3_aux>;
 			vss2-supply = <&p12v_a>;
 			shunt-resistor-micro-ohms = <100000 4500000>;
-			led-enable = <1>;
-
+			leds {
+				power {
+					label = "rssd16:green:power";
+					reg = <0>;
+					default-state = "off";
+				};
+			};
 			regulators {
 				sw0_ssb_rssd16: SW0 {
 					vss1-supply = <&p3v3_aux>;
