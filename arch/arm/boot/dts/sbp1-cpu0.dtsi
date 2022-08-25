@@ -1,4 +1,4 @@
-&i2c10 { // BMC_MUX_CPU0 TODO: Figureout right regulator
+&i2c14 { // BMC_MUX_CPU0 TODO: Figureout right regulator
 	status = "okay";
 	// Bus frequency limited to 100KHz by cy8c9540
 
