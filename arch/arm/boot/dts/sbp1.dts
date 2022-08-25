@@ -1657,7 +1657,6 @@
 // SDA2 BMC_MUX_NIC
 #include "sbp1-nic.dtsi"
 
-
 &i2c2 { // SMB_VR_P3V3_BMC_AUX, MAX77813
 	status = "okay";
 };
