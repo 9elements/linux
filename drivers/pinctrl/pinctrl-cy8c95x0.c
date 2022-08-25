@@ -1267,6 +1267,7 @@ static int cy8c95x0_detect(struct i2c_client *client,
 static int cy8c95x0_probe(struct i2c_client *client)
 {
 	struct cy8c95x0_pinctrl *chip;
+	struct gpio_desc *reset_gpio;
 	struct regulator *reg;
 	int ret;
 
@@ -1314,6 +1315,11 @@ static int cy8c95x0_probe(struct i2c_client *client)
 		}
 		chip->regulator = reg;
 	}
+
+	/* bring the chip out of reset if reset pin is provided */
+	reset_gpio = devm_gpiod_get_optional(&client->dev, "reset", GPIOD_OUT_LOW);
+	if (IS_ERR(reset_gpio))
+		dev_warn(&client->dev, "Could not get reset-gpios\n");
 
 	chip->regmap = devm_regmap_init_i2c(client, &cy8c95x0_i2c_regmap);
 	if (IS_ERR(chip->regmap)) {
