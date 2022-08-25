@@ -103,6 +103,8 @@
 				interrupts = <6 IRQ_TYPE_LEVEL_HIGH>; // SMB_PEX_RSSD01_16_INT
 				interrupt-controller;
 				vdd-supply = <&p3v3_aux>;
+				// Reset is PEX_RSSD01_16_RST
+				reset-gpios = <&bmc_pex_irq 18 GPIO_ACTIVE_HIGH>;
 				ngpios = <48>;
 				gpio-reserved-ranges = <48 12>;
 

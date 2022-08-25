@@ -105,6 +105,9 @@
 				interrupts = <13 IRQ_TYPE_LEVEL_HIGH>;
 				interrupt-controller;
 				vdd-supply = <&p3v3_aux>;
+				// Reset is PEX_RSSD17_32_RST
+				reset-gpios = <&bmc_pex_irq 19 GPIO_ACTIVE_HIGH>;
+
 				ngpios = <48>;
 				gpio-reserved-ranges = <48 12>;
 

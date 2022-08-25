@@ -1,6 +1,6 @@
 &i2c6 { // BMC_MUX_CPU2 TODO: Figureout right regulator
 	status = "okay";
-	// Bus frequency limited to 100KHz by cy8c9520
+	// Bus frequency limited to 100KHz by cy8c9540
 
 	i2cmux3: mux@77 {
 		#address-cells = <1>;
@@ -27,6 +27,8 @@
 				interrupts = <3 IRQ_TYPE_LEVEL_HIGH>; // SMB_PEX_CPU2_EVENT_INT
 				interrupt-controller;
 				vdd-supply = <&p3v3_aux>;
+				// Reset is PEX_CPU2_EVENT_RST
+				reset-gpios = <&smb_svc_pex_cpu2_led 16 GPIO_ACTIVE_HIGH>;
 				ngpios = <17>;
 				//FIXME: Used by unit testing. Uncomment on release.
 				gpio-reserved-ranges = <14 2>, <21 1>, <25 3>, <33 1>;

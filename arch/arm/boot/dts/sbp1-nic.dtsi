@@ -27,6 +27,9 @@
 				interrupts = <8 IRQ_TYPE_LEVEL_HIGH>; // SMB_PEX_NIC_INT
 				interrupt-controller;
 				vdd-supply = <&p3v3_aux>;
+				// Reset is PEX_NIC_RST
+				reset-gpios = <&gpio0 ASPEED_GPIO(Q, 3) GPIO_ACTIVE_HIGH>;
+
 				ngpios = <38>;
 				gpio-reserved-ranges = <19 1>, <22 6>, <30 6>, <38 2>;
 
