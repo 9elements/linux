@@ -1326,8 +1326,11 @@ static int cy8c95x0_probe(struct i2c_client *client)
 		return ret;
 	} else if (!chip->gpio_reset) {
 		/* datasheet doesn't specific reset timings ... */
+		dev_info(chip->dev, "Using reset GPIO. Pulling high...\n");
 		usleep_range(100, 200);
 		gpiod_set_value_cansleep(chip->gpio_reset, 0);
+		dev_info(chip->dev, "Using reset GPIO. Pulling low...\n");
+
 		usleep_range(100, 200);
 
 		gpiod_set_consumer_name(chip->gpio_reset, "CY8C95X0 RESET");
