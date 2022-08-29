@@ -1,4 +1,4 @@
-&i2c11 { // BMC_MUX_FANPWM_RSSD01_16
+&i2c15 { // BMC_MUX_FANPWM_RSSD01_16
 	status = "okay";
 	// Bus frequency limited to 100KHz by cy8c9560
 
