@@ -248,7 +248,7 @@
 				i2c@2 { // SMB_SVC_PEX_CPU1_LED
 					#address-cells = <1>;
 					#size-cells = <0>;
-					reg = <4>;
+					reg = <2>;
 
 					smb_svc_pex_cpu1_led: U65500@20 {
 						#address-cells = <1>;
