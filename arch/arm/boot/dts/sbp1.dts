@@ -1534,6 +1534,11 @@
 			&pinctrl_nri1_default>;
 };
 
+// 1.8V domain is not connected
+&gpio1 {
+	status = "disabled";
+};
+
 &pinctrl {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_vgahs_default &pinctrl_vgavs_default>;
