@@ -8,7 +8,8 @@
 		compatible = "maxim,max7357";
 		reg = <0x77>;
 		interrupt-parent = <&gpio0>;
-		interrupts = <ASPEED_GPIO(R, 0) IRQ_TYPE_LEVEL_HIGH>; // BMC_MUX_FANSSB_RSSD17_32_RST_INT_N
+		// using BMC_MUX_FANSSB_RSSD17_32_RST_INT_N
+		interrupts = <ASPEED_GPIO(R, 0) IRQ_TYPE_LEVEL_HIGH>;
 		vdd-supply = <&p3v3_aux>;
 
 		i2c@0 { // SMB_MUX_SSB_FANGRP0
