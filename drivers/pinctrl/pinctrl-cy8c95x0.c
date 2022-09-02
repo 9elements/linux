@@ -1319,11 +1319,12 @@ static int cy8c95x0_probe(struct i2c_client *client)
 	/* bring the chip out of reset if reset pin is provided */
 	chip->gpio_reset = devm_gpiod_get_optional(&client->dev, "reset", GPIOD_OUT_HIGH);
 	if (PTR_ERR(chip->gpio_reset) == -EPROBE_DEFER) {
-		return -EPROBE_DEFER;
+		ret = -EPROBE_DEFER;
+		goto err_exit;
 	} else if (IS_ERR(chip->gpio_reset)) {
 		ret = PTR_ERR(chip->gpio_reset);
 		dev_err(chip->dev, "unable to request GPIO reset pin (%d)\n", ret);
-		return ret;
+		goto err_exit;
 	} else if (chip->gpio_reset) {
 		/* datasheet doesn't specific reset timings ... */
 		dev_info(chip->dev, "Using reset GPIO. Pulling high...\n");
