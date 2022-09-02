@@ -28,7 +28,7 @@
 				interrupt-controller;
 				vdd-supply = <&p3v3_aux>;
 				// Reset is PEX_CPU1_EVENT_RST
-				reset-gpios = <&smb_svc_pex_cpu0_led 16 GPIO_ACTIVE_HIGH>;
+				reset-gpios = <&smb_svc_pex_cpu1_led 16 GPIO_ACTIVE_HIGH>;
 				ngpios = <17>;
 				//FIXME: Used by unit testing. Uncomment on release.
 				gpio-reserved-ranges = <14 2>, <21 1>, <25 3>, <33 1>;
