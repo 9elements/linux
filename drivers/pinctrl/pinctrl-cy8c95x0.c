@@ -1327,12 +1327,11 @@ static int cy8c95x0_probe(struct i2c_client *client)
 		goto err_exit;
 	} else if (chip->gpio_reset) {
 		/* datasheet doesn't specific reset timings ... */
-		dev_info(chip->dev, "Using reset GPIO. Pulling high...\n");
-		usleep_range(100000, 200000);
-		gpiod_set_value_cansleep(chip->gpio_reset, 0);
-		dev_info(chip->dev, "Using reset GPIO. Pulling low...\n");
+		dev_info(chip->dev, "Trying short reset pulse...\n");
 
-		usleep_range(1000000, 2000000);
+		usleep_range(10000, 20000);
+		gpiod_set_value_cansleep(chip->gpio_reset, 0);
+		usleep_range(100000, 200000);
 
 		gpiod_set_consumer_name(chip->gpio_reset, "CY8C95X0 RESET");
 	}
@@ -1349,8 +1348,19 @@ static int cy8c95x0_probe(struct i2c_client *client)
 	mutex_init(&chip->i2c_lock);
 
 	ret = device_cy8c95x0_init(chip);
-	if (ret)
-		goto err_exit;
+	if (ret) {
+		if (chip->gpio_reset) {
+			dev_info(chip->dev, "Trying long reset pulse...\n");
+
+			usleep_range(100000, 200000);
+			gpiod_set_value_cansleep(chip->gpio_reset, 0);
+			usleep_range(1000000, 2000000);
+		}
+		ret = device_cy8c95x0_init(chip);
+		if (ret) {
+			goto err_exit;
+		}
+	}
 
 	if (client->irq) {
 		ret = cy8c95x0_irq_setup(chip, client->irq);
