@@ -403,12 +403,18 @@ static int mp2975_identify_multiphase_rail2(struct i2c_client *client,
 	 * In case phase number is zero – only page zero is supported
 	 */
 	ret = i2c_smbus_write_byte_data(client, PMBUS_PAGE, 2);
-	if (ret < 0)
+	if (ret < 0) {
+		dev_err(&client->dev, "Writing PMBUS_PAGE failed with ret=%d\n", ret);
+
 		return ret;
+	}
 
 	ret = i2c_smbus_read_word_data(client, MP2975_MFR_VR_MULTI_CONFIG_R2);
-	if (ret < 0)
+	if (ret < 0) {
+		dev_err(&client->dev, "Reading MP2975_MFR_VR_MULTI_CONFIG_R2 failed with ret=%d\n", ret);
+
 		return ret;
+	}
 
 	ret &= GENMASK(2, 0);
 	return (ret >= data->max_phases[1]) ? data->max_phases[1] : ret;
@@ -444,8 +450,9 @@ mp2975_identify_multiphase(struct i2c_client *client, struct mp2975_data *data,
 
 	/* Identify multiphase for rail 1 - could be from 1 to data->max_phases[0]. */
 	ret = i2c_smbus_read_word_data(client, MP2975_MFR_VR_MULTI_CONFIG_R1);
-	if (ret <= 0)
-		return ret;
+	if (ret <= 0) {
+		dev_err(&client->dev, "Reading MP2975_MFR_VR_MULTI_CONFIG_R1 failed with ret=%d\n", ret);
+	}
 
 	info->phases[0] = ret & GENMASK(3, 0);
 
@@ -457,8 +464,11 @@ mp2975_identify_multiphase(struct i2c_client *client, struct mp2975_data *data,
 	 * 1 operates with 1-phase DCM. When rail 2 phase count is configured
 	 * as 0, rail 2 is disabled.
 	 */
-	if (info->phases[0] > data->max_phases[0])
+	if (info->phases[0] > data->max_phases[0]) {
+		dev_err(&client->dev, "Phase 0 has more than %d rails\n", data->max_phases[0]);
+
 		return -EINVAL;
+	}
 
 	mp2975_set_phase_rail1(info);
 	num_phases2 = min(data->max_phases[0] - info->phases[0],
@@ -478,16 +488,21 @@ mp2975_identify_vid(struct i2c_client *client, struct mp2975_data *data,
 
 	/* Identify VID mode and step selection. */
 	ret = i2c_smbus_read_word_data(client, reg);
-	if (ret < 0)
-		return ret;
+	if (ret < 0) {
+		dev_err(&client->dev, "Reading register 0x%02x failed with %d\n", reg, ret);
 
+		return ret;
+	}
 	if (ret & imvp_bit) {
+		dev_err(&client->dev, "Using VID IMVP9 format on page %d\n", page);
 		info->vrm_version[page] = imvp9;
 		data->vid_step[page] = MP2975_PROT_DEV_OV_OFF;
 	} else if (ret & vr_bit) {
+		dev_err(&client->dev, "Using VID VR12 format on page %d\n", page);
 		info->vrm_version[page] = vr12;
 		data->vid_step[page] = MP2975_PROT_DEV_OV_ON;
 	} else {
+		dev_err(&client->dev, "Using VID VR13 format on page %d\n", page);
 		info->vrm_version[page] = vr13;
 		data->vid_step[page] = MP2975_PROT_DEV_OV_OFF;
 	}
@@ -502,9 +517,11 @@ mp2975_identify_rails_vid(struct i2c_client *client, struct mp2975_data *data,
 	int ret;
 
 	ret = i2c_smbus_write_byte_data(client, PMBUS_PAGE, 2);
-	if (ret < 0)
-		return ret;
+	if (ret < 0) {
+		dev_err(&client->dev, "Writing PAGE 2 failed with %d\n", ret);
 
+		return ret;
+	}
 	/* Identify VID mode for rail 1. */
 	ret = mp2975_identify_vid(client, data, info,
 				  MP2975_MFR_VR_MULTI_CONFIG_R1, 0,
@@ -518,6 +535,10 @@ mp2975_identify_rails_vid(struct i2c_client *client, struct mp2975_data *data,
 					  MP2975_MFR_VR_MULTI_CONFIG_R2, 1,
 					  MP2975_IMVP9_EN_R2,
 					  MP2975_VID_STEP_SEL_R2);
+
+	if (ret)
+		dev_err(&client->dev, "mp2975_identify_vid for rail 2 failed with %d\n", ret);
+
 	return ret;
 }
 
@@ -539,8 +560,11 @@ mp2975_current_sense_gain_get(struct i2c_client *client,
 			return ret;
 		ret = i2c_smbus_read_word_data(client,
 					       MP2975_MFR_VR_CONFIG1);
-		if (ret < 0)
+		if (ret < 0) {
+			dev_err(&client->dev, "Reading  MP2975_MFR_VR_CONFIG1 failed with %d\n", ret);
+
 			return ret;
+		}
 
 		switch ((ret & MP2975_DRMOS_KCS) >> 12) {
 		case 0:
@@ -568,22 +592,28 @@ mp2975_vref_get(struct i2c_client *client, struct mp2975_data *data,
 	int ret;
 
 	ret = i2c_smbus_write_byte_data(client, PMBUS_PAGE, 3);
-	if (ret < 0)
-		return ret;
+	if (ret < 0) {
+		dev_err(&client->dev, "Writing PAGE failed with %d\n", ret);
 
+		return ret;
+	}
 	/* Get voltage reference value for rail 1. */
 	ret = i2c_smbus_read_word_data(client, MP2975_MFR_READ_VREF_R1);
-	if (ret < 0)
-		return ret;
+	if (ret < 0) {
+		dev_err(&client->dev, "Reading MP2975_MFR_READ_VREF_R1 failed with %d\n", ret);
 
+		return ret;
+	}
 	data->vref[0] = ret * data->vid_step[0];
 
 	/* Get voltage reference value for rail 2, if connected. */
 	if (data->info.pages == MP2975_PAGE_NUM) {
 		ret = i2c_smbus_read_word_data(client, MP2975_MFR_READ_VREF_R2);
-		if (ret < 0)
-			return ret;
+		if (ret < 0) {
+			dev_err(&client->dev, "Reading MP2975_MFR_READ_VREF_R2 failed with %d\n", ret);
 
+			return ret;
+		}
 		data->vref[1] = ret * data->vid_step[1];
 	}
 	return 0;
@@ -610,6 +640,8 @@ mp2975_vref_offset_get(struct i2c_client *client, struct mp2975_data *data,
 		data->vref_off[page] = 400;
 		break;
 	default:
+		dev_err(&client->dev, "Unsupported Vref offset: %lu\n", (ret & GENMASK(5, 3)) >> 3);
+
 		return -EINVAL;
 	}
 	return 0;
@@ -664,6 +696,11 @@ mp2975_set_vout_format(struct i2c_client *client,
 		if (ret < 0)
 			return ret;
 
+		ret = i2c_smbus_read_byte_data(client, PMBUS_VOUT_MODE);
+		if (ret < 0)
+			return ret;
+		dev_err(&client->dev, "PMBUS_VOUT_MODE=0x%x on page %d\n", ret, page);
+
 	}
 	return 0;
 }
@@ -684,15 +721,21 @@ mp2975_vout_ov_scale_get(struct i2c_client *client, struct mp2975_data *data,
 	 * decay register.
 	 */
 	ret = i2c_smbus_read_word_data(client, MP2975_MFR_APS_DECAY_ADV);
-	if (ret < 0)
+	if (ret < 0) {
+		dev_err(&client->dev, "Reading MP2975_MFR_APS_DECAY_ADV failed with %d\n", ret);
+
 		return ret;
+	}
 	thres_dev = ret & MP2975_PRT_THRES_DIV_OV_EN ? MP2975_PROT_DEV_OV_ON :
 	                                               MP2975_PROT_DEV_OV_OFF;
 
 	/* Select the gain of remote sense amplifier. */
 	ret = i2c_smbus_read_word_data(client, PMBUS_VOUT_SCALE_LOOP);
-	if (ret < 0)
+	if (ret < 0) {
+		dev_err(&client->dev, "Reading PMBUS_VOUT_SCALE_LOOP failed with %d\n", ret);
+
 		return ret;
+	}
 	sense_ampl = ret & MP2975_SENSE_AMPL ? MP2975_SENSE_AMPL_HALF :
 					       MP2975_SENSE_AMPL_UNIT;
 
@@ -710,8 +753,9 @@ mp2975_vout_per_rail_config_get(struct i2c_client *client,
 
 	for (i = 0; i < data->info.pages; i++) {
 		ret = i2c_smbus_write_byte_data(client, PMBUS_PAGE, i);
-		if (ret < 0)
-			return ret;
+		if (ret < 0) {
+			dev_err(&client->dev, "Writing PAGE failed with %d\n", ret);
+		}
 
 		/*
 		 * Set VOUT format for READ_VOUT command : direct.
@@ -719,8 +763,11 @@ mp2975_vout_per_rail_config_get(struct i2c_client *client,
 		 * formats.
 		 */
 		ret = mp2975_set_vout_format(client, data, i);
-		if (ret < 0)
+		if (ret < 0) {
+			dev_err(&client->dev, "mp2975_set_vout_format failed with %d\n", ret);
+
 			return ret;
+		}
 
 		/* Skip if reading Vref is unsupported */
 		if (data->chip_id != mp2975)
@@ -728,14 +775,18 @@ mp2975_vout_per_rail_config_get(struct i2c_client *client,
 
 		/* Obtain voltage reference offsets. */
 		ret = mp2975_vref_offset_get(client, data, i);
-		if (ret < 0)
-			return ret;
+		if (ret < 0) {
+			dev_err(&client->dev, "mp2975_vref_offset_get failed with %d\n", ret);
 
+			return ret;
+		}
 		/* Obtain maximum voltage values. */
 		ret = mp2975_vout_max_get(client, data, info, i);
-		if (ret < 0)
-			return ret;
+		if (ret < 0) {
+			dev_err(&client->dev, "mp2975_vout_max_get failed with %d\n", ret);
 
+			return ret;
+		}
 		/*
 		 * Set over-voltage fixed value. Thresholds are provided as
 		 * fixed value, and tracking value. The minimum of them are
@@ -793,14 +844,19 @@ static int mp2975_probe(struct i2c_client *client)
 	memcpy(data->max_phases, mp2975_max_phases[data->chip_id],
 	       sizeof(data->max_phases));
 
+	dev_err(&client->dev, "mp2975_max_phases[0]= %d\n", data->max_phases[0]);
+	dev_err(&client->dev, "mp2975_max_phases[1]= %d\n", data->max_phases[1]);
+
 	memcpy(&data->info, &mp2975_info, sizeof(*info));
 	info = &data->info;
 
 	/* Identify multiphase configuration for rail 2. */
 	ret = mp2975_identify_multiphase_rail2(client, data);
-	if (ret < 0)
-		return ret;
+	if (ret < 0) {
+		dev_err(&client->dev, "mp2975_identify_multiphase_rail2 failed with ret=%d\n", ret);
 
+		return ret;
+	}
 	if (ret) {
 		/* Two rails are connected. */
 		data->info.pages = MP2975_PAGE_NUM;
@@ -813,7 +869,7 @@ static int mp2975_probe(struct i2c_client *client)
 	if (data->chip_id == mp2975) {
 		/* Identify multiphase configuration. */
 		ret = mp2975_identify_multiphase(client, data, info);
-		if (ret)
+		if (ret) 
 			return ret;
 
 		/* Identify VID setting per rail. */
@@ -839,10 +895,20 @@ static int mp2975_probe(struct i2c_client *client)
 
 	/* Obtain offsets, maximum and format for vout. */
 	ret = mp2975_vout_per_rail_config_get(client, data, info);
-	if (ret)
-		return ret;
+	if (ret) {
+		dev_err(&client->dev, "mp2975_vout_per_rail_config_get failed with ret=%d\n", ret);
 
-	return pmbus_do_probe(client, info);
+		return ret;
+	}
+
+	ret = pmbus_do_probe(client, info);
+	if (ret) {
+		dev_err(&client->dev, "pmbus_do_probe failed with ret=%d\n", ret);
+
+		return ret;
+	}
+
+	return ret;
 }
 
 static const struct of_device_id __maybe_unused mp2975_of_match[] = {
