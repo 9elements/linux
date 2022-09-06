@@ -35,6 +35,8 @@
 #define MP2975_MFR_OVP_TH_SET		0xe5
 #define MP2975_MFR_UVP_SET		0xe6
 
+#define MP2973_MFR_RESO_SET		0xc7
+
 #define MP2975_VOUT_FORMAT		BIT(15)
 #define MP2975_VID_STEP_SEL_R1		BIT(4)
 #define MP2975_IMVP9_EN_R1		BIT(13)
@@ -48,6 +50,9 @@
 #define MP2975_SENSE_AMPL_UNIT		1
 #define MP2975_SENSE_AMPL_HALF		2
 #define MP2975_VIN_UV_LIMIT_UNIT	8
+
+#define MP2973_VOUT_FORMAT_DIRECT	BIT(7)
+#define MP2973_VOUT_FORMAT_LINEAR	BIT(6)
 
 #define MP2975_MAX_PHASE_RAIL1	8
 #define MP2975_MAX_PHASE_RAIL2	4
@@ -602,6 +607,9 @@ mp2975_vref_offset_get(struct i2c_client *client, struct mp2975_data *data,
 {
 	int ret;
 
+	if (data->chip_id == mp2973)
+		return 0;
+
 	ret = i2c_smbus_read_word_data(client, MP2975_MFR_OVP_TH_SET);
 	if (ret < 0) {
 		dev_err(&client->dev, "Reading MP2975_MFR_OVP_TH_SET failed with: %d\n",  ret);
@@ -648,14 +656,28 @@ mp2975_identify_vout_format(struct i2c_client *client,
 {
 	int ret;
 
-	ret = i2c_smbus_read_word_data(client, MP2975_MFR_DC_LOOP_CTRL);
-	if (ret < 0)
-		return ret;
+	if (data->chip_id == mp2975) {
+		ret = i2c_smbus_read_word_data(client, MP2975_MFR_DC_LOOP_CTRL);
+		if (ret < 0)
+			return ret;
 
-	if (ret & MP2975_VOUT_FORMAT)
-		data->vout_format[page] = vid;
-	else
-		data->vout_format[page] = direct;
+		if (ret & MP2975_VOUT_FORMAT)
+			data->vout_format[page] = vid;
+		else
+			data->vout_format[page] = direct;
+	} else {
+		ret = i2c_smbus_read_word_data(client, MP2973_MFR_RESO_SET);
+		if (ret < 0)
+			return ret;
+
+		if (ret & MP2973_VOUT_FORMAT_DIRECT)
+			data->vout_format[page] = direct;
+		else if (ret & MP2973_VOUT_FORMAT_LINEAR)
+			data->vout_format[page] = linear;
+		else
+			data->vout_format[page] = vid;
+
+	}
 	return 0;
 }
 
@@ -664,6 +686,9 @@ mp2975_vout_ov_scale_get(struct i2c_client *client, struct mp2975_data *data,
 			 struct pmbus_driver_info *info)
 {
 	int thres_dev, sense_ampl, ret;
+
+	if (data->chip_id == mp2973)
+		return 0;
 
 	ret = i2c_smbus_write_byte_data(client, PMBUS_PAGE, 0);
 	if (ret < 0)
@@ -719,6 +744,7 @@ mp2975_vout_per_rail_config_get(struct i2c_client *client,
 
 			return ret;
 		}
+		
 		/* Obtain maximum voltage values. */
 		ret = mp2975_vout_max_get(client, data, info, i);
 		if (ret < 0) {
@@ -726,6 +752,7 @@ mp2975_vout_per_rail_config_get(struct i2c_client *client,
 
 			return ret;
 		}
+
 		/*
 		 * Get VOUT format for READ_VOUT command : VID or direct.
 		 * Pages on same device can be configured with different
