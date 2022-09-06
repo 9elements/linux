@@ -1269,7 +1269,7 @@ static int cy8c95x0_probe(struct i2c_client *client)
 {
 	struct cy8c95x0_pinctrl *chip;
 	struct regulator *reg;
-	int ret, i, pulse;
+	int ret;
 
 	chip = devm_kzalloc(&client->dev, sizeof(*chip), GFP_KERNEL);
 	if (!chip)
@@ -1326,103 +1326,13 @@ static int cy8c95x0_probe(struct i2c_client *client)
 		dev_err(chip->dev, "unable to request GPIO reset pin (%d)\n", ret);
 		goto err_exit;
 	} else if (chip->gpio_reset) {
-		ret = 0;
-		for (i = 100; i < 1000; i+= 100) {
-			pulse = i;
-			gpiod_set_value_cansleep(chip->gpio_reset, 1);
-			usleep_range(i, i);
-			gpiod_set_value_cansleep(chip->gpio_reset, 0);
-			usleep_range(i, i);
-			ret = device_cy8c95x0_init(chip);
-			if (!ret) {
-				dev_info(chip->dev, "Reset pulse of %d usec worked!\n", i);
-				break;
-			}
-		}
-		if (ret) {
-			for (i = 1000; i < 10000; i+= 1000) {
-				pulse = i;
-				gpiod_set_value_cansleep(chip->gpio_reset, 1);
-				usleep_range(i, i);
-				gpiod_set_value_cansleep(chip->gpio_reset, 0);
-				usleep_range(i, i);
-				ret = device_cy8c95x0_init(chip);
-				if (!ret) {
-					dev_info(chip->dev, "Reset pulse of %d usec worked!\n", i);
-					break;
-				}
-			}
-		}
-		if (ret) {
-			for (i = 10000; i < 100000; i+= 10000) {
-				pulse = i;
-				gpiod_set_value_cansleep(chip->gpio_reset, 1);
-				usleep_range(i, i);
-				gpiod_set_value_cansleep(chip->gpio_reset, 0);
-				usleep_range(i, i);
-				ret = device_cy8c95x0_init(chip);
-				if (!ret) {
-					dev_info(chip->dev, "Reset pulse of %d usec worked!\n", i);
-					break;
-				}
-			}
-		}
-		if (ret) {
-			for (i = 100000; i < 1000000; i+= 100000) {
-				pulse = i;
-				gpiod_set_value_cansleep(chip->gpio_reset, 1);
-				usleep_range(i, i);
-				gpiod_set_value_cansleep(chip->gpio_reset, 0);
-				usleep_range(i, i);
-				ret = device_cy8c95x0_init(chip);
-				if (!ret) {
-					dev_info(chip->dev, "Reset pulse of %d usec worked!\n", i);
-					break;
-				}
-			}
-		}
-		if (!ret) {
-			ret = 0;
-			for (i = 100; i < 1000; i+= 100) {
-				gpiod_set_value_cansleep(chip->gpio_reset, 1);
-				usleep_range(pulse, pulse);
-				gpiod_set_value_cansleep(chip->gpio_reset, 0);
-				usleep_range(i, i);
-				ret = device_cy8c95x0_init(chip);
-				if (!ret) {
-					dev_info(chip->dev, "Delay after reset pulse of %d usec worked!\n", i);
-					break;
-				}
-			}
-			if (ret) {
-				for (i = 1000; i < 10000; i+= 1000) {
-					pulse = i;
-					gpiod_set_value_cansleep(chip->gpio_reset, 1);
-					usleep_range(pulse, pulse);
-					gpiod_set_value_cansleep(chip->gpio_reset, 0);
-					usleep_range(i, i);
-					ret = device_cy8c95x0_init(chip);
-					if (!ret) {
-						dev_info(chip->dev, "Delay after reset pulse of %d usec worked!\n", i);
-						break;
-					}
-				}
-			}
-			if (ret) {
-				for (i = 10000; i < 100000; i+= 10000) {
-					pulse = i;
-					gpiod_set_value_cansleep(chip->gpio_reset, 1);
-					usleep_range(pulse, pulse);
-					gpiod_set_value_cansleep(chip->gpio_reset, 0);
-					usleep_range(i, i);
-					ret = device_cy8c95x0_init(chip);
-					if (!ret) {
-						dev_info(chip->dev, "Delay after reset pulse of %d usec worked!\n", i);
-						break;
-					}
-				}
-			}
-		}
+		/* datasheet doesn't specific reset timings ... */
+		dev_info(chip->dev, "Using reset GPIO. Pulling high...\n");
+		usleep_range(100000, 200000);
+		gpiod_set_value_cansleep(chip->gpio_reset, 0);
+		dev_info(chip->dev, "Using reset GPIO. Pulling low...\n");
+
+		usleep_range(1000000, 2000000);
 
 		gpiod_set_consumer_name(chip->gpio_reset, "CY8C95X0 RESET");
 	}
@@ -1437,17 +1347,6 @@ static int cy8c95x0_probe(struct i2c_client *client)
 	bitmap_zero(chip->shiftmask, MAX_LINE);
 	bitmap_set(chip->shiftmask, 0, 20);
 	mutex_init(&chip->i2c_lock);
-
-	if (chip->gpio_reset) {
-		gpiod_set_value_cansleep(chip->gpio_reset, 1);
-
-		/* datasheet doesn't specific reset timings ... */
-		dev_info(chip->dev, "Using long pulse...\n");
-
-		usleep_range(100000, 200000);
-		gpiod_set_value_cansleep(chip->gpio_reset, 0);
-		usleep_range(1000000, 2000000);
-	}
 
 	ret = device_cy8c95x0_init(chip);
 	if (ret)
