@@ -80,6 +80,7 @@ struct mp2975_data {
 	int vout_ov_fixed[MP2975_PAGE_NUM];
 	int vout_format[MP2975_PAGE_NUM];
 	int curr_sense_gain[MP2975_PAGE_NUM];
+	s8 vout_mode_exponent[MP2975_PAGE_NUM];
 };
 
 static const struct i2c_device_id mp2975_id[] = {
@@ -145,6 +146,50 @@ mp2975_vid2direct(int vrf, int val)
 }
 
 static int
+mp2975_linear162direct(s16 exponent, u16 data)
+{
+	s32 mantissa;
+	s64 val;
+
+	mantissa = data;
+
+	val = mantissa;
+
+	/* scale result to milli-units for all sensors except fans */
+	val = val * 1000LL;
+
+	if (exponent >= 0)
+		val <<= exponent;
+	else
+		val >>= -exponent;
+
+	return val;
+}
+
+static int
+mp2975_linear112direct(u16 data)
+{
+	s16 exponent;
+	s32 mantissa;
+	s64 val;
+
+	exponent = ((s16)data) >> 11;
+	mantissa = ((s16)((data & 0x7ff) << 5)) >> 5;
+
+	val = mantissa;
+
+	/* scale result to milli-units for all sensors except fans */
+	val = val * 1000LL;
+
+	if (exponent >= 0)
+		val <<= exponent;
+	else
+		val >>= -exponent;
+
+	return val;
+}
+
+static int
 mp2975_read_phase(struct i2c_client *client, struct mp2975_data *data,
 		  int page, int phase, u8 reg)
 {
@@ -181,7 +226,9 @@ mp2975_read_phase(struct i2c_client *client, struct mp2975_data *data,
 	if (ret < 0)
 		return ret;
 
-	return max_t(int, DIV_ROUND_CLOSEST(ret, data->info.phases[page]),
+	ret = mp2975_linear112direct(ret);
+
+	return max_t(int, DIV_ROUND_CLOSEST(ret, data->info.phases[page] * 1000),
 		     DIV_ROUND_CLOSEST(ph_curr, data->curr_sense_gain[page]));
 }
 
@@ -304,6 +351,8 @@ static int mp2975_read_word_data(struct i2c_client *client, int page,
 		 */
 		if (data->vout_format[page] == vid)
 			ret = mp2975_vid2direct(info->vrm_version[page], ret);
+		else if (data->vout_format[page] == linear)
+			ret = mp2975_linear162direct(data->vout_mode_exponent[page], ret);
 		break;
 	case PMBUS_VIRT_READ_POUT_MAX:
 		ret = mp2975_read_word_helper(client, page, phase,
@@ -672,8 +721,13 @@ mp2975_identify_vout_format(struct i2c_client *client,
 
 		if (ret & MP2973_VOUT_FORMAT_DIRECT)
 			data->vout_format[page] = direct;
-		else if (ret & MP2973_VOUT_FORMAT_LINEAR)
+		else if (ret & MP2973_VOUT_FORMAT_LINEAR) {
+			ret = i2c_smbus_read_word_data(client, PMBUS_VOUT_MODE);
+			if (ret < 0)
+				return ret;
+			data->vout_mode_exponent[page] = ((s8)(ret << 3)) >> 3;
 			data->vout_format[page] = linear;
+		}
 		else
 			data->vout_format[page] = vid;
 
@@ -803,6 +857,31 @@ static struct pmbus_driver_info mp2975_info = {
 #endif
 };
 
+static struct pmbus_driver_info mp2973_info = {
+	.pages = 1,
+	.format[PSC_VOLTAGE_IN] = linear,
+	.format[PSC_VOLTAGE_OUT] = direct, // emulated by driver
+	.format[PSC_TEMPERATURE] = direct,
+	.format[PSC_CURRENT_IN] = linear,
+	.format[PSC_CURRENT_OUT] = direct, // emulated by driver
+	.format[PSC_POWER] = linear,
+	.m[PSC_TEMPERATURE] = 1,
+	.m[PSC_VOLTAGE_OUT] = 1,
+	.R[PSC_VOLTAGE_OUT] = 3,
+	.m[PSC_CURRENT_OUT] = 1,
+	.m[PSC_POWER] = 1,
+	.func[0] = PMBUS_HAVE_VIN | PMBUS_HAVE_VOUT | PMBUS_HAVE_STATUS_VOUT |
+		PMBUS_HAVE_IIN | PMBUS_HAVE_IOUT | PMBUS_HAVE_STATUS_IOUT |
+		PMBUS_HAVE_TEMP | PMBUS_HAVE_STATUS_TEMP | PMBUS_HAVE_POUT |
+		PMBUS_HAVE_PIN | PMBUS_HAVE_STATUS_INPUT | PMBUS_PHASE_VIRTUAL,
+	.read_byte_data = mp2975_read_byte_data,
+	.read_word_data = mp2975_read_word_data,
+#if IS_ENABLED(CONFIG_SENSORS_MP2975_REGULATOR)
+	.num_regulators = 1,
+	.reg_desc = mp2975_reg_desc,
+#endif
+};
+
 static int mp2975_probe(struct i2c_client *client)
 {
 	struct pmbus_driver_info *info;
@@ -814,13 +893,17 @@ static int mp2975_probe(struct i2c_client *client)
 	if (!data)
 		return -ENOMEM;
 
-	memcpy(&data->info, &mp2975_info, sizeof(*info));
-	info = &data->info;
-
 	if (client->dev.of_node)
 		data->chip_id = (enum chips)of_device_get_match_data(&client->dev);
 	else
 		data->chip_id = i2c_match_id(mp2975_id, client)->driver_data;
+
+	if (data->chip_id == mp2975) {
+		memcpy(&data->info, &mp2975_info, sizeof(*info));
+	} else {
+		memcpy(&data->info, &mp2973_info, sizeof(*info));
+	}
+	info = &data->info;
 
 	/* Identify multiphase configuration for rail 2. */
 	ret = mp2975_identify_multiphase_rail2(client, data);
