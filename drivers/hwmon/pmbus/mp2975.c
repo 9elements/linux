@@ -61,12 +61,15 @@
 #define MP2973_MAX_PHASE_RAIL1  14
 #define MP2973_MAX_PHASE_RAIL2	6
 
+#define MP2971_MAX_PHASE_RAIL1  8
+#define MP2971_MAX_PHASE_RAIL2	3
+
 #define MP2975_RAIL2_FUNC	(PMBUS_HAVE_VOUT | PMBUS_HAVE_STATUS_VOUT | \
 				 PMBUS_HAVE_IOUT | PMBUS_HAVE_STATUS_IOUT | \
 				 PMBUS_HAVE_POUT | PMBUS_PHASE_VIRTUAL)
 
 enum chips {
-	mp2975, mp2973
+	mp2975, mp2973, mp2971
 };
 
 struct mp2975_data {
@@ -432,6 +435,9 @@ static int mp2975_identify_multiphase_rail2(struct i2c_client *client, struct mp
 		case mp2973:
 			max_phases = MP2973_MAX_PHASE_RAIL2;
 			break;
+		case mp2971:
+			max_phases = MP2971_MAX_PHASE_RAIL2;
+			break;
 		default:
 			return -EINVAL;
 	}
@@ -480,7 +486,11 @@ mp2975_identify_multiphase(struct i2c_client *client, struct mp2975_data *data,
 			break;
 		case mp2973:
 			max_phases_r1 = MP2973_MAX_PHASE_RAIL1;
-			max_phases_r2 = MP2975_MAX_PHASE_RAIL2;
+			max_phases_r2 = MP2973_MAX_PHASE_RAIL2;
+			break;
+		case mp2971:
+			max_phases_r1 = MP2971_MAX_PHASE_RAIL1;
+			max_phases_r2 = MP2971_MAX_PHASE_RAIL2;
 			break;
 		default:
 			return -EINVAL;
@@ -656,7 +666,7 @@ mp2975_vref_offset_get(struct i2c_client *client, struct mp2975_data *data,
 {
 	int ret;
 
-	if (data->chip_id == mp2973)
+	if (data->chip_id != mp2975)
 		return 0;
 
 	ret = i2c_smbus_read_word_data(client, MP2975_MFR_OVP_TH_SET);
@@ -741,7 +751,7 @@ mp2975_vout_ov_scale_get(struct i2c_client *client, struct mp2975_data *data,
 {
 	int thres_dev, sense_ampl, ret;
 
-	if (data->chip_id == mp2973)
+	if (data->chip_id != mp2973)
 		return 0;
 
 	ret = i2c_smbus_write_byte_data(client, PMBUS_PAGE, 0);
@@ -882,6 +892,31 @@ static struct pmbus_driver_info mp2973_info = {
 #endif
 };
 
+static struct pmbus_driver_info mp2971_info = {
+	.pages = 1,
+	.format[PSC_VOLTAGE_IN] = linear,
+	.format[PSC_VOLTAGE_OUT] = direct, // emulated by driver
+	.format[PSC_TEMPERATURE] = direct,
+	.format[PSC_CURRENT_IN] = linear,
+	.format[PSC_CURRENT_OUT] = direct, // emulated by driver
+	.format[PSC_POWER] = linear,
+	.m[PSC_TEMPERATURE] = 1,
+	.m[PSC_VOLTAGE_OUT] = 1,
+	.R[PSC_VOLTAGE_OUT] = 3,
+	.m[PSC_CURRENT_OUT] = 1,
+	.m[PSC_POWER] = 1,
+	.func[0] = PMBUS_HAVE_VIN | PMBUS_HAVE_VOUT | PMBUS_HAVE_STATUS_VOUT |
+		PMBUS_HAVE_IIN | PMBUS_HAVE_IOUT | PMBUS_HAVE_STATUS_IOUT |
+		PMBUS_HAVE_TEMP | PMBUS_HAVE_STATUS_TEMP | PMBUS_HAVE_POUT |
+		PMBUS_HAVE_PIN | PMBUS_HAVE_STATUS_INPUT | PMBUS_PHASE_VIRTUAL,
+	.read_byte_data = mp2975_read_byte_data,
+	.read_word_data = mp2975_read_word_data,
+#if IS_ENABLED(CONFIG_SENSORS_MP2975_REGULATOR)
+	.num_regulators = 1,
+	.reg_desc = mp2975_reg_desc,
+#endif
+};
+
 static int mp2975_probe(struct i2c_client *client)
 {
 	struct pmbus_driver_info *info;
@@ -900,8 +935,10 @@ static int mp2975_probe(struct i2c_client *client)
 
 	if (data->chip_id == mp2975) {
 		memcpy(&data->info, &mp2975_info, sizeof(*info));
-	} else {
+	} else if (data->chip_id == mp2973) {
 		memcpy(&data->info, &mp2973_info, sizeof(*info));
+	} else {
+		memcpy(&data->info, &mp2971_info, sizeof(*info));
 	}
 	info = &data->info;
 
@@ -978,6 +1015,7 @@ static int mp2975_probe(struct i2c_client *client)
 }
 
 static const struct of_device_id __maybe_unused mp2975_of_match[] = {
+	{.compatible = "mps,mp2971", .data = (void *)mp2971},
 	{.compatible = "mps,mp2973", .data = (void *)mp2973},
 	{.compatible = "mps,mp2975", .data = (void *)mp2975},
 	{}
