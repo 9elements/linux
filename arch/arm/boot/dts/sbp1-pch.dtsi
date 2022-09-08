@@ -6,8 +6,7 @@
 		#address-cells = <1>;
 		#size-cells = <0>;
 		reg = <0x77>;
-		interrupt-parent = <&gpio0>;
-		interrupts = <ASPEED_GPIO(Z, 2) IRQ_TYPE_LEVEL_HIGH>; // BMC_MUX_VR_PCH_CPU_RST_INT_N
+		reset-gpios = <&gpio0 ASPEED_GPIO(Z, 2) (GPIO_ACTIVE_LOW | GPIO_OPEN_DRAIN)>; // BMC_MUX_VR_PCH_CPU_RST_INT_N
 		vdd-supply = <&p3v3_aux>;
 
 		i2c@1 { // SMB_VR_P1V05_PCH_AUX

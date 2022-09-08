@@ -7,9 +7,7 @@
 		#size-cells = <0>;
 		compatible = "maxim,max7357";
 		reg = <0x77>;
-		interrupt-parent = <&gpio0>;
-		// using BMC_MUX_FANSSB_RSSD17_32_RST_INT_N
-		interrupts = <ASPEED_GPIO(R, 0) IRQ_TYPE_LEVEL_HIGH>;
+		reset-gpios = <&gpio0 ASPEED_GPIO(R, 0) (GPIO_ACTIVE_LOW | GPIO_OPEN_DRAIN)>; // BMC_MUX_FANSSB_RSSD17_32_RST_INT_N
 		vdd-supply = <&p3v3_aux>;
 
 		i2c@0 { // SMB_MUX_SSB_FANGRP0
@@ -21,9 +19,7 @@
 				#address-cells = <1>;
 				#size-cells = <0>;
 				reg = <0x70>;
-				interrupt-parent = <&bmc_pex_irq>;
-				// using SMB_MUX_SSB_FANGRP0_RST_INT_N
-				interrupts = <16 IRQ_TYPE_LEVEL_HIGH>;
+				reset-gpios = <&bmc_pex_irq 16 (GPIO_ACTIVE_LOW | GPIO_OPEN_DRAIN)>; // SMB_MUX_SSB_FANGRP0_RST_INT_N
 				vdd-supply = <&p3v3_aux>;
 			};
 		};
@@ -37,8 +33,7 @@
 				#address-cells = <1>;
 				#size-cells = <0>;
 				reg = <0x70>;
-				interrupt-parent = <&bmc_pex_irq>;
-				interrupts = <7 IRQ_TYPE_LEVEL_HIGH>; // SMB_MUX_SSB_FANGRP1_RST_INT_N
+				reset-gpios = <&bmc_pex_irq 7 (GPIO_ACTIVE_LOW | GPIO_OPEN_DRAIN)>; // SMB_MUX_SSB_FANGRP1_RST_INT_N
 				vdd-supply = <&p3v3_aux>;
 			};
 		};
@@ -52,8 +47,7 @@
 				#address-cells = <1>;
 				#size-cells = <0>;
 				reg = <0x70>;
-				interrupt-parent = <&bmc_pex_irq>;
-				interrupts = <1 IRQ_TYPE_LEVEL_HIGH>; // SMB_MUX_SSB_FANGRP2_RST_INT_N
+				reset-gpios = <&bmc_pex_irq 1 (GPIO_ACTIVE_LOW | GPIO_OPEN_DRAIN)>; // SMB_MUX_SSB_FANGRP2_RST_INT_N
 				vdd-supply = <&p3v3_aux>;
 			};
 		};
@@ -67,8 +61,7 @@
 				#address-cells = <1>;
 				#size-cells = <0>;
 				reg = <0x70>;
-				interrupt-parent = <&bmc_pex_irq>;
-				interrupts = <10 IRQ_TYPE_LEVEL_HIGH>; // SMB_MUX_SSB_RSSD17_24_RST_INT_N
+				reset-gpios = <&bmc_pex_irq 10 (GPIO_ACTIVE_LOW | GPIO_OPEN_DRAIN)>; // SMB_MUX_SSB_RSSD17_24_RST_INT_N
 				vdd-supply = <&p3v3_aux>;
 			};
 		};
@@ -82,8 +75,7 @@
 				#address-cells = <1>;
 				#size-cells = <0>;
 				reg = <0x70>;
-				interrupt-parent = <&bmc_pex_irq>;
-				interrupts = <15 IRQ_TYPE_LEVEL_HIGH>; // SMB_MUX_SSB_RSSD25_32_RST_INT_N
+				reset-gpios = <&bmc_pex_irq 15 (GPIO_ACTIVE_LOW | GPIO_OPEN_DRAIN)>; // SMB_MUX_SSB_RSSD25_32_RST_INT_N
 				vdd-supply = <&p3v3_aux>;
 			};
 		};
@@ -160,9 +152,7 @@
 				#address-cells = <1>;
 				#size-cells = <0>;
 				reg = <0x70>;
-				interrupt-parent = <&bmc_pex_irq>;
-				// using SMB_MUX_RSSD17_24_RST_INT_N
-				interrupts = <12 IRQ_TYPE_LEVEL_HIGH>;
+				reset-gpios = <&bmc_pex_irq 12 (GPIO_ACTIVE_LOW | GPIO_OPEN_DRAIN)>; // SMB_MUX_RSSD17_24_RST_INT_N
 				vdd-supply = <&p3v3_aux>;
 
 				i2c@0 { // SMB_RSSD17
@@ -217,9 +207,7 @@
 				#address-cells = <1>;
 				#size-cells = <0>;
 				reg = <0x70>;
-				interrupt-parent = <&bmc_pex_irq>;
-				// using SMB_MUX_RSSD25_32_RST_INT_N
-				interrupts = <14 IRQ_TYPE_LEVEL_HIGH>;
+				reset-gpios = <&bmc_pex_irq 14 (GPIO_ACTIVE_LOW | GPIO_OPEN_DRAIN)>; // SMB_MUX_RSSD25_32_RST_INT_N
 				vdd-supply = <&p3v3_aux>;
 
 				i2c@0 { // SMB_RSSD25
