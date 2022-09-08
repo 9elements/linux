@@ -8,9 +8,7 @@
 		#address-cells = <1>;
 		#size-cells = <0>;
 		reg = <0x77>;
-		interrupt-parent = <&gpio0>;
-		// using BMC_MUX_SVC_EXP_RST_INT_N
-		interrupts = <ASPEED_GPIO(R, 4) IRQ_TYPE_LEVEL_HIGH>;
+		reset-gpios = <&gpio0 ASPEED_GPIO(R, 4) (GPIO_ACTIVE_LOW | GPIO_OPEN_DRAIN)>; // BMC_MUX_SVC_EXP_RST_INT_N
 		vdd-supply = <&p3v3_bmc_aux>;
 
 		i2c@0 { // SMB_PEX_VR_CTRL
@@ -113,9 +111,7 @@
 				#address-cells = <1>;
 				#size-cells = <0>;
 				reg = <0x70>;
-				// using BMC_MUX_SVC_RSSD_INT
-				interrupt-parent = <&gpio0>;
-				interrupts = <ASPEED_GPIO(P, 3) IRQ_TYPE_LEVEL_HIGH>;
+				reset-gpios = <&gpio0 ASPEED_GPIO(P, 3) (GPIO_ACTIVE_LOW | GPIO_OPEN_DRAIN)>; // BMC_MUX_SVC_RSSD_INT
 				vdd-supply = <&p3v3_bmc_aux>;
 
 				i2c@0 { // SMB_SVC_PEX_RSSD01_16
@@ -544,9 +540,7 @@
 				#address-cells = <1>;
 				#size-cells = <0>;
 				reg = <0x70>;
-				// uses BMC_MUX_SVC_VR_RST_INT
-				interrupt-parent = <&gpio0>;
-				interrupts = <ASPEED_GPIO(R, 2) IRQ_TYPE_LEVEL_HIGH>;
+				reset-gpios = <&gpio0 ASPEED_GPIO(R, 2) (GPIO_ACTIVE_LOW | GPIO_OPEN_DRAIN)>; // BMC_MUX_SVC_VR_RST_INT
 				vdd-supply = <&p3v3_bmc_aux>;
 
 				i2c@1 { // SMB_VR_P5V_AUX

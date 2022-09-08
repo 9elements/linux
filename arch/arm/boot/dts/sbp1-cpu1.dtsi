@@ -7,8 +7,7 @@
 		#size-cells = <0>;
 		compatible = "maxim,max7357";
 		reg = <0x77>;
-		interrupt-parent = <&gpio0>;
-		interrupts = <ASPEED_GPIO(F, 3) IRQ_TYPE_LEVEL_HIGH>; // BMC_MUX_CPU1_RST_INT_N
+		reset-gpios = <&gpio0 ASPEED_GPIO(F, 3) (GPIO_ACTIVE_LOW | GPIO_OPEN_DRAIN)>; // BMC_MUX_CPU1_RST_INT_N
 		vdd-supply = <&p3v3_aux>;
 
 		i2c@0 { // SMB_PEX_CPU1_EVENT

@@ -1676,8 +1676,7 @@
 		#address-cells = <1>;
 		#size-cells = <0>;
 		reg = <0x77>;
-		interrupt-parent = <&gpio0>;
-		interrupts = <ASPEED_GPIO(R, 7) IRQ_TYPE_LEVEL_HIGH>; // BMC_MUX_M2_RST_INT_N
+		reset-gpios = <&gpio0 ASPEED_GPIO(R, 7) (GPIO_ACTIVE_LOW | GPIO_OPEN_DRAIN)>; // BMC_MUX_M2_RST_INT_N
 		vdd-supply = <&p3v3_aux>;
 
 		i2c@0 { // SMB_S3M_CPU0_LVC1
