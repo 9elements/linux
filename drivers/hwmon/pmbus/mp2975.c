@@ -339,7 +339,7 @@ static int mp2975_read_word_data(struct i2c_client *client, int page,
 		break;
 	case PMBUS_READ_VOUT:
 		ret = mp2975_read_word_helper(client, page, phase, reg,
-					      GENMASK(11, 0));
+					      GENMASK(15, 0));
 		if (ret < 0)
 			return ret;
 
@@ -356,6 +356,8 @@ static int mp2975_read_word_data(struct i2c_client *client, int page,
 			ret = mp2975_vid2direct(info->vrm_version[page], ret);
 		else if (data->vout_format[page] == linear)
 			ret = mp2975_linear162direct(data->vout_mode_exponent[page], ret);
+		else
+			ret &= GENMASK(11, 0);
 		break;
 	case PMBUS_VIRT_READ_POUT_MAX:
 		ret = mp2975_read_word_helper(client, page, phase,
