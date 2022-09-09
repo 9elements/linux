@@ -11,7 +11,14 @@
 #include <linux/init.h>
 #include <linux/kernel.h>
 #include <linux/module.h>
+#include <linux/regulator/driver.h>
 #include "pmbus.h"
+
+#if IS_ENABLED(CONFIG_SENSORS_TDA38640_REGULATOR)
+static const struct regulator_desc tda38640_reg_desc[] = {
+	PMBUS_REGULATOR("vout", 0),
+};
+#endif /* CONFIG_SENSORS_TDA38640_REGULATOR */
 
 static struct pmbus_driver_info tda38640_info = {
 	.pages = 1,
@@ -28,6 +35,10 @@ static struct pmbus_driver_info tda38640_info = {
 	    | PMBUS_HAVE_VOUT | PMBUS_HAVE_STATUS_VOUT
 	    | PMBUS_HAVE_IOUT | PMBUS_HAVE_STATUS_IOUT
 	    | PMBUS_HAVE_POUT | PMBUS_HAVE_PIN,
+#if IS_ENABLED(CONFIG_SENSORS_TDA38640_REGULATOR)
+	.num_regulators = 1,
+	.reg_desc = tda38640_reg_desc,
+#endif
 };
 
 static int tda38640_probe(struct i2c_client *client)
