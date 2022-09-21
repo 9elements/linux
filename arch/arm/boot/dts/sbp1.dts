@@ -898,7 +898,7 @@
 		regulator-name = "pvccfa_ehv_fivra_cpu0";
 		regulator-supplies = "vbus";
 		vbus-supply = <&pvccfa_ehv_fivra_cpu0>;
-		comment = "PVCCFA_EHV_FIVRA of CPU0";
+		comment = "PVCCFA EHV FIVRA of CPU0";
 	};
 
 	pvccd_hv_cpu0_consumer {
@@ -962,7 +962,7 @@
 		regulator-name = "pvccfa_ehv_fivra_cpu1";
 		regulator-supplies = "vbus";
 		vbus-supply = <&pvccfa_ehv_fivra_cpu1>;
-		comment = "PVCCFA_EHV_FIVRA of CPU1";
+		comment = "PVCCDA EHV FIVRA of CPU1";
 	};
 
 	pvccd_hv_cpu1_consumer {
@@ -1025,7 +1025,7 @@
 		regulator-name = "pvccfa_ehv_fivra_cpu2";
 		regulator-supplies = "vbus";
 		vbus-supply = <&pvccfa_ehv_fivra_cpu2>;
-		comment = "PVCCFA_EHV_FIVRA of CPU2";
+		comment = "PVCCDA EHV FIVRA of CPU2";
 	};
 
 	pvccd_hv_cpu2_consumer {
@@ -1082,6 +1082,14 @@
 		comment = "PVCCIN of CPU3";
 	};
 
+	pvccfa_ehv_fivra_cpu3_consumer {
+		status = "okay";
+		compatible = "reg-userspace-consumer";
+		regulator-name = "pvccfa_ehv_fivra_cpu3";
+		regulator-supplies = "vbus";
+		vbus-supply = <&pvccfa_ehv_fivra_cpu3>;
+		comment = "PVCCDA EHV FIVRA of CPU3";
+	};
 
 	pvccd_hv_cpu3_consumer {
 		status = "okay";
