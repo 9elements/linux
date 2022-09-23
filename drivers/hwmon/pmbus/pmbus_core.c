@@ -2880,6 +2880,25 @@ static int pmbus_regulator_is_enabled(struct regulator_dev *rdev)
 
 	return !!(ret & PB_OPERATION_CONTROL_ON);
 }
+static int tda_pmbus_regulator_is_enabled(struct regulator_dev *rdev)
+{
+	struct device *dev = rdev_get_dev(rdev);
+	struct i2c_client *client = to_i2c_client(dev->parent);
+	struct pmbus_data *data = i2c_get_clientdata(client);
+	u8 page = rdev_get_id(rdev);
+	int ret;
+
+	mutex_lock(&data->update_lock);
+	ret = pmbus_read_byte_data(client, page, PMBUS_ON_OFF_CONFIG);
+	mutex_unlock(&data->update_lock);
+
+	if (ret < 0)
+		return ret;
+
+	if ((ret & 0x17) == 0x15)
+		return 1;
+	return 0;
+}
 
 static int _pmbus_regulator_on_off(struct regulator_dev *rdev, bool enable)
 {
@@ -2898,6 +2917,23 @@ static int _pmbus_regulator_on_off(struct regulator_dev *rdev, bool enable)
 	return ret;
 }
 
+static int tda_pmbus_regulator_on_off(struct regulator_dev *rdev, bool enable)
+{
+	struct device *dev = rdev_get_dev(rdev);
+	struct i2c_client *client = to_i2c_client(dev->parent);
+	struct pmbus_data *data = i2c_get_clientdata(client);
+	u8 page = rdev_get_id(rdev);
+	int ret;
+
+	mutex_lock(&data->update_lock);
+	ret = pmbus_write_byte_data(client, page, PMBUS_ON_OFF_CONFIG,
+				     enable ? 0x15 : 0x17);
+	mutex_unlock(&data->update_lock);
+
+	return ret;
+}
+
+
 static int pmbus_regulator_enable(struct regulator_dev *rdev)
 {
 	return _pmbus_regulator_on_off(rdev, 1);
@@ -2906,6 +2942,15 @@ static int pmbus_regulator_enable(struct regulator_dev *rdev)
 static int pmbus_regulator_disable(struct regulator_dev *rdev)
 {
 	return _pmbus_regulator_on_off(rdev, 0);
+}
+static int tda_pmbus_regulator_enable(struct regulator_dev *rdev)
+{
+	return tda_pmbus_regulator_on_off(rdev, 1);
+}
+
+static int tda_pmbus_regulator_disable(struct regulator_dev *rdev)
+{
+	return tda_pmbus_regulator_on_off(rdev, 0);
 }
 
 /* A PMBus status flag and the corresponding REGULATOR_ERROR_* flag */
@@ -3227,6 +3272,14 @@ const struct regulator_ops pmbus_regulator_ops = {
 	.list_voltage = pmbus_regulator_list_voltage,
 };
 EXPORT_SYMBOL_NS_GPL(pmbus_regulator_ops, PMBUS);
+
+const struct regulator_ops tda_pmbus_regulator_ops = {
+	.enable = tda_pmbus_regulator_enable,
+	.disable = tda_pmbus_regulator_disable,
+	.is_enabled = tda_pmbus_regulator_is_enabled,
+	.get_status = pmbus_regulator_get_status,
+};
+EXPORT_SYMBOL_NS_GPL(tda_pmbus_regulator_ops, PMBUS);
 
 /*
  * Write the SMALERT mask register.
