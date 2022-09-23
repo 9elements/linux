@@ -16,7 +16,7 @@
 
 #if IS_ENABLED(CONFIG_SENSORS_TDA38640_REGULATOR)
 static const struct regulator_desc tda38640_reg_desc[] = {
-	PMBUS_REGULATOR("vout", 0),
+	TDA_PMBUS_REGULATOR("vout", 0),
 };
 #endif /* CONFIG_SENSORS_TDA38640_REGULATOR */
 
