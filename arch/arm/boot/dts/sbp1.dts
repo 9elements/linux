@@ -1547,6 +1547,10 @@
 	status = "disabled";
 };
 
+&espi_ctrl {
+        status = "okay";
+};
+
 &pinctrl {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_vgahs_default &pinctrl_vgavs_default>;
