@@ -464,6 +464,7 @@ struct pmbus_driver_info {
 /* Regulator ops */
 
 extern const struct regulator_ops pmbus_regulator_ops;
+extern const struct regulator_ops tda_pmbus_regulator_ops;
 
 /* Macros for filling in array of struct regulator_desc */
 #define PMBUS_REGULATOR_STEP(_name, _id, _voltages, _step)  \
@@ -481,6 +482,18 @@ extern const struct regulator_ops pmbus_regulator_ops;
 	}
 
 #define PMBUS_REGULATOR(_name, _id)	PMBUS_REGULATOR_STEP(_name, _id, 0, 0)
+
+#define TDA_PMBUS_REGULATOR(_name, _id)				\
+	[_id] = {						\
+		.name = (_name # _id),				\
+		.supply_name = "vin",				\
+		.id = (_id),					\
+		.of_match = of_match_ptr(_name # _id),		\
+		.regulators_node = of_match_ptr("regulators"),	\
+		.ops = &tda_pmbus_regulator_ops,			\
+		.type = REGULATOR_VOLTAGE,			\
+		.owner = THIS_MODULE,				\
+	}
 
 /* Function declarations */
 
