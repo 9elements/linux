@@ -20,6 +20,50 @@ static const struct regulator_desc tda38640_reg_desc[] = {
 };
 #endif /* CONFIG_SENSORS_TDA38640_REGULATOR */
 
+static int tda38640_read_byte_data(struct i2c_client *client, int page, int reg)
+{
+	int ret, on_off_config;
+
+	if (reg != PMBUS_OPERATION)
+		return -ENODATA;
+
+	ret = pmbus_read_byte_data(client, page, reg);
+	if (ret < 0)
+		return ret;
+
+	ret &= ~PB_OPERATION_CONTROL_ON;
+
+	on_off_config = pmbus_read_byte_data(client, page,
+					     PMBUS_ON_OFF_CONFIG);
+	if (on_off_config < 0)
+		return on_off_config;
+
+	if (on_off_config & PB_ON_OFF_CONFIG_EN_PIN_REQ)
+		ret |= PB_OPERATION_CONTROL_ON;
+
+	return ret;
+}
+
+static int tda38640_write_byte_data(struct i2c_client *client, int page,
+				    int reg, u8 byte)
+{
+	int enable, ret;
+
+	if (reg != PMBUS_OPERATION)
+		return -ENODATA;
+
+	enable = byte & PB_OPERATION_CONTROL_ON;
+
+	byte &= ~PB_OPERATION_CONTROL_ON;
+	ret = pmbus_write_byte_data(client, page, reg, byte);
+	if (ret < 0)
+		return ret;
+
+	return pmbus_update_byte_data(client, page, PMBUS_ON_OFF_CONFIG,
+				      PB_ON_OFF_CONFIG_EN_PIN_REQ,
+				      enable ? PB_ON_OFF_CONFIG_EN_PIN_REQ : 0);
+}
+
 static struct pmbus_driver_info tda38640_info = {
 	.pages = 1,
 	.format[PSC_VOLTAGE_IN] = linear,
@@ -28,7 +72,6 @@ static struct pmbus_driver_info tda38640_info = {
 	.format[PSC_CURRENT_IN] = linear,
 	.format[PSC_POWER] = linear,
 	.format[PSC_TEMPERATURE] = linear,
-
 	.func[0] = PMBUS_HAVE_VIN | PMBUS_HAVE_STATUS_INPUT
 	    | PMBUS_HAVE_TEMP | PMBUS_HAVE_STATUS_TEMP
 #if IS_ENABLED(CONFIG_SENSORS_TDA38640_REGULATOR)
@@ -46,7 +89,44 @@ static struct pmbus_driver_info tda38640_info = {
 
 static int tda38640_probe(struct i2c_client *client)
 {
-	return pmbus_do_probe(client, &tda38640_info);
+	struct device *dev = &client->dev;
+	struct device_node *np = dev_of_node(dev);
+	struct pmbus_driver_info *info;
+	u32 en_pin_lvl;
+	int ret;
+
+	info = devm_kzalloc(dev, sizeof(*info), GFP_KERNEL);
+	if (!info)
+		return -ENOMEM;
+	memcpy(info, &tda38640_info, sizeof(*info));
+
+	if (!CONFIG_SENSORS_TDA38640_REGULATOR || !np ||
+	    of_property_read_u32(np, "infineon,en-pin-fixed-level", &en_pin_lvl))
+		return pmbus_do_probe(client, info);
+
+	/*
+	 * Apply ON_OFF_CONFIG workaround as enabling the regulator using the
+	 * OPERATION register doesn't work in SVID mode.
+	 */
+	info->read_byte_data = tda38640_read_byte_data;
+	info->write_byte_data = tda38640_write_byte_data;
+
+	ret = i2c_smbus_read_byte_data(client, PMBUS_ON_OFF_CONFIG);
+	if (ret < 0)
+		return ret;
+
+	ret &= ~(PB_ON_OFF_CONFIG_POWERUP_ANYTIME |
+		PB_ON_OFF_CONFIG_OPERATION_REQ |
+		PB_ON_OFF_CONFIG_POLARITY_HIGH);
+
+	if (en_pin_lvl)
+		ret |= PB_ON_OFF_CONFIG_POLARITY_HIGH;
+
+	ret = i2c_smbus_write_byte_data(client, PMBUS_ON_OFF_CONFIG, ret);
+	if (ret < 0)
+		return ret;
+
+	return pmbus_do_probe(client, info);
 }
 
 static const struct i2c_device_id tda38640_id[] = {
