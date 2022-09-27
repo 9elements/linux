@@ -80,7 +80,7 @@ enum chips {
 struct mp2975_data {
 	struct pmbus_driver_info info;
 	enum chips chip_id;
-	int vout_scale;
+	int vout_scale[MP2975_PAGE_NUM];
 	int vid_step[MP2975_PAGE_NUM];
 	int vref[MP2975_PAGE_NUM];
 	int vref_off[MP2975_PAGE_NUM];
@@ -340,7 +340,7 @@ static int mp2975_read_word_data(struct i2c_client *client, int page,
 			return ret;
 
 		ret = DIV_ROUND_CLOSEST(data->vref[page] * 10 - 50 *
-					(ret + 1) * data->vout_scale, 10);
+					(ret + 1) * data->vout_scale[page], 10);
 		break;
 	case PMBUS_READ_VOUT:
 		ret = mp2975_read_word_helper(client, page, phase, reg,
@@ -769,17 +769,12 @@ mp2975_identify_vout_format(struct i2c_client *client,
 }
 
 static int
-mp2975_vout_ov_scale_get(struct i2c_client *client, struct mp2975_data *data,
-			 struct pmbus_driver_info *info)
+mp2975_vout_ov_scale_get(struct i2c_client *client, struct mp2975_data *data)
 {
 	int thres_dev, sense_ampl, ret;
 
 	if (data->chip_id != mp2975)
 		return 0;
-
-	ret = i2c_smbus_write_byte_data(client, PMBUS_PAGE, 0);
-	if (ret < 0)
-		return ret;
 
 	/*
 	 * Get divider for over- and under-voltage protection thresholds
@@ -805,7 +800,7 @@ mp2975_vout_ov_scale_get(struct i2c_client *client, struct mp2975_data *data,
 	sense_ampl = ret & MP2975_SENSE_AMPL ? MP2975_SENSE_AMPL_HALF :
 					       MP2975_SENSE_AMPL_UNIT;
 
-	data->vout_scale = sense_ampl * thres_dev;
+	data->vout_scale[page] = sense_ampl * thres_dev;
 
 	return 0;
 }
@@ -821,6 +816,13 @@ mp2975_vout_per_rail_config_get(struct i2c_client *client,
 		ret = i2c_smbus_write_byte_data(client, PMBUS_PAGE, i);
 		if (ret < 0) {
 			dev_err(&client->dev, "Writing PAGE failed with %d\n", ret);
+
+			return ret;
+		}
+		/* Obtain vout over-voltage scales. */
+		ret = mp2975_vout_ov_scale_get(client, data);
+		if (ret < 0) {
+			dev_err(&client->dev, "mp2975_vout_ov_scale_get failed with ret=%d\n", ret);
 
 			return ret;
 		}
@@ -858,7 +860,7 @@ mp2975_vout_per_rail_config_get(struct i2c_client *client,
 		 */
 		data->vout_ov_fixed[i] = data->vref[i] +
 					 DIV_ROUND_CLOSEST(data->vref_off[i] *
-							   data->vout_scale,
+							   data->vout_scale[i],
 							   10);
 	}
 
@@ -1007,14 +1009,6 @@ static int mp2975_probe(struct i2c_client *client)
 	ret = mp2975_vref_get(client, data, info);
 	if (ret) {
 		dev_err(&client->dev, "mp2975_vref_get failed with ret=%d\n", ret);
-
-		return ret;
-	}
-
-	/* Obtain vout over-voltage scales. */
-	ret = mp2975_vout_ov_scale_get(client, data, info);
-	if (ret < 0) {
-		dev_err(&client->dev, "mp2975_vout_ov_scale_get failed with ret=%d\n", ret);
 
 		return ret;
 	}
