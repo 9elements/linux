@@ -35,6 +35,7 @@
 #define MP2975_MFR_OVP_TH_SET		0xe5
 #define MP2975_MFR_UVP_SET		0xe6
 
+
 #define MP2973_MFR_RESO_SET		0xc7
 
 #define MP2975_VOUT_FORMAT		BIT(15)
@@ -50,6 +51,10 @@
 #define MP2975_SENSE_AMPL_UNIT		1
 #define MP2975_SENSE_AMPL_HALF		2
 #define MP2975_VIN_UV_LIMIT_UNIT	8
+
+#define MP2973_IMVP9_EN_R1		BIT(14)
+#define MP2973_IMVP9_EN_R2		BIT(13)
+#define MP2973_DRMOS_KCS		GENMASK(12, 11)
 
 #define MP2973_VOUT_FORMAT_DIRECT	BIT(7)
 #define MP2973_VOUT_FORMAT_LINEAR	BIT(6)
@@ -563,20 +568,25 @@ mp2975_identify_rails_vid(struct i2c_client *client, struct mp2975_data *data,
 
 		return ret;
 	}
+
 	/* Identify VID mode for rail 1. */
 	ret = mp2975_identify_vid(client, data, info,
 				  MP2975_MFR_VR_MULTI_CONFIG_R1, 0,
-				  MP2975_IMVP9_EN_R1, MP2975_VID_STEP_SEL_R1);
+				  (data->chip_id == mp2975) ?
+				    MP2975_IMVP9_EN_R1 : MP2973_IMVP9_EN_R1,
+				  MP2975_VID_STEP_SEL_R1);
 	if (ret < 0) {
 		dev_err(&client->dev, "mp2975_identify_vid for rail 1 failed with %d\n", ret);
 
 		return ret;
 	}
+
 	/* Identify VID mode for rail 2, if connected. */
 	if (info->phases[1])
 		ret = mp2975_identify_vid(client, data, info,
 					  MP2975_MFR_VR_MULTI_CONFIG_R2, 1,
-					  MP2975_IMVP9_EN_R2,
+					  (data->chip_id == mp2975) ?
+					    MP2975_IMVP9_EN_R2 : MP2973_IMVP9_EN_R2,
 					  MP2975_VID_STEP_SEL_R2);
 
 	if (ret)
@@ -589,7 +599,7 @@ static int
 mp2975_current_sense_gain_get(struct i2c_client *client,
 			      struct mp2975_data *data)
 {
-	int i, ret;
+	int i, ret, mask, shift;
 
 	/*
 	 * Obtain DrMOS current sense gain of power stage from the register
@@ -609,7 +619,18 @@ mp2975_current_sense_gain_get(struct i2c_client *client,
 			return ret;
 		}
 
-		switch ((ret & MP2975_DRMOS_KCS) >> 12) {
+		switch (data->chip_id) {
+		case mp2975:
+			mask = MP2975_DRMOS_KCS;
+			shift = 12;
+			break;
+		case mp2973:
+		case mp2971:
+			mask = MP2973_DRMOS_KCS;
+			shift = 11;
+			break;
+		}
+		switch ((ret & mask) >> shift) {
 		case 0:
 			data->curr_sense_gain[i] = 50;
 			break;
@@ -753,7 +774,7 @@ mp2975_vout_ov_scale_get(struct i2c_client *client, struct mp2975_data *data,
 {
 	int thres_dev, sense_ampl, ret;
 
-	if (data->chip_id != mp2973)
+	if (data->chip_id != mp2975)
 		return 0;
 
 	ret = i2c_smbus_write_byte_data(client, PMBUS_PAGE, 0);
