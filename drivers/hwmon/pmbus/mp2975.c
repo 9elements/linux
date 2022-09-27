@@ -551,12 +551,15 @@ mp2975_identify_vid(struct i2c_client *client, struct mp2975_data *data,
 		return ret;
 	}
 	if (ret & imvp_bit) {
+		dev_err(&client->dev, "Using VID IMVP9 format on page %d\n", page);
 		info->vrm_version[page] = imvp9;
 		data->vid_step[page] = MP2975_PROT_DEV_OV_OFF;
 	} else if (ret & vr_bit) {
+		dev_err(&client->dev, "Using VID VR12 format on page %d\n", page);
 		info->vrm_version[page] = vr12;
 		data->vid_step[page] = MP2975_PROT_DEV_OV_ON;
 	} else {
+		dev_err(&client->dev, "Using VID VR13 format on page %d\n", page);
 		info->vrm_version[page] = vr13;
 		data->vid_step[page] = MP2975_PROT_DEV_OV_OFF;
 	}
@@ -772,17 +775,23 @@ mp2975_identify_vout_format(struct i2c_client *client,
 		if (ret < 0)
 			return ret;
 
-		if (ret & MP2973_VOUT_FORMAT_DIRECT)
+		if (ret & MP2973_VOUT_FORMAT_DIRECT) {
+			dev_err(&client->dev, "Using DIRECT VOUT format on page %d\n", page);
 			data->vout_format[page] = direct;
+		}
 		else if (ret & MP2973_VOUT_FORMAT_LINEAR) {
+			dev_err(&client->dev, "Using LINEAR VOUT format on page %d\n", page);
+
 			ret = i2c_smbus_read_word_data(client, PMBUS_VOUT_MODE);
 			if (ret < 0)
 				return ret;
 			data->vout_mode_exponent[page] = ((s8)(ret << 3)) >> 3;
 			data->vout_format[page] = linear;
 		}
-		else
+		else {
+			dev_err(&client->dev, "Using VID format on page %d\n", page);
 			data->vout_format[page] = vid;
+		}
 
 	}
 	return 0;
