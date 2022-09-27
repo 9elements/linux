@@ -38,8 +38,10 @@
 
 #define MP2973_MFR_VR_CONFIG_IMON_OFFSET_R1	0x0e
 #define MP2973_MFR_VR_CONFIG_IMON_OFFSET_R2	0x1e
+#define MP2973_MFR_PROTECT_SET			0xc5
 #define MP2973_MFR_RESO_SET			0xc7
 
+#define MP2975_OVP_THRESHOLD_SET	GENMASK(5, 3)
 #define MP2975_VOUT_FORMAT		BIT(15)
 #define MP2975_VID_STEP_SEL_R1		BIT(4)
 #define MP2975_IMVP9_EN_R1		BIT(13)
@@ -54,6 +56,8 @@
 #define MP2975_SENSE_AMPL_HALF		2
 #define MP2975_VIN_UV_LIMIT_UNIT	8
 
+#define MP2973_OVP_THRESHOLD_SET_R1	GENMASK(13, 11)
+#define MP2973_OVP_THRESHOLD_SET_R2	GENMASK(11, 9)
 #define MP2973_PRT_THRES_DIV_OV_EN_R1	BIT(14)
 #define MP2973_PRT_THRES_DIV_OV_EN_R2	BIT(13)
 #define MP2973_IMVP9_EN_R1		BIT(14)
@@ -691,18 +695,30 @@ static int
 mp2975_vref_offset_get(struct i2c_client *client, struct mp2975_data *data,
 		       int page)
 {
-	int ret;
+	int ret, reg, mask, shift;
 
-	if (data->chip_id != mp2975)
-		return 0;
+	switch (data->chip_id) {
+	case mp2975:
+		reg = MP2975_MFR_OVP_TH_SET;
+		mask = MP2975_OVP_THRESHOLD_SET;
+		shift = 3;
+		break;
+	case mp2973:
+	case mp2971:
+		reg = MP2973_MFR_PROTECT_SET;
+		mask = (page == 0) ? MP2973_OVP_THRESHOLD_SET_R1 :
+				     MP2973_OVP_THRESHOLD_SET_R2;
+		shift = (page == 0) ? 11 : 9;
+		break;
+	}
 
-	ret = i2c_smbus_read_word_data(client, MP2975_MFR_OVP_TH_SET);
+	ret = i2c_smbus_read_word_data(client, reg);
 	if (ret < 0) {
 		dev_err(&client->dev, "Reading MP2975_MFR_OVP_TH_SET failed with: %d\n",  ret);
 
 		return ret;
 	}
-	switch ((ret & GENMASK(5, 3)) >> 3) {
+	switch ((ret & mask) >> shift) {
 	case 1:
 		data->vref_off[page] = 140;
 		break;
