@@ -891,9 +891,9 @@ static int
 mp2975_vout_ov_scale_get(struct i2c_client *client, struct mp2975_data *data, int page)
 {
 	if (data->chip_id == mp2975)
-		mp2975_vout_ov_scale_get_mp2975(client, data, page);
+		return mp2975_vout_ov_scale_get_mp2975(client, data, page);
 	else
-		mp2975_vout_ov_scale_get_mp2973(client, data, page);
+		return mp2975_vout_ov_scale_get_mp2973(client, data, page);
 }
 
 static int
