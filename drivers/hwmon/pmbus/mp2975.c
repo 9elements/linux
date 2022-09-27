@@ -36,7 +36,9 @@
 #define MP2975_MFR_UVP_SET		0xe6
 
 
-#define MP2973_MFR_RESO_SET		0xc7
+#define MP2973_MFR_VR_CONFIG_IMON_OFFSET_R1	0x0e
+#define MP2973_MFR_VR_CONFIG_IMON_OFFSET_R2	0x1e
+#define MP2973_MFR_RESO_SET			0xc7
 
 #define MP2975_VOUT_FORMAT		BIT(15)
 #define MP2975_VID_STEP_SEL_R1		BIT(4)
@@ -52,6 +54,8 @@
 #define MP2975_SENSE_AMPL_HALF		2
 #define MP2975_VIN_UV_LIMIT_UNIT	8
 
+#define MP2973_PRT_THRES_DIV_OV_EN_R1	BIT(14)
+#define MP2973_PRT_THRES_DIV_OV_EN_R2	BIT(13)
 #define MP2973_IMVP9_EN_R1		BIT(14)
 #define MP2973_IMVP9_EN_R2		BIT(13)
 #define MP2973_DRMOS_KCS		GENMASK(12, 11)
@@ -768,13 +772,11 @@ mp2975_identify_vout_format(struct i2c_client *client,
 	return 0;
 }
 
+
 static int
-mp2975_vout_ov_scale_get(struct i2c_client *client, struct mp2975_data *data)
+mp2975_vout_ov_scale_get_mp2975(struct i2c_client *client, struct mp2975_data *data)
 {
 	int thres_dev, sense_ampl, ret;
-
-	if (data->chip_id != mp2975)
-		return 0;
 
 	/*
 	 * Get divider for over- and under-voltage protection thresholds
@@ -806,6 +808,70 @@ mp2975_vout_ov_scale_get(struct i2c_client *client, struct mp2975_data *data)
 }
 
 static int
+mp2975_vout_ov_scale_get_mp2973(struct i2c_client *client, struct mp2975_data *data, int page)
+{
+	int thres_dev, sense_ampl, ret, reg, mask;
+
+	ret = i2c_smbus_write_byte_data(client, PMBUS_PAGE, 2);
+	if (ret < 0) {
+		dev_err(&client->dev, "Writing PAGE failed with %d\n", ret);
+
+		return ret;
+	}
+
+	/*
+	 * Get divider for over- and under-voltage protection thresholds
+	 * configuration from the Advanced Options of Auto Phase Shedding and
+	 * decay register.
+	 */
+	if (!page) {
+		reg = MP2973_MFR_VR_CONFIG_IMON_OFFSET_R1;
+		mask = MP2973_PRT_THRES_DIV_OV_EN_R1;
+	} else {
+		reg = MP2973_MFR_VR_CONFIG_IMON_OFFSET_R2;
+		mask = MP2973_PRT_THRES_DIV_OV_EN_R2;
+	}
+	
+	ret = i2c_smbus_read_word_data(client, reg);
+	if (ret < 0) {
+		dev_err(&client->dev, "Reading MP2973_MFR_VR_CONFIG_IMON_OFFSET_Rx failed with %d\n", ret);
+
+		return ret;
+	}
+	thres_dev = (ret & mask) ? MP2975_PROT_DEV_OV_ON :
+	                           MP2975_PROT_DEV_OV_OFF;
+
+	ret = i2c_smbus_write_byte_data(client, PMBUS_PAGE, page);
+	if (ret < 0) {
+		dev_err(&client->dev, "Writing PAGE failed with %d\n", ret);
+
+		return ret;
+	}
+	/* Select the gain of remote sense amplifier. */
+	ret = i2c_smbus_read_word_data(client, PMBUS_VOUT_SCALE_LOOP);
+	if (ret < 0) {
+		dev_err(&client->dev, "Reading PMBUS_VOUT_SCALE_LOOP failed with %d\n", ret);
+
+		return ret;
+	}
+	sense_ampl = ret & MP2975_SENSE_AMPL ? MP2975_SENSE_AMPL_HALF :
+					       MP2975_SENSE_AMPL_UNIT;
+
+	data->vout_scale[page] = sense_ampl * thres_dev;
+
+	return 0;
+}
+
+static int
+mp2975_vout_ov_scale_get(struct i2c_client *client, struct mp2975_data *data, int page)
+{
+	if (data->chip_id == mp2975)
+		mp2975_vout_ov_scale_get_mp2975(client, data);
+	else
+		mp2975_vout_ov_scale_get_mp2973(client, data, page);
+}
+
+static int
 mp2975_vout_per_rail_config_get(struct i2c_client *client,
 				struct mp2975_data *data,
 				struct pmbus_driver_info *info)
@@ -820,7 +886,7 @@ mp2975_vout_per_rail_config_get(struct i2c_client *client,
 			return ret;
 		}
 		/* Obtain vout over-voltage scales. */
-		ret = mp2975_vout_ov_scale_get(client, data);
+		ret = mp2975_vout_ov_scale_get(client, data, i);
 		if (ret < 0) {
 			dev_err(&client->dev, "mp2975_vout_ov_scale_get failed with ret=%d\n", ret);
 
