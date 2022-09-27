@@ -56,8 +56,8 @@
 #define MP2975_SENSE_AMPL_HALF		2
 #define MP2975_VIN_UV_LIMIT_UNIT	8
 
-#define MP2973_OVP_THRESHOLD_SET_R1	GENMASK(13, 11)
-#define MP2973_OVP_THRESHOLD_SET_R2	GENMASK(11, 9)
+#define MP2973_OVP_THRESHOLD_SET_R1	GENMASK(14, 12)
+#define MP2973_OVP_THRESHOLD_SET_R2	GENMASK(12, 10)
 #define MP2973_PRT_THRES_DIV_OV_EN_R1	BIT(14)
 #define MP2973_PRT_THRES_DIV_OV_EN_R2	BIT(13)
 #define MP2973_IMVP9_EN_R1		BIT(14)
@@ -711,7 +711,7 @@ mp2975_vref_offset_get(struct i2c_client *client, struct mp2975_data *data,
 		reg = MP2973_MFR_PROTECT_SET;
 		mask = (page == 0) ? MP2973_OVP_THRESHOLD_SET_R1 :
 				     MP2973_OVP_THRESHOLD_SET_R2;
-		shift = (page == 0) ? 11 : 9;
+		shift = (page == 0) ? 12 : 10;
 		break;
 	}
 
