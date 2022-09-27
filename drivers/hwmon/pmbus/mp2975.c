@@ -732,7 +732,7 @@ mp2975_vref_offset_get(struct i2c_client *client, struct mp2975_data *data,
 		data->vref_off[page] = 400;
 		break;
 	default:
-		dev_err(&client->dev, "Unsupported Vref offset: %lu\n", (ret & GENMASK(5, 3)) >> 3);
+		dev_err(&client->dev, "Unsupported Vref offset: %u\n", (ret & mask) >> shift);
 
 		return -EINVAL;
 	}
