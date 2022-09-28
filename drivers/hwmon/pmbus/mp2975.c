@@ -64,8 +64,10 @@
 #define MP2973_IMVP9_EN_R2		BIT(13)
 #define MP2973_DRMOS_KCS		GENMASK(12, 11)
 
-#define MP2973_VOUT_FORMAT_DIRECT	BIT(7)
-#define MP2973_VOUT_FORMAT_LINEAR	BIT(6)
+#define MP2973_VOUT_FORMAT_DIRECT_R1	BIT(7)
+#define MP2973_VOUT_FORMAT_LINEAR_R1	BIT(6)
+#define MP2973_VOUT_FORMAT_DIRECT_R2	BIT(4)
+#define MP2973_VOUT_FORMAT_LINEAR_R2	BIT(3)
 
 #define MP2975_MAX_PHASE_RAIL1	8
 #define MP2975_MAX_PHASE_RAIL2	4
@@ -759,7 +761,7 @@ static int
 mp2975_identify_vout_format(struct i2c_client *client,
 			    struct mp2975_data *data, int page)
 {
-	int ret;
+	int ret, direct_mask, linear_mask;
 
 	if (data->chip_id == mp2975) {
 		ret = i2c_smbus_read_word_data(client, MP2975_MFR_DC_LOOP_CTRL);
@@ -775,11 +777,19 @@ mp2975_identify_vout_format(struct i2c_client *client,
 		if (ret < 0)
 			return ret;
 
-		if (ret & MP2973_VOUT_FORMAT_DIRECT) {
+		if (page == 0) {
+			direct_mask = MP2973_VOUT_FORMAT_DIRECT_R1;
+			linear_mask = MP2973_VOUT_FORMAT_LINEAR_R1;
+		} else {
+			direct_mask = MP2973_VOUT_FORMAT_DIRECT_R2;
+			linear_mask = MP2973_VOUT_FORMAT_LINEAR_R2;
+		}
+
+		if (ret & direct_mask) {
 			dev_err(&client->dev, "Using DIRECT VOUT format on page %d\n", page);
 			data->vout_format[page] = direct;
 		}
-		else if (ret & MP2973_VOUT_FORMAT_LINEAR) {
+		else if (ret & linear_mask) {
 			dev_err(&client->dev, "Using LINEAR VOUT format on page %d\n", page);
 
 			ret = i2c_smbus_read_word_data(client, PMBUS_VOUT_MODE);
