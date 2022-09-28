@@ -803,6 +803,11 @@ mp2975_identify_vout_format(struct i2c_client *client,
 			data->vout_format[page] = vid;
 		}
 
+		ret = i2c_smbus_read_byte_data(client, PMBUS_VOUT_MODE);
+		if (ret < 0)
+			return ret;
+		dev_err(&client->dev, "PMBUS_VOUT_MODE=0x%x on page %d\n", ret, page);
+
 	}
 	return 0;
 }
