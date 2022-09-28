@@ -393,9 +393,18 @@ static int mp2975_read_word_data(struct i2c_client *client, int page,
 		ret = DIV_ROUND_CLOSEST(ret, 4);
 		break;
 	case PMBUS_READ_IOUT:
-		ret = mp2975_read_phases(client, data, page, phase);
-		if (ret < 0)
-			return ret;
+		if (phase == 0xff) {
+			ret = pmbus_read_word_data(client, page, 0xff, PMBUS_READ_IOUT);
+			if (ret < 0)
+				return ret;
+
+			ret = mp2975_linear112direct(ret);
+
+		} else {
+			ret = mp2975_read_phases(client, data, page, phase);
+			if (ret < 0)
+				return ret;
+		}
 
 		break;
 	case PMBUS_UT_WARN_LIMIT:
