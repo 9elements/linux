@@ -330,6 +330,18 @@ static int mp2975_read_word_data(struct i2c_client *client, int page,
 		ret = DIV_ROUND_CLOSEST(data->vref[page] * 10 - 50 *
 					(ret + 1) * data->vout_scale, 10);
 		break;
+	case PMBUS_READ_PIN:
+		ret = mp2975_read_word_helper(client, page, phase, reg,
+					      GENMASK(15, 0));
+		if (ret < 0)
+			return ret;
+
+		/* MP2975 returns DIRECT format */
+		if (data->chip_id == mp2975)
+			break;
+		/* MP2973, MP2971 returns LINEAR11 format */
+		ret = DIV_ROUND_CLOSEST(mp2975_reg2data_linear11(ret), 1000);
+		break;
 	case PMBUS_VIRT_READ_POUT_MAX:
 		ret = mp2975_read_word_helper(client, page, phase,
 					      MP2975_MFR_READ_POUT_PK,
