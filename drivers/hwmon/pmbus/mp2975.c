@@ -91,6 +91,28 @@ mp2975_read_word_helper(struct i2c_client *client, int page, int phase, u8 reg,
 	return (ret > 0) ? ret & mask : ret;
 }
 
+static s32
+mp2975_reg2data_linear11(u16 data)
+{
+	s16 exponent;
+	s32 mantissa;
+	s32 val;
+
+	exponent = ((s16)data) >> 11;
+	mantissa = ((s16)((data & 0x7ff) << 5)) >> 5;
+
+	val = mantissa;
+
+	val *= 1000;
+
+	if (exponent >= 0)
+		val <<= exponent;
+	else
+		val >>= -exponent;
+
+	return val;
+}
+
 static int
 mp2975_vid2direct(int vrf, int val)
 {
@@ -111,6 +133,20 @@ mp2975_vid2direct(int vrf, int val)
 		return -EINVAL;
 	}
 	return 0;
+}
+
+static int
+mp2975_read_iout(struct i2c_client *client, int page, int phase)
+{
+	int ret;
+	/* LINEAR11 with exponent set to 0 */
+	ret = mp2975_read_word_helper(client, page, phase, PMBUS_READ_IOUT,
+				      GENMASK(15, 0));
+	if (ret < 0)
+		return ret;
+
+	/* Convert to DIRECT format 1A/LSB */
+	return DIV_ROUND_CLOSEST(mp2975_reg2data_linear11(ret), 1000);
 }
 
 static int
@@ -146,7 +182,7 @@ mp2975_read_phase(struct i2c_client *client, struct mp2975_data *data,
 	 * case phase current is represented as the maximum between the value
 	 * calculated  above and total rail current divided by number phases.
 	 */
-	ret = pmbus_read_word_data(client, page, phase, PMBUS_READ_IOUT);
+	ret = mp2975_read_iout(client, page, phase);
 	if (ret < 0)
 		return ret;
 
@@ -275,10 +311,10 @@ static int mp2975_read_word_data(struct i2c_client *client, int page,
 		ret = DIV_ROUND_CLOSEST(ret, 4);
 		break;
 	case PMBUS_READ_IOUT:
-		ret = mp2975_read_phases(client, data, page, phase);
-		if (ret < 0)
-			return ret;
-
+		if (phase == 0xff)
+			ret = mp2975_read_iout(client, page, phase);
+		else
+			ret = mp2975_read_phases(client, data, page, phase);
 		break;
 	case PMBUS_UT_WARN_LIMIT:
 	case PMBUS_UT_FAULT_LIMIT:
