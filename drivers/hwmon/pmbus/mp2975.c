@@ -140,14 +140,17 @@ static int
 mp2975_read_iout(struct i2c_client *client, int page, int phase)
 {
 	int ret;
-	/* LINEAR11 with exponent set to 0 */
+	/* LINEAR11 with fixed exponent:
+	 * - MP2975       : 0
+	 * - MP2973/MP2971: -1 or -2
+	 */
 	ret = mp2975_read_word_helper(client, page, phase, PMBUS_READ_IOUT,
 				      GENMASK(15, 0));
 	if (ret < 0)
 		return ret;
 
-	/* Convert to DIRECT format 1A/LSB */
-	ret = DIV_ROUND_CLOSEST(mp2975_reg2data_linear11(ret), 1000);
+	/* Convert to DIRECT format 0.25A/LSB */
+	ret = DIV_ROUND_CLOSEST(mp2975_reg2data_linear11(ret), (1000 * 4));
 	if (ret > 0xffff)
 		return -EOVERFLOW;
 	return ret;
@@ -178,6 +181,9 @@ mp2975_read_phase(struct i2c_client *client, struct mp2975_data *data,
 	 *   value 1kΩ.
 	 */
 	ph_curr = ret * 100 - 9800;
+
+	/* Output format is 0.25A/LSB DIRECT */
+	ph_curr *= 4;
 
 	/*
 	 * Current phase sensing, providing by the device is not accurate
@@ -309,10 +315,6 @@ static int mp2975_read_word_data(struct i2c_client *client, int page,
 		ret = mp2975_read_word_helper(client, page, phase,
 					      MP2975_MFR_READ_IOUT_PK,
 					      GENMASK(12, 0));
-		if (ret < 0)
-			return ret;
-
-		ret = DIV_ROUND_CLOSEST(ret, 4);
 		break;
 	case PMBUS_READ_IOUT:
 		if (phase == 0xff)
@@ -688,7 +690,7 @@ static struct pmbus_driver_info mp2975_info = {
 	.m[PSC_TEMPERATURE] = 1,
 	.m[PSC_VOLTAGE_OUT] = 1,
 	.R[PSC_VOLTAGE_OUT] = 3,
-	.m[PSC_CURRENT_OUT] = 1,
+	.m[PSC_CURRENT_OUT] = 4,
 	.m[PSC_POWER] = 1,
 	.func[0] = PMBUS_HAVE_VIN | PMBUS_HAVE_VOUT | PMBUS_HAVE_STATUS_VOUT |
 		PMBUS_HAVE_IIN | PMBUS_HAVE_IOUT | PMBUS_HAVE_STATUS_IOUT |
