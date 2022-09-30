@@ -291,6 +291,8 @@ static int mp2975_read_word_data(struct i2c_client *client, int page,
 		ret = DIV_ROUND_CLOSEST(ret, MP2975_VIN_UV_LIMIT_UNIT);
 		break;
 	case PMBUS_VOUT_OV_FAULT_LIMIT:
+		if (data->chip_id != mp2975)
+			return -ENXIO;
 		/*
 		 * Register provides two values for over-voltage protection
 		 * threshold for fixed (ovp2) and tracking (ovp1) modes. The
@@ -307,6 +309,8 @@ static int mp2975_read_word_data(struct i2c_client *client, int page,
 			    data->vout_ov_fixed[page]);
 		break;
 	case PMBUS_VOUT_UV_FAULT_LIMIT:
+		if (data->chip_id != mp2975)
+			return -ENXIO;
 		ret = mp2975_read_word_helper(client, page, phase,
 					      MP2975_MFR_UVP_SET,
 					      GENMASK(2, 0));
@@ -333,7 +337,7 @@ static int mp2975_read_word_data(struct i2c_client *client, int page,
 	case PMBUS_READ_IOUT:
 		if (phase == 0xff)
 			ret = mp2975_read_iout(client, page, phase);
-		else
+		else if (data->chip_id == mp2975)
 			ret = mp2975_read_phases(client, data, page, phase);
 		break;
 	case PMBUS_UT_WARN_LIMIT:
@@ -660,6 +664,19 @@ mp2975_vout_per_rail_config_get(struct i2c_client *client,
 		if (ret < 0)
 			return ret;
 
+		/*
+		 * Set VOUT format for READ_VOUT command : direct.
+		 * Pages on same device can be configured with different
+		 * formats.
+		 */
+		ret = mp2975_set_vout_format(client, data, i);
+		if (ret < 0)
+			return ret;
+
+		/* Skip if reading Vref is unsupported */
+		if (data->chip_id != mp2975)
+			continue;
+
 		/* Obtain voltage reference offsets. */
 		ret = mp2975_vref_offset_get(client, data, i);
 		if (ret < 0)
@@ -667,15 +684,6 @@ mp2975_vout_per_rail_config_get(struct i2c_client *client,
 
 		/* Obtain maximum voltage values. */
 		ret = mp2975_vout_max_get(client, data, info, i);
-		if (ret < 0)
-			return ret;
-
-		/*
-		 * Set VOUT format for READ_VOUT command : direct.
-		 * Pages on same device can be configured with different
-		 * formats.
-		 */
-		ret = mp2975_set_vout_format(client, data, i);
 		if (ret < 0)
 			return ret;
 
@@ -736,7 +744,7 @@ static int mp2975_probe(struct i2c_client *client)
 	info = &data->info;
 
 	/* Identify multiphase configuration for rail 2. */
-	ret = mp2975_identify_multiphase_rail2(client);
+	ret = mp2975_identify_multiphase_rail2(client, data);
 	if (ret < 0)
 		return ret;
 
@@ -747,30 +755,32 @@ static int mp2975_probe(struct i2c_client *client)
 		data->info.func[1] = MP2975_RAIL2_FUNC;
 	}
 
-	/* Identify multiphase configuration. */
-	ret = mp2975_identify_multiphase(client, data, info);
-	if (ret)
-		return ret;
+	if (data->chip_id == mp2975) {
+		/* Identify multiphase configuration. */
+		ret = mp2975_identify_multiphase(client, data, info);
+		if (ret)
+			return ret;
 
-	/* Identify VID setting per rail. */
-	ret = mp2975_identify_rails_vid(client, data, info);
-	if (ret < 0)
-		return ret;
+		/* Identify VID setting per rail. */
+		ret = mp2975_identify_rails_vid(client, data, info);
+		if (ret < 0)
+			return ret;
 
-	/* Obtain current sense gain of power stage. */
-	ret = mp2975_current_sense_gain_get(client, data);
-	if (ret)
-		return ret;
+		/* Obtain current sense gain of power stage. */
+		ret = mp2975_current_sense_gain_get(client, data);
+		if (ret)
+			return ret;
 
-	/* Obtain voltage reference values. */
-	ret = mp2975_vref_get(client, data, info);
-	if (ret)
-		return ret;
+		/* Obtain voltage reference values. */
+		ret = mp2975_vref_get(client, data, info);
+		if (ret)
+			return ret;
 
-	/* Obtain vout over-voltage scales. */
-	ret = mp2975_vout_ov_scale_get(client, data, info);
-	if (ret < 0)
-		return ret;
+		/* Obtain vout over-voltage scales. */
+		ret = mp2975_vout_ov_scale_get(client, data, info);
+		if (ret < 0)
+			return ret;
+	}
 
 	/* Obtain offsets, maximum and format for vout. */
 	ret = mp2975_vout_per_rail_config_get(client, data, info);
