@@ -98,6 +98,8 @@ struct mp2975_data {
 };
 
 static const struct i2c_device_id mp2975_id[] = {
+	{"mp2971", mp2971},
+	{"mp2973", mp2973},
 	{"mp2975", mp2975},
 	{}
 };
@@ -833,6 +835,8 @@ static int mp2975_probe(struct i2c_client *client)
 }
 
 static const struct of_device_id __maybe_unused mp2975_of_match[] = {
+	{.compatible = "mps,mp2971", .data = (void *)mp2971},
+	{.compatible = "mps,mp2973", .data = (void *)mp2973},
 	{.compatible = "mps,mp2975", .data = (void *)mp2975},
 	{}
 };
