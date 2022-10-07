@@ -57,6 +57,37 @@
 
 #define PCA954X_IRQ_OFFSET 4
 
+/*
+ * The MAX7357 and MAX7358 have 6 additional registers called enhanced mode
+ * in the following paragraphs. While the MAX7357 exposes those registers
+ * without a special sequence, the MAX7358 requires an unlock sequence.
+ *
+ * The first enhanced mode register called CONF allows to configure
+ * additional features.
+ */
+#define MAX7357_REG_SWITCH				0
+#define MAX7357_REG_CONF				1
+#define  MAX7357_CONF_INT_ENABLE			BIT(0)
+#define  MAX7357_CONF_FLUSH_OUT				BIT(1)
+#define  MAX7357_CONF_RELEASE_INT			BIT(2)
+#define  MAX7357_CONF_LOCK_UP_CLEAR_ON_READ		BIT(3)
+#define  MAX7357_CONF_DISCON_SINGLE_CHAN		BIT(4)
+#define  MAX7357_CONF_BUS_LOCKUP_DETECTION_DISABLE	BIT(5)
+#define  MAX7357_CONF_ENABLE_BASIC_MODE			BIT(6)
+#define  MAX7357_CONF_PRECONNECT_TEST			BIT(7)
+
+/*
+ * On boot the MAX735x behave like a regular MUX. Apply a fixed
+ * default configuration on MAX7357 that:
+ * - disables interrupts
+ * - sents automatically flush-out sequence on locked-up channels
+     when a lock-up condition is detected
+ * - isolates only the locked channel instead of all channels
+ * - doesn't disable bus lock-up detection.
+ */
+#define MAX7357_CONF_DEFAULTS (MAX7357_CONF_FLUSH_OUT | \
+	 MAX7357_CONF_DISCON_SINGLE_CHAN)
+
 enum pca_type {
 	max_7367,
 	max_7368,
@@ -82,6 +113,7 @@ struct chip_desc {
 	u8 nchans;
 	u8 enable;	/* used for muxes only */
 	u8 has_irq;
+	u8 maxim_enhanced_mode;
 	enum muxtype {
 		pca954x_ismux = 0,
 		pca954x_isswi
@@ -113,6 +145,7 @@ static const struct chip_desc chips[] = {
 	[max_7357] = {
 		.nchans = 8,
 		.muxtype = pca954x_isswi,
+		.maxim_enhanced_mode = 1,
 		.id = { .manufacturer_id = I2C_DEVICE_ID_NONE },
 	},
 	[max_7358] = {
@@ -452,6 +485,7 @@ static void pca954x_cleanup(struct i2c_mux_core *muxc)
 
 static int pca954x_init(struct i2c_client *client, struct pca954x *data)
 {
+	struct i2c_adapter *adap = client->adapter;
 	int ret;
 
 	if (data->idle_state >= 0)
@@ -459,7 +493,17 @@ static int pca954x_init(struct i2c_client *client, struct pca954x *data)
 	else
 		data->last_chan = 0; /* Disconnect multiplexer */
 
-	ret = i2c_smbus_write_byte(client, data->last_chan);
+	if (data->chip->maxim_enhanced_mode) {
+		if (i2c_check_functionality(adap, I2C_FUNC_SMBUS_WRITE_BYTE_DATA)) {
+			ret = i2c_smbus_write_byte_data(client, data->last_chan,
+							MAX7357_CONF_DEFAULTS);
+		} else {
+			dev_warn(&client->dev, "Didn't configure enhanced defaults\n");
+			ret = i2c_smbus_write_byte(client, data->last_chan);
+		}
+	} else {
+		ret = i2c_smbus_write_byte(client, data->last_chan);
+	}
 	if (ret < 0)
 		data->last_chan = 0;
 
