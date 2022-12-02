@@ -30,6 +30,8 @@
 #define DRIVER_AUTHOR   "Alex Williamson <alex.williamson@redhat.com>"
 #define DRIVER_DESC     "VFIO PCI - User Level meta-driver"
 
+extern int vfio_tgl_quirks(struct pci_dev *pdev, const struct pci_device_id *id);
+
 static char ids[1024] __initdata;
 module_param_string(ids, ids, sizeof(ids), 0);
 MODULE_PARM_DESC(ids, "Initial PCI IDs to add to the vfio driver, format is \"vendor:device[:subvendor[:subdevice[:class[:class_mask]]]]\" and multiple comma separated entries can be specified");
@@ -98,6 +100,31 @@ static bool vfio_pci_is_denylisted(struct pci_dev *pdev)
 	return true;
 }
 
+static bool vfio_pci_is_intel_tgl(struct pci_dev *pdev)
+{
+	switch (pdev->vendor) {
+	case PCI_VENDOR_ID_INTEL:
+		switch (pdev->device) {
+			case PCI_DEVICE_ID_INTEL_TGL_GT1_0:
+			case PCI_DEVICE_ID_INTEL_TGL_GT1_1:
+			case PCI_DEVICE_ID_INTEL_TGL_GT1_2:
+			case PCI_DEVICE_ID_INTEL_TGL_GT2_0:
+			case PCI_DEVICE_ID_INTEL_TGL_GT2_1:
+			case PCI_DEVICE_ID_INTEL_TGL_GT2_2:
+			case PCI_DEVICE_ID_INTEL_TGL_GT2_3:
+			case PCI_DEVICE_ID_INTEL_TGL_GT2_4:
+			case PCI_DEVICE_ID_INTEL_TGL_GT2_5:
+			case PCI_DEVICE_ID_INTEL_TGL_GT2_6:
+			case PCI_DEVICE_ID_INTEL_TGL_GT2_7:
+			return true;
+		default:
+			return false;
+		}
+	}
+
+	return false;
+}
+
 static int vfio_pci_open_device(struct vfio_device *core_vdev)
 {
 	struct vfio_pci_core_device *vdev =
@@ -150,6 +177,15 @@ static int vfio_pci_probe(struct pci_dev *pdev, const struct pci_device_id *id)
 	if (!vdev)
 		return -ENOMEM;
 	vfio_pci_core_init_device(vdev, pdev, &vfio_pci_ops);
+
+	// Intel Gen11 Tiger Lake quirks
+	if (vfio_pci_is_intel_tgl(pdev)) {
+		pci_warn(pdev, "device %04x:%04x is Intel Tiger Lake GPU\n",
+			 pdev->vendor, pdev->device);
+		ret = vfio_tgl_quirks(pdev, id);
+		if (ret)
+			return ret;
+	}
 
 	dev_set_drvdata(&pdev->dev, vdev);
 	ret = vfio_pci_core_register_device(vdev);
