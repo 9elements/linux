@@ -546,7 +546,7 @@ static int vfio_pci_igd_dsm_init(struct vfio_pci_core_device *vdev)
 	dsm_base = intel_graphics_stolen_res.start & ~((1024 * 1024) - 1); /* 1MB aligned */
 	dsm_size = gen9_get_stolen_size(gmch);
 
-	ret = vfio_pci_register_dev_region(vdev,
+	ret = vfio_pci_core_register_dev_region(vdev,
 		PCI_VENDOR_ID_INTEL | VFIO_REGION_TYPE_PCI_VENDOR_TYPE,
 		VFIO_REGION_SUBTYPE_INTEL_IGD_DSM,
 		&vfio_pci_igd_dsm_regops, dsm_size,
