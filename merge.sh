@@ -1,6 +1,6 @@
 #!/bin/bash
 
-PREFIX="origin/dev-5.15"
+PREFIX="origin/dev-6.0"
 LOCAL_PREFIX=$(echo ${PREFIX}|sed "s|origin/||")
 
 if [ -d ".git/sequencer" ]; then
