@@ -3381,6 +3381,7 @@
 								// 2msec for regulator + 18msec for board capacitance
 								// Note: Every IC has a PTC which slowly charges the bypass cap.
 								regulator-enable-ramp-delay = <200000>;
+								regulator-boot-on;
 							};
 						};
 					};
