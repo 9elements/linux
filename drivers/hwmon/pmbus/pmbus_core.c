@@ -3372,7 +3372,6 @@ static int pmbus_regulator_register(struct i2c_client *client, struct pmbus_data
 	struct device *dev = &client->dev;
 	const struct pmbus_driver_info *info = data->info;
 	const struct pmbus_platform_data *pdata = dev_get_platdata(dev);
-	struct regulator_desc *desc;
 	struct regulator_dev **rdevs;
 	struct regulator_irq_desc pmbus_notif = {
 		.name = "pmbus-irq",
@@ -3401,11 +3400,6 @@ static int pmbus_regulator_register(struct i2c_client *client, struct pmbus_data
 			return dev_err_probe(dev, PTR_ERR(rdevs[i]),
 					     "Failed to register %s regulator\n",
 					     info->reg_desc[i].name);
-
-		if (data->info->func[i] & PMBUS_HAVE_PGOOD)
-			desc->poll_enabled_time = 10000;
-		dev_err(dev, "desc->poll_enabled_time = %d\n",
-				desc->poll_enabled_time);
 
 	}
 
