@@ -3076,6 +3076,7 @@ static int pmbus_regulator_get_status(struct regulator_dev *rdev)
 
 	mutex_lock(&data->update_lock);
 	status = pmbus_get_status(client, page, PMBUS_STATUS_WORD);
+	mutex_unlock(&data->update_lock);
 	if (status < 0) {
 		ret = status;
 		goto unlock;
