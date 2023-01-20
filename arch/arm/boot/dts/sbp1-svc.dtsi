@@ -60,6 +60,39 @@
 				/* GPORT5*/
 					"LED_ID_M2_SSD2", "LED_ID_M2_SSD1",
 					"PLUG_DETECT_M2_SSD_CARRIER2","M2_SSD2_SSB_ALERT_N";
+
+				pinctrl-0 = <&U62120_pins>;
+				pinctrl-names = "default";
+				U62120_pins: pin-cfg {
+					input {
+						pins = "gp01", "gp02", "gp03", "gp04", "gp05",
+						"gp06", "gp07", "gp10", "gp11", "gp12", "gp13",
+						"gp15", "gp23", "gp40", "gp44";
+						function = "gpio";
+						input-enable;
+					};
+					input_pullup {
+						pins = "gp00", "gp16", "gp30", "gp31", "gp37",
+						"gp41", "gp42", "gp43", "gp45", "gp52", "gp53";
+						function = "gpio";
+						input-enable;
+						bias-pull-up;
+					};
+					out-low {
+						pins = "gp17", "gp36";
+						function = "gpio";
+						output-enable;
+						output-low;
+					};
+					out-high {
+						pins = "gp14", "gp20", "gp21", "gp22", "gp32",
+						"gp33", "gp34", "gp35", "gp46", "gp47", "gp50",
+						"gp51";
+						function = "gpio";
+						output-enable;
+						output-high;
+					};
+				};
 			};
 		};
 		i2c@1 { // BMC_PEX_IRQ
@@ -99,6 +132,23 @@
 				"SMB_MUX_SSB_FANGRP0_RST_INT_N", "PEX_FAN_ALERT_RST",
 				"PEX_RSSD01_16_RST", "PEX_RSSD17_32_RST";
 
+				pinctrl-0 = <&U60000_pins>;
+				pinctrl-names = "default";
+				U60000_pins: pin-cfg {
+					input {
+						pins = "gp00", "gp01", "gp02", "gp03", "gp04",
+						"gp05", "gp06", "gp07", "gp10", "gp11", "gp12",
+						"gp13", "gp14", "gp15", "gp16", "gp17", "gp20";
+						function = "gpio";
+						input-enable;
+					};
+					out-high {
+						pins = "gp21", "gp22", "gp23";
+						function = "gpio";
+						output-enable;
+						output-high;
+					};
+				};
 			};
 		};
 		i2c@2 { // BMC_MUX_SVC_RSSD
@@ -175,7 +225,36 @@
 						"SSB_RSSD13_ALERT_N", "SSB_RSSD14_ALERT_N",
 						"SSB_RSSD15_ALERT_N", "SSB_RSSD16_ALERT_N";
 
-
+						pinctrl-0 = <&U65200_pins>;
+						pinctrl-names = "default";
+						U65200_pins: pin-cfg {
+							input_pullup {
+								pins = "gp20", "gp21", "gp22",
+								"gp23", "gp30", "gp31", "gp32",
+								"gp33", "gp34", "gp35", "gp36",
+								"gp37", "gp40", "gp41", "gp42",
+								"gp43", "gp52", "gp53", "gp54",
+								"gp55", "gp56", "gp57", "gp60",
+								"gp61", "gp62", "gp63", "gp64",
+								"gp65", "gp66", "gp67", "gp70",
+								"gp71", "gp72", "gp73", "gp74",
+								"gp75", "gp76", "gp77";
+								function = "gpio";
+								input-enable;
+								bias-pull-up;
+							};
+							out-high {
+								pins = "gp00", "gp01", "gp02",
+								"gp03", "gp04", "gp05", "gp06",
+								"gp07", "gp10", "gp11", "gp12",
+								"gp13", "gp14", "gp15", "gp16",
+								"gp17", "gp44", "gp45", "gp46",
+								"gp47", "gp50", "gp51";
+								function = "gpio";
+								output-enable;
+								output-high;
+							};
+						};
 					};
 				};
 				i2c@1 { // SMB_SVC_PEX_RSSD17_32
@@ -238,6 +317,37 @@
 						"SSB_RSSD27_ALERT_N", "SSB_RSSD28_ALERT_N",
 						"SSB_RSSD29_ALERT_N", "SSB_RSSD30_ALERT_N",
 						"SSB_RSSD31_ALERT_N", "SSB_RSSD32_ALERT_N";
+
+						pinctrl-0 = <&U65300_pins>;
+						pinctrl-names = "default";
+						U65300_pins: pin-cfg {
+							input_pullup {
+								pins = "gp20", "gp21", "gp22",
+								"gp23", "gp30", "gp31", "gp32",
+								"gp33", "gp34", "gp35", "gp36",
+								"gp37", "gp40", "gp41", "gp42",
+								"gp43", "gp52", "gp53", "gp54",
+								"gp55", "gp56", "gp57", "gp60",
+								"gp61", "gp62", "gp63", "gp64",
+								"gp65", "gp66", "gp67", "gp70",
+								"gp71", "gp72", "gp73", "gp74",
+								"gp75", "gp76", "gp77";
+								function = "gpio";
+								input-enable;
+								bias-pull-up;
+							};
+							out-high {
+								pins = "gp00", "gp01", "gp02",
+								"gp03", "gp04", "gp05", "gp06",
+								"gp07", "gp10", "gp11", "gp12",
+								"gp13", "gp14", "gp15", "gp16",
+								"gp17", "gp44", "gp45", "gp46",
+								"gp47", "gp50", "gp51";
+								function = "gpio";
+								output-enable;
+								output-high;
+							};
+						};
 					};
 				};
 
@@ -291,6 +401,30 @@
 						/* GPORT5*/
 						"", "",
 						"FM_CPU1_SKTOCC_N", "LED_ID_CPU1";
+
+						pinctrl-0 = <&U65500_pins>;
+						pinctrl-names = "default";
+						U65500_pins: pin-cfg {
+							input {
+								pins = "gp00", "gp01", "gp02",
+								"gp03", "gp04", "gp05", "gp06",
+								"gp07", "gp10", "gp11", "gp12",
+								"gp13", "gp14", "gp15", "gp16",
+								"gp17", "gp52";
+								function = "gpio";
+								input-enable;
+							};
+							out-high {
+								pins = "gp20", "gp21", "gp30",
+								"gp31", "gp32", "gp33", "gp34",
+								"gp35", "gp36", "gp37", "gp40",
+								"gp41", "gp42", "gp43", "gp44",
+								"gp45", "gp46", "gp47", "gp53";
+								function = "gpio";
+								output-enable;
+								output-high;
+							};
+						};
 					};
 				};
 				
@@ -356,7 +490,30 @@
 						"", "",
 						"", "",
 						"", "",
-						"", "";  
+						"", "";
+
+						pinctrl-0 = <&U65600_pins>;
+						pinctrl-names = "default";
+						U65600_pins: pin-cfg {
+							input_pullup {
+								pins = "gp00", "gp01", "gp02",
+								"gp03", "gp04", "gp05", "gp06",
+								"gp07", "gp10", "gp11", "gp12",
+								"gp13", "gp14", "gp15", "gp16",
+								"gp17", "gp20", "gp21", "gp22",
+								"gp23", "gp30", "gp31", "gp32",
+								"gp33", "gp37", "gp40", "gp41",
+								"gp42", "gp43", "gp44", "gp45",
+								"gp46", "gp47", "gp50", "gp51",
+								"gp52", "gp53", "gp54", "gp55",
+								"gp56", "gp57", "gp60", "gp61",
+								"gp62", "gp63", "gp64", "gp65",
+								"gp66";
+								function = "gpio";
+								input-enable;
+								bias-pull-up;
+							};
+						};
 					};
 				};
 				i2c@4 { // SMB_SVC_PEX_CPU2_LED
@@ -409,6 +566,30 @@
 						/* GPORT5*/
 						"", "",
 						"FM_CPU2_SKTOCC_N", "LED_ID_CPU2";
+
+						pinctrl-0 = <&U65800_pins>;
+						pinctrl-names = "default";
+						U65800_pins: pin-cfg {
+							input {
+								pins = "gp00", "gp01", "gp02",
+								"gp03", "gp04", "gp05", "gp06",
+								"gp07", "gp10", "gp11", "gp12",
+								"gp13", "gp14", "gp15", "gp16",
+								"gp17", "gp52";
+								function = "gpio";
+								input-enable;
+							};
+							out-high {
+								pins = "gp20", "gp30", "gp31",
+								"gp32", "gp33", "gp34", "gp35",
+								"gp36", "gp37", "gp40", "gp41",
+								"gp42", "gp43", "gp44", "gp45",
+								"gp46", "gp47", "gp53";
+								function = "gpio";
+								output-enable;
+								output-high;
+							};
+						};
 					};
 				};
 				i2c@5 { // SMB_SVC_PEX_CPU3_LED
@@ -462,6 +643,31 @@
 						/* GPORT5*/
 						"LED_PWR_DWR_FRNT", "LED_ID_DWR_FRNT_P",
 						"FM_CPU3_SKTOCC_N", "LED_ID_CPU3";
+
+						pinctrl-0 = <&U65900_pins>;
+						pinctrl-names = "default";
+						U65900_pins: pin-cfg {
+							input {
+								pins = "gp00", "gp01", "gp02",
+								"gp03", "gp04", "gp05", "gp06",
+								"gp07", "gp10", "gp11", "gp12",
+								"gp13", "gp14", "gp15", "gp16",
+								"gp17", "gp52";
+								function = "gpio";
+								input-enable;
+							};
+							out-high {
+								pins = "gp20", "gp30", "gp31",
+								"gp32", "gp33", "gp34", "gp35",
+								"gp36", "gp37", "gp40", "gp41",
+								"gp42", "gp43", "gp44", "gp45",
+								"gp46", "gp47", "gp50", "gp51",
+								"gp53";
+								function = "gpio";
+								output-enable;
+								output-high;
+							};
+						};
 					};
 				};
 				i2c@6 { // SMB_SVC_PEX_CPU0_LED
@@ -515,6 +721,31 @@
 						/* GPORT5*/
 						"", "",
 						"FM_CPU0_SKTOCC_N", "LED_ID_CPU0";
+
+						pinctrl-0 = <&U65400_pins>;
+						pinctrl-names = "default";
+						U65400_pins: pin-cfg {
+							input {
+								pins = "gp00", "gp01", "gp02",
+								"gp03", "gp04", "gp05", "gp06",
+								"gp07", "gp10", "gp11", "gp12",
+								"gp13", "gp14", "gp15", "gp16",
+								"gp17", "gp52";
+								function = "gpio";
+								input-enable;
+							};
+							out-high {
+								pins = "gp20", "gp21", "gp30",
+								"gp31", "gp32", "gp33", "gp34",
+								"gp35", "gp36", "gp37", "gp40",
+								"gp41", "gp42", "gp43",
+								"gp44", "gp45", "gp46",
+								"gp47", "gp53";
+								function = "gpio";
+								output-enable;
+								output-high;
+							};
+						};
 					};
 				};
 			};

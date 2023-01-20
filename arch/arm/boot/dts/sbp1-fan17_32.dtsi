@@ -139,7 +139,30 @@
 				"", "",
 				"", "",
 				"", "",
-				"", "";  
+				"", "";
+
+				pinctrl-0 = <&U62140_pins>;
+				pinctrl-names = "default";
+				U62140_pins: pin-cfg {
+					input {
+						pins = "gp20", "gp21", "gp22", "gp23", "gp30",
+						"gp31", "gp32", "gp33", "gp34", "gp35", "gp36",
+						"gp37", "gp40", "gp41", "gp42", "gp43", "gp44",
+						"gp45", "gp46", "gp47", "gp50", "gp51", "gp52",
+						"gp53", "gp54", "gp55", "gp56", "gp57", "gp60",
+						"gp61", "gp62", "gp63";
+						function = "gpio";
+						input-enable;
+					};
+					out-high {
+						pins = "gp00", "gp01", "gp02", "gp03", "gp04",
+						"gp05", "gp06", "gp07", "gp10", "gp11", "gp12",
+						"gp13", "gp14", "gp15", "gp16", "gp17";
+						function = "gpio";
+						output-enable;
+						output-high;
+					};
+				};
 			};
 		};
 		i2c@6 { // SMB_MUX_RSSD17_24
