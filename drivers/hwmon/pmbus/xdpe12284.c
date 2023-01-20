@@ -139,10 +139,12 @@ static struct pmbus_driver_info xdpe122_info = {
 	.func[0] = PMBUS_HAVE_VIN | PMBUS_HAVE_VOUT | PMBUS_HAVE_STATUS_VOUT |
 		PMBUS_HAVE_IIN | PMBUS_HAVE_IOUT | PMBUS_HAVE_STATUS_IOUT |
 		PMBUS_HAVE_TEMP | PMBUS_HAVE_STATUS_TEMP |
+		PMBUS_HAVE_PGOOD |
 		PMBUS_HAVE_POUT | PMBUS_HAVE_PIN | PMBUS_HAVE_STATUS_INPUT,
 	.func[1] = PMBUS_HAVE_VIN | PMBUS_HAVE_VOUT | PMBUS_HAVE_STATUS_VOUT |
 		PMBUS_HAVE_IIN | PMBUS_HAVE_IOUT | PMBUS_HAVE_STATUS_IOUT |
 		PMBUS_HAVE_TEMP | PMBUS_HAVE_STATUS_TEMP |
+		PMBUS_HAVE_PGOOD |
 		PMBUS_HAVE_POUT | PMBUS_HAVE_PIN | PMBUS_HAVE_STATUS_INPUT,
 	.identify = xdpe122_identify,
 #if IS_ENABLED(CONFIG_SENSORS_XDPE122_REGULATOR)
@@ -167,6 +169,7 @@ static const struct i2c_device_id xdpe122_id[] = {
 	{"xdpe11280", 0},
 	{"xdpe12254", 0},
 	{"xdpe12284", 0},
+	{"xdpe15284", 0},
 	{}
 };
 
@@ -176,6 +179,7 @@ static const struct of_device_id __maybe_unused xdpe122_of_match[] = {
 	{.compatible = "infineon,xdpe11280"},
 	{.compatible = "infineon,xdpe12254"},
 	{.compatible = "infineon,xdpe12284"},
+	{.compatible = "infineon,xdpe15284"},
 	{}
 };
 MODULE_DEVICE_TABLE(of, xdpe122_of_match);
