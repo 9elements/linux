@@ -548,14 +548,8 @@ static int cy8c95x0_gpio_direction_output(struct gpio_chip *gc,
 {
 	struct cy8c95x0_pinctrl *chip = gpiochip_get_data(gc);
 	u8 port = cypress_get_port(chip, off);
-	u8 outreg = CY8C95X0_OUTPUT_(port);
 	u8 bit = cypress_get_pin_mask(chip, off);
 	int ret;
-
-	/* set output level */
-	ret = regmap_write_bits(chip->regmap, outreg, bit, val ? bit : 0);
-	if (ret)
-		return ret;
 
 	mutex_lock(&chip->i2c_lock);
 	/* select port */
@@ -785,6 +779,10 @@ static int cy8c95x0_gpio_set_config(struct gpio_chip *gc, unsigned int offset,
 	case PIN_CONFIG_INPUT_ENABLE:
 		return cy8c95x0_gpio_direction_input(gc, offset);
 	case PIN_CONFIG_OUTPUT:
+		cy8c95x0_gpio_set_value(gc, offset, arg);
+		return cy8c95x0_gpio_direction_output(gc, offset, arg);
+
+	case PIN_CONFIG_OUTPUT_ENABLE:
 		return cy8c95x0_gpio_direction_output(gc, offset, arg);
 	case PIN_CONFIG_MODE_PWM:
 	case PIN_CONFIG_BIAS_PULL_UP:
@@ -1121,7 +1119,7 @@ static int cy8c95x0_pinconf_set(struct pinctrl_dev *pctldev, unsigned int pin,
 		return -EINVAL;
 
 	for (i = 0; i < num_configs; i++) {
-		ret = cy8c95x0_gpio_set_pincfg(chip, pin, configs[i]);
+		ret = cy8c95x0_gpio_set_config(&chip->gpio_chip, pin, configs[i]);
 		if (ret)
 			return ret;
 	}
