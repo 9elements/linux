@@ -2347,6 +2347,26 @@ struct tb_switch *tb_switch_alloc(struct tb *tb, struct device *parent,
 	if (ret)
 		goto err_free_sw_ports;
 
+	/* The Dell WD19TB dock causes problems on Alder Lake when the DP tunnel
+	 * is created by the boot firmware, e.g. a QEMU Windows guest with Intel
+	 * GPU passthrough is sometimes unable to activate an external monitor
+	 * without a Thunderbolt hotplug. To mitigate this problem, do a switch
+	 * reset if it is already enabled, and abort the switch initialization.
+	 * This should cause a new hotplug event to initialize that device
+	 * correctly.
+	 */
+
+	if (sw->config.enabled && sw->config.vendor_id == PCI_VENDOR_ID_INTEL &&
+			sw->config.device_id == 0x15ef &&
+			tb->nhi->pdev->vendor == PCI_VENDOR_ID_INTEL &&
+			(tb->nhi->pdev->device == PCI_DEVICE_ID_INTEL_ADL_NHI0 ||
+			 tb->nhi->pdev->device == PCI_DEVICE_ID_INTEL_ADL_NHI1)) {
+		tb_info(tb, "reset Dell WD19TB switch\n");
+		tb_switch_reset(sw);
+		ret = -ENODEV;
+		goto err_free_sw_ports;
+	}
+
 	sw->generation = tb_switch_get_generation(sw);
 
 	tb_dbg(tb, "current switch config:\n");
