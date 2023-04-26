@@ -148,7 +148,7 @@
 		};
 		id_dimm_k0 {
 			label = "LED_ID_DIMM_K0";
-			gpios = <&smb_svc_pex_cpu12_led 39 GPIO_ACTIVE_LOW>;
+			gpios = <&smb_svc_pex_cpu12_led 40 GPIO_ACTIVE_LOW>;
 		};
 		id_dimm_k1 {
 			label = "LED_ID_DIMM_K1";
@@ -204,7 +204,7 @@
 		};
 		id_dimm_s0 {
 			label = "LED_ID_DIMM_S0";
-			gpios = <&smb_svc_pex_cpu12_led 42 GPIO_ACTIVE_LOW>;
+			gpios = <&smb_svc_pex_cpu12_led 43 GPIO_ACTIVE_LOW>;
 		};
 		id_dimm_s1 {
 			label = "LED_ID_DIMM_S1";
@@ -265,6 +265,135 @@
 		id_dimm_z1 {
 			label = "LED_ID_DIMM_Z1";
 			gpios = <&smb_svc_pex_cpu03_led 59 GPIO_ACTIVE_LOW>;
+		};
+
+		id_rssd_01 {
+			label = "LED_ID_RSSD01";
+			gpios = <&smb_svc_pex_rssd01_16 0 GPIO_ACTIVE_LOW>;
+		};
+		id_rssd_02 {
+			label = "LED_ID_RSSD02";
+			gpios = <&smb_svc_pex_rssd01_16 1 GPIO_ACTIVE_LOW>;
+		};
+		id_rssd_03 {
+			label = "LED_ID_RSSD03";
+			gpios = <&smb_svc_pex_rssd01_16 2 GPIO_ACTIVE_LOW>;
+		};
+		id_rssd_04 {
+			label = "LED_ID_RSSD04";
+			gpios = <&smb_svc_pex_rssd01_16 3 GPIO_ACTIVE_LOW>;
+		};
+		id_rssd_05 {
+			label = "LED_ID_RSSD05";
+			gpios = <&smb_svc_pex_rssd01_16 4 GPIO_ACTIVE_LOW>;
+		};
+		id_rssd_06 {
+			label = "LED_ID_RSSD06";
+			gpios = <&smb_svc_pex_rssd01_16 5 GPIO_ACTIVE_LOW>;
+		};
+		id_rssd_07 {
+			label = "LED_ID_RSSD07";
+			gpios = <&smb_svc_pex_rssd01_16 6 GPIO_ACTIVE_LOW>;
+		};
+		id_rssd_08 {
+			label = "LED_ID_RSSD08";
+			gpios = <&smb_svc_pex_rssd01_16 7 GPIO_ACTIVE_LOW>;
+		};
+		id_rssd_09 {
+			label = "LED_ID_RSSD09";
+			gpios = <&smb_svc_pex_rssd01_16 8 GPIO_ACTIVE_LOW>;
+		};
+		id_rssd_10 {
+			label = "LED_ID_RSSD10";
+			gpios = <&smb_svc_pex_rssd01_16 9 GPIO_ACTIVE_LOW>;
+		};
+		id_rssd_11 {
+			label = "LED_ID_RSSD11";
+			gpios = <&smb_svc_pex_rssd01_16 10 GPIO_ACTIVE_LOW>;
+		};
+		id_rssd_12 {
+			label = "LED_ID_RSSD12";
+			gpios = <&smb_svc_pex_rssd01_16 11 GPIO_ACTIVE_LOW>;
+		};
+		id_rssd_13 {
+			label = "LED_ID_RSSD13";
+			gpios = <&smb_svc_pex_rssd01_16 12 GPIO_ACTIVE_LOW>;
+		};
+		id_rssd_14 {
+			label = "LED_ID_RSSD14";
+			gpios = <&smb_svc_pex_rssd01_16 13 GPIO_ACTIVE_LOW>;
+		};
+		id_rssd_15 {
+			label = "LED_ID_RSSD15";
+			gpios = <&smb_svc_pex_rssd01_16 14 GPIO_ACTIVE_LOW>;
+		};
+		id_rssd_16 {
+			label = "LED_ID_RSSD16";
+			gpios = <&smb_svc_pex_rssd01_16 15 GPIO_ACTIVE_LOW>;
+		};
+		id_rssd_17 {
+			label = "LED_ID_RSSD17";
+			gpios = <&smb_svc_pex_rssd17_32 0 GPIO_ACTIVE_LOW>;
+		};
+		id_rssd_18 {
+			label = "LED_ID_RSSD18";
+			gpios = <&smb_svc_pex_rssd17_32 1 GPIO_ACTIVE_LOW>;
+		};
+		id_rssd_19 {
+			label = "LED_ID_RSSD19";
+			gpios = <&smb_svc_pex_rssd17_32 2 GPIO_ACTIVE_LOW>;
+		};
+		id_rssd_20 {
+			label = "LED_ID_RSSD20";
+			gpios = <&smb_svc_pex_rssd17_32 3 GPIO_ACTIVE_LOW>;
+		};
+		id_rssd_21 {
+			label = "LED_ID_RSSD21";
+			gpios = <&smb_svc_pex_rssd17_32 4 GPIO_ACTIVE_LOW>;
+		};
+		id_rssd_22 {
+			label = "LED_ID_RSSD22";
+			gpios = <&smb_svc_pex_rssd17_32 5 GPIO_ACTIVE_LOW>;
+		};
+		id_rssd_23 {
+			label = "LED_ID_RSSD23";
+			gpios = <&smb_svc_pex_rssd17_32 6 GPIO_ACTIVE_LOW>;
+		};
+		id_rssd_24 {
+			label = "LED_ID_RSSD24";
+			gpios = <&smb_svc_pex_rssd17_32 7 GPIO_ACTIVE_LOW>;
+		};
+		id_rssd_25 {
+			label = "LED_ID_RSSD25";
+			gpios = <&smb_svc_pex_rssd17_32 8 GPIO_ACTIVE_LOW>;
+		};
+		id_rssd_26 {
+			label = "LED_ID_RSSD26";
+			gpios = <&smb_svc_pex_rssd17_32 9 GPIO_ACTIVE_LOW>;
+		};
+		id_rssd_27 {
+			label = "LED_ID_RSSD27";
+			gpios = <&smb_svc_pex_rssd17_32 10 GPIO_ACTIVE_LOW>;
+		};
+		id_rssd_28 {
+			label = "LED_ID_RSSD28";
+			gpios = <&smb_svc_pex_rssd17_32 11 GPIO_ACTIVE_LOW>;
+		};
+		id_rssd_29 {
+			label = "LED_ID_RSSD29";
+			gpios = <&smb_svc_pex_rssd17_32 12 GPIO_ACTIVE_LOW>;
+		};
+		id_rssd_30 {
+			label = "LED_ID_RSSD30";
+			gpios = <&smb_svc_pex_rssd17_32 13 GPIO_ACTIVE_LOW>;
+		};
+		id_rssd_31 {
+			label = "LED_ID_RSSD31";
+			gpios = <&smb_svc_pex_rssd17_32 14 GPIO_ACTIVE_LOW>;
+		};
+		id_rssd_32 {
+			label = "LED_ID_RSSD32";
+			gpios = <&smb_svc_pex_rssd17_32 15 GPIO_ACTIVE_LOW>;
 		};
 	};
 
