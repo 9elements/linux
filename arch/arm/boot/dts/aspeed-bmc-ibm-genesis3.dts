@@ -148,7 +148,7 @@
 		};
 		id_dimm_k0 {
 			label = "LED_ID_DIMM_K0";
-			gpios = <&smb_svc_pex_cpu12_led 40 GPIO_ACTIVE_LOW>;
+			gpios = <&smb_svc_pex_cpu12_led 39 GPIO_ACTIVE_LOW>;
 		};
 		id_dimm_k1 {
 			label = "LED_ID_DIMM_K1";
