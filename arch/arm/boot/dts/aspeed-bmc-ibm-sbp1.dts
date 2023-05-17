@@ -1521,6 +1521,8 @@
 		m25p,fast-read;
 		label = "bmc";
 		spi-max-frequency = <50000000>;
+		spi-tx-bus-width = <4>;
+		spi-rx-bus-width = <4>;
 #include "openbmc-flash-layout-64.dtsi"
 	};
 
@@ -1529,6 +1531,8 @@
 		m25p,fast-read;
 		label = "alt-bmc";
 		spi-max-frequency = <50000000>;
+		spi-tx-bus-width = <4>;
+		spi-rx-bus-width = <4>;
 #include "openbmc-flash-layout-64-alt.dtsi"
 	};
 };
@@ -1677,7 +1681,7 @@
 };
 
 // SDA2 BMC_MUX_NIC
-#include "sbp1-nic.dtsi"
+#include "aspeed-bmc-ibm-sbp1-nic.dtsi"
 
 &i2c2 { // SMB_VR_P3V3_BMC_AUX, MAX77813
 	status = "okay";
@@ -1811,28 +1815,28 @@
 };
 
 // SDA6 BMC_MUX_VR_PCH_CPU
-#include "sbp1-pch.dtsi"
+#include "aspeed-bmc-ibm-sbp1-pch.dtsi"
 
 // SDA11 BMC_MUX_CPU0
-#include "sbp1-cpu0.dtsi"
+#include "aspeed-bmc-ibm-sbp1-cpu0.dtsi"
 
 // SDA8 BMC_MUX_CPU1
-#include "sbp1-cpu1.dtsi"
+#include "aspeed-bmc-ibm-sbp1-cpu1.dtsi"
 
 // SDA7 BMC_MUX_CPU2
-#include "sbp1-cpu2.dtsi"
+#include "aspeed-bmc-ibm-sbp1-cpu2.dtsi"
 
 // SDA13 BMC_MUX_CPU3
-#include "sbp1-cpu3.dtsi"
+#include "aspeed-bmc-ibm-sbp1-cpu3.dtsi"
 
 // SDA9 BMC_MUX_FANSSB_RSSD17_32
-#include "sbp1-fan17_32.dtsi"
+#include "aspeed-bmc-ibm-sbp1-fan17_32.dtsi"
 
 // SDA12 BMC_MUX_FANSSB_RSSD01_16
-#include "sbp1-fan01_16.dtsi"
+#include "aspeed-bmc-ibm-sbp1-fan01_16.dtsi"
 
 // SDA14 BMC_MUX_SVC_EXP
-#include "sbp1-svc.dtsi"
+#include "aspeed-bmc-ibm-sbp1-svc.dtsi"
 
 // SDA10 
 &i2c9 { // SMB_VR_P1V2_BMC_AUX
@@ -1850,18 +1854,8 @@
 	};
 };
 
-
-
-
 // Fan regulator/pwm
-#include "sbp1-fanmux.dtsi"
+#include "aspeed-bmc-ibm-sbp1-fanmux.dtsi"
 
 // SSD
-#include "sbp1-ssd.dtsi"
-
-
-
-
-
-
-
+#include "aspeed-bmc-ibm-sbp1-ssd.dtsi"
