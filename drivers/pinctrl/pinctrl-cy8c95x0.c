@@ -726,6 +726,8 @@ static int cy8c95x0_gpio_set_pincfg(struct cy8c95x0_pinctrl *chip,
 	u8 port = cypress_get_port(chip, off);
 	u8 bit = cypress_get_pin_mask(chip, off);
 	unsigned long param = pinconf_to_config_param(config);
+	unsigned long arg = pinconf_to_config_argument(config);
+	u8 outreg = CY8C95X0_OUTPUT_(port);
 	unsigned int reg;
 	int ret;
 
@@ -735,6 +737,15 @@ static int cy8c95x0_gpio_set_pincfg(struct cy8c95x0_pinctrl *chip,
 	ret = regmap_write(chip->regmap, CY8C95X0_PORTSEL, port);
 	if (ret < 0)
 		goto out;
+
+	if (param == PIN_CONFIG_OUTPUT) {
+		/* Set output level */
+		ret = regmap_write_bits(chip->regmap, outreg, bit, arg ? bit : 0);
+		if (ret)
+			goto out;
+		param = PIN_CONFIG_OUTPUT_ENABLE;
+		val = 1;
+	}
 
 	switch (param) {
 	case PIN_CONFIG_BIAS_PULL_UP:
@@ -763,6 +774,21 @@ static int cy8c95x0_gpio_set_pincfg(struct cy8c95x0_pinctrl *chip,
 		break;
 	case PIN_CONFIG_MODE_PWM:
 		reg = CY8C95X0_PWMSEL;
+		break;
+	case PIN_CONFIG_OUTPUT_ENABLE:
+		ret = regmap_write_bits(chip->regmap, CY8C95X0_DIRECTION, bit, arg ? bit : 0);
+		if (ret)
+			goto out;
+
+		if (!test_bit(off, chip->push_pull) && arg) {
+			reg = CY8C95X0_DRV_PP_FAST;
+			__set_bit(off, chip->push_pull);
+		} else if (test_bit(off, chip->push_pull) && !arg) {
+			reg = CY8C95X0_DRV_HIZ;
+			__clear_bit(off, chip->push_pull);
+		} else {
+			goto out;
+		}
 		break;
 	default:
 		ret = -ENOTSUPP;
@@ -1151,50 +1177,15 @@ static int cy8c95x0_gpio_request_enable(struct pinctrl_dev *pctldev,
 	return ret;
 }
 
-static int cy8c95x0_pinmux_direction(struct cy8c95x0_pinctrl *chip,
-				     unsigned int pin, bool input)
-{
-	u8 port = cypress_get_port(chip, pin);
-	u8 bit = cypress_get_pin_mask(chip, pin);
-	int ret;
-
-	/* Select port... */
-	ret = regmap_write(chip->regmap, CY8C95X0_PORTSEL, port);
-	if (ret)
-		return ret;
-
-	/* ...then direction */
-	ret = regmap_write_bits(chip->regmap, CY8C95X0_DIRECTION, bit, input ? bit : 0);
-	if (ret)
-		return ret;
-
-	/*
-	 * Disable driving the pin by forcing it to HighZ. Only setting
-	 * the direction register isn't sufficient in Push-Pull mode.
-	 */
-	if (input && test_bit(pin, chip->push_pull)) {
-		ret = regmap_write_bits(chip->regmap, CY8C95X0_DRV_HIZ, bit, bit);
-		if (ret)
-			return ret;
-
-		__clear_bit(pin, chip->push_pull);
-	}
-
-	return 0;
-}
-
 static int cy8c95x0_gpio_set_direction(struct pinctrl_dev *pctldev,
 				       struct pinctrl_gpio_range *range,
 				       unsigned int pin, bool input)
 {
 	struct cy8c95x0_pinctrl *chip = pinctrl_dev_get_drvdata(pctldev);
-	int ret;
+	unsigned long config;
 
-	mutex_lock(&chip->i2c_lock);
-	ret = cy8c95x0_pinmux_direction(chip, pin, input);
-	mutex_unlock(&chip->i2c_lock);
-
-	return ret;
+	config = pinconf_to_config_packed(PIN_CONFIG_OUTPUT_ENABLE, !input);
+	return cy8c95x0_gpio_set_pincfg(chip, pin, config);
 }
 
 static const struct pinmux_ops cy8c95x0_pmxops = {
