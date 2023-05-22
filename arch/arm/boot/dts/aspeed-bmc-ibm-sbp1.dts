@@ -1665,6 +1665,10 @@
 			&pinctrl_nri1_default>;
 };
 
+&uart5 {
+	status = "disabled";
+};
+
 // 1.8V domain is not connected
 &gpio1 {
 	status = "disabled";
