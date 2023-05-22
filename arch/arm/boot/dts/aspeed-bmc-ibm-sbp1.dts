@@ -1637,8 +1637,7 @@
 		status = "okay";
 		m25p,fast-read;
 		label = "bmc";
-		spi-max-frequency = <50000000>;
-		spi-tx-bus-width = <4>;
+		spi-tx-bus-width = <1>;
 		spi-rx-bus-width = <4>;
 #include "openbmc-flash-layout-64.dtsi"
 	};
@@ -1647,8 +1646,7 @@
 		status = "okay";
 		m25p,fast-read;
 		label = "alt-bmc";
-		spi-max-frequency = <50000000>;
-		spi-tx-bus-width = <4>;
+		spi-tx-bus-width = <1>;
 		spi-rx-bus-width = <4>;
 #include "openbmc-flash-layout-64-alt.dtsi"
 	};
