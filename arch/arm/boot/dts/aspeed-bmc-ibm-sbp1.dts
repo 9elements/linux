@@ -1679,6 +1679,14 @@
 	flash,size = <0x4000000>;
 };
 
+&video {
+	status = "okay";
+};
+
+&vhub {
+	status = "okay";
+};
+
 &pinctrl {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_vgahs_default &pinctrl_vgavs_default>;
