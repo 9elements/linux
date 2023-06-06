@@ -144,7 +144,7 @@
 				reg = <0x58>;
 				// using SMB_VR_PVCCIN_CPU2_ALERT
 				interrupt-parent = <&smb_pex_cpu2_event>;
-				interrupts = <10 IRQ_TYPE_LEVEL_LOW>;
+				interrupts = <12 IRQ_TYPE_LEVEL_LOW>;
 
 				regulators {
 					pvccin_cpu2: vout0 {
