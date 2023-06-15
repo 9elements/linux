@@ -18,7 +18,7 @@
 					vss1-supply = <&p12v_a>;
 					regulator-compatible = "SW0";
 					regulator-name = "fan10_supply";
-					shunt-resistor-micro-ohms = <12000>;
+					shunt-resistor-micro-ohms = <10000>;
 					regulator-over-current-protection;
 					regulator-oc-protection-microamp = <3400000>;
 					regulator-enable-ramp-delay = <1000>;
@@ -46,7 +46,7 @@
 					vss1-supply = <&p12v_a>;
 					regulator-compatible = "SW0";
 					regulator-name = "fan12_supply";
-					shunt-resistor-micro-ohms = <12000>;
+					shunt-resistor-micro-ohms = <10000>;
 					regulator-over-current-protection;
 					regulator-oc-protection-microamp = <3400000>;
 					regulator-enable-ramp-delay = <1000>;
@@ -74,7 +74,7 @@
 					vss1-supply = <&p12v_a>;
 					regulator-compatible = "SW0";
 					regulator-name = "fan14_supply";
-					shunt-resistor-micro-ohms = <12000>;
+					shunt-resistor-micro-ohms = <10000>;
 					regulator-over-current-protection;
 					regulator-oc-protection-microamp = <3400000>;
 					regulator-enable-ramp-delay = <1000>;
@@ -101,7 +101,7 @@
 					vss1-supply = <&p12v_a>;
 					regulator-compatible = "SW0";
 					regulator-name = "fan16_supply";
-					shunt-resistor-micro-ohms = <12000>;
+					shunt-resistor-micro-ohms = <10000>;
 					regulator-over-current-protection;
 					regulator-oc-protection-microamp = <3400000>;
 					regulator-enable-ramp-delay = <1000>;
@@ -128,7 +128,7 @@
 					vss1-supply = <&p12v_a>;
 					regulator-compatible = "SW0";
 					regulator-name = "fan18_supply";
-					shunt-resistor-micro-ohms = <12000>;
+					shunt-resistor-micro-ohms = <10000>;
 					regulator-over-current-protection;
 					regulator-oc-protection-microamp = <3400000>;
 					regulator-enable-ramp-delay = <1000>;
@@ -155,7 +155,7 @@
 					vss1-supply = <&p12v_a>;
 					regulator-compatible = "SW0";
 					regulator-name = "fan20_supply";
-					shunt-resistor-micro-ohms = <12000>;
+					shunt-resistor-micro-ohms = <10000>;
 					regulator-over-current-protection;
 					regulator-oc-protection-microamp = <3400000>;
 					regulator-enable-ramp-delay = <1000>;
@@ -182,7 +182,7 @@
 					vss1-supply = <&p12v_a>;
 					regulator-compatible = "SW0";
 					regulator-name = "fan22_supply";
-					shunt-resistor-micro-ohms = <12000>;
+					shunt-resistor-micro-ohms = <10000>;
 					regulator-over-current-protection;
 					regulator-oc-protection-microamp = <3400000>;
 					regulator-enable-ramp-delay = <1000>;
@@ -209,7 +209,7 @@
 					vss1-supply = <&p12v_a>;
 					regulator-compatible = "SW0";
 					regulator-name = "fan24_supply";
-					shunt-resistor-micro-ohms = <12000>;
+					shunt-resistor-micro-ohms = <10000>;
 					regulator-over-current-protection;
 					regulator-oc-protection-microamp = <3400000>;
 					regulator-enable-ramp-delay = <1000>;
@@ -968,7 +968,7 @@
 					vss1-supply = <&p12v_a>;
 					regulator-compatible = "SW0";
 					regulator-name = "fan17_supply";
-					shunt-resistor-micro-ohms = <12000>;
+					shunt-resistor-micro-ohms = <10000>;
 					regulator-over-current-protection;
 					regulator-oc-protection-microamp = <3400000>;
 					regulator-enable-ramp-delay = <1000>;
@@ -995,7 +995,7 @@
 					vss1-supply = <&p12v_a>;
 					regulator-compatible = "SW0";
 					regulator-name = "fan19_supply";
-					shunt-resistor-micro-ohms = <12000>;
+					shunt-resistor-micro-ohms = <10000>;
 					regulator-over-current-protection;
 					regulator-oc-protection-microamp = <3400000>;
 					regulator-enable-ramp-delay = <1000>;
@@ -1022,7 +1022,7 @@
 					vss1-supply = <&p12v_a>;
 					regulator-compatible = "SW0";
 					regulator-name = "fan21_supply";
-					shunt-resistor-micro-ohms = <12000>;
+					shunt-resistor-micro-ohms = <10000>;
 					regulator-over-current-protection;
 					regulator-oc-protection-microamp = <3400000>;
 					regulator-enable-ramp-delay = <1000>;
@@ -1049,7 +1049,7 @@
 					vss1-supply = <&p12v_a>;
 					regulator-compatible = "SW0";
 					regulator-name = "fan23_supply";
-					shunt-resistor-micro-ohms = <12000>;
+					shunt-resistor-micro-ohms = <10000>;
 					regulator-over-current-protection;
 					regulator-oc-protection-microamp = <3400000>;
 					regulator-enable-ramp-delay = <1000>;
@@ -1076,7 +1076,7 @@
 					vss1-supply = <&p12v_a>;
 					regulator-compatible = "SW0";
 					regulator-name = "fan02_supply";
-					shunt-resistor-micro-ohms = <12000>;
+					shunt-resistor-micro-ohms = <10000>;
 					regulator-over-current-protection;
 					regulator-oc-protection-microamp = <3400000>;
 					regulator-enable-ramp-delay = <1000>;
@@ -1103,7 +1103,7 @@
 					vss1-supply = <&p12v_a>;
 					regulator-compatible = "SW0";
 					regulator-name = "fan04_supply";
-					shunt-resistor-micro-ohms = <12000>;
+					shunt-resistor-micro-ohms = <10000>;
 					regulator-over-current-protection;
 					regulator-oc-protection-microamp = <3400000>;
 					regulator-enable-ramp-delay = <1000>;
@@ -1130,7 +1130,7 @@
 					vss1-supply = <&p12v_a>;
 					regulator-compatible = "SW0";
 					regulator-name = "fan06_supply";
-					shunt-resistor-micro-ohms = <12000>;
+					shunt-resistor-micro-ohms = <10000>;
 					regulator-over-current-protection;
 					regulator-oc-protection-microamp = <3400000>;
 					regulator-enable-ramp-delay = <1000>;
@@ -1157,7 +1157,7 @@
 					vss1-supply = <&p12v_a>;
 					regulator-compatible = "SW0";
 					regulator-name = "fan08_supply";
-					shunt-resistor-micro-ohms = <12000>;
+					shunt-resistor-micro-ohms = <10000>;
 					regulator-over-current-protection;
 					regulator-oc-protection-microamp = <3400000>;
 					regulator-enable-ramp-delay = <1000>;
@@ -1188,7 +1188,7 @@
 					vss1-supply = <&p12v_a>;
 					regulator-compatible = "SW0";
 					regulator-name = "fan01_supply";
-					shunt-resistor-micro-ohms = <12000>;
+					shunt-resistor-micro-ohms = <10000>;
 					regulator-over-current-protection;
 					regulator-oc-protection-microamp = <3400000>;
 					regulator-enable-ramp-delay = <1000>;
@@ -1215,7 +1215,7 @@
 					vss1-supply = <&p12v_a>;
 					regulator-name = "fan03_supply";
 					regulator-compatible = "SW0";
-					shunt-resistor-micro-ohms = <12000>;
+					shunt-resistor-micro-ohms = <10000>;
 					regulator-over-current-protection;
 					regulator-oc-protection-microamp = <3400000>;
 					regulator-enable-ramp-delay = <1000>;
@@ -1242,7 +1242,7 @@
 					vss1-supply = <&p12v_a>;
 					regulator-compatible = "SW0";
 					regulator-name = "fan05_supply";
-					shunt-resistor-micro-ohms = <12000>;
+					shunt-resistor-micro-ohms = <10000>;
 					regulator-over-current-protection;
 					regulator-oc-protection-microamp = <3400000>;
 					regulator-enable-ramp-delay = <1000>;
@@ -1269,7 +1269,7 @@
 					vss1-supply = <&p12v_a>;
 					regulator-compatible = "SW0";
 					regulator-name = "fan07_supply";
-					shunt-resistor-micro-ohms = <12000>;
+					shunt-resistor-micro-ohms = <10000>;
 					regulator-over-current-protection;
 					regulator-oc-protection-microamp = <3400000>;
 					regulator-enable-ramp-delay = <1000>;
@@ -1296,7 +1296,7 @@
 					vss1-supply = <&p12v_a>;
 					regulator-compatible = "SW0";
 					regulator-name = "fan09_supply";
-					shunt-resistor-micro-ohms = <12000>;
+					shunt-resistor-micro-ohms = <10000>;
 					regulator-over-current-protection;
 					regulator-oc-protection-microamp = <3400000>;
 					regulator-enable-ramp-delay = <1000>;
@@ -1323,7 +1323,7 @@
 					vss1-supply = <&p12v_a>;
 					regulator-compatible = "SW0";
 					regulator-name = "fan11_supply";
-					shunt-resistor-micro-ohms = <12000>;
+					shunt-resistor-micro-ohms = <10000>;
 					regulator-over-current-protection;
 					regulator-oc-protection-microamp = <3400000>;
 					regulator-enable-ramp-delay = <1000>;
@@ -1350,7 +1350,7 @@
 					vss1-supply = <&p12v_a>;
 					regulator-compatible = "SW0";
 					regulator-name = "fan13_supply";
-					shunt-resistor-micro-ohms = <12000>;
+					shunt-resistor-micro-ohms = <10000>;
 					regulator-over-current-protection;
 					regulator-oc-protection-microamp = <3400000>;
 					regulator-enable-ramp-delay = <1000>;
@@ -1377,7 +1377,7 @@
 					vss1-supply = <&p12v_a>;
 					regulator-compatible = "SW0";
 					regulator-name = "fan15_supply";
-					shunt-resistor-micro-ohms = <12000>;
+					shunt-resistor-micro-ohms = <10000>;
 					regulator-over-current-protection;
 					regulator-oc-protection-microamp = <3400000>;
 					regulator-enable-ramp-delay = <1000>;
