@@ -124,6 +124,7 @@
 				// using SMB_VR_PVNN_MAIN_CPU3_ALERT_N
 				interrupt-parent = <&smb_pex_cpu3_event>;
 				interrupts = <10 IRQ_TYPE_LEVEL_LOW>;
+				infineon,en-pin-fixed-level = <0>;
 				regulators {
 					pvnn_main_cpu3: vout0 {
 						regulator-compatible = "vout0";
@@ -171,6 +172,7 @@
 				// using  SMB_VR_PVCCD_HV_CPU3_ALERT_N
 				interrupt-parent = <&smb_pex_cpu3_event>;
 				interrupts = <11 IRQ_TYPE_LEVEL_LOW>;
+				infineon,en-pin-fixed-level = <0>;
 				regulators {
 					pvccd_hv_cpu3: vout0 {
 						regulator-compatible = "vout0";
@@ -191,6 +193,7 @@
 				// using   SMB_VR_PVPP_HBM_CPU3_ALERT_N
 				interrupt-parent = <&smb_pex_cpu3_event>;
 				interrupts = <8 IRQ_TYPE_LEVEL_LOW>;
+				infineon,en-pin-fixed-level = <0>;
 				regulators {
 					pvpp_hbm_cpu3: vout0 {
 						regulator-compatible = "vout0";
