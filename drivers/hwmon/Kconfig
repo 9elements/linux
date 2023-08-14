@@ -1709,6 +1709,12 @@ config SENSORS_NCT7904
 	  This driver can also be built as a module. If so, the module
 	  will be called nct7904.
 
+config SENSORS_NETINT
+	tristate "Netint smbus"
+	depends on I2C
+	help
+          Netint VPUs smbus. Temperature Sensor.
+
 config SENSORS_NPCM7XX
 	tristate "Nuvoton NPCM750 and compatible PWM and Fan controllers"
 	imply THERMAL
