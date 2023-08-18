@@ -10,6 +10,8 @@
 		reg = <0x77>;
 		reset-gpios = <&gpio0 ASPEED_GPIO(R, 4) (GPIO_ACTIVE_LOW | GPIO_OPEN_DRAIN)>; // BMC_MUX_SVC_EXP_RST_INT_N
 		vdd-supply = <&p3v3_bmc_aux>;
+		maxim,isolate-stuck-channel;
+		maxim,send-flush-out-sequence;
 
 		i2c@0 { // SMB_PEX_VR_CTRL
 			#address-cells = <1>;
@@ -163,6 +165,8 @@
 				reg = <0x70>;
 				reset-gpios = <&gpio0 ASPEED_GPIO(P, 3) (GPIO_ACTIVE_LOW | GPIO_OPEN_DRAIN)>; // BMC_MUX_SVC_RSSD_INT
 				vdd-supply = <&p3v3_bmc_aux>;
+				maxim,isolate-stuck-channel;
+				maxim,send-flush-out-sequence;
 
 				i2c@0 { // SMB_SVC_PEX_RSSD01_16
 					#address-cells = <1>;
@@ -773,6 +777,8 @@
 				reg = <0x70>;
 				reset-gpios = <&gpio0 ASPEED_GPIO(R, 2) (GPIO_ACTIVE_LOW | GPIO_OPEN_DRAIN)>; // BMC_MUX_SVC_VR_RST_INT
 				vdd-supply = <&p3v3_bmc_aux>;
+				maxim,isolate-stuck-channel;
+				maxim,send-flush-out-sequence;
 
 				i2c@1 { // SMB_VR_P5V_AUX
 					#address-cells = <1>;

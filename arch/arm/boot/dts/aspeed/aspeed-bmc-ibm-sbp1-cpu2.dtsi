@@ -10,6 +10,8 @@
 		interrupt-parent = <&gpio0>;
 		interrupts = <ASPEED_GPIO(F, 4) IRQ_TYPE_LEVEL_HIGH>; // BMC_MUX_CPU2_RST_INT_N
 		vdd-supply = <&p3v3_aux>;
+		maxim,isolate-stuck-channel;
+		maxim,send-flush-out-sequence;
 
 		i2c@0 { // SMB_PEX_CPU2_EVENT
 			#address-cells = <1>;
