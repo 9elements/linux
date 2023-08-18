@@ -21,6 +21,8 @@
 				reg = <0x70>;
 				reset-gpios = <&bmc_pex_irq 16 (GPIO_ACTIVE_LOW | GPIO_OPEN_DRAIN)>; // SMB_MUX_SSB_FANGRP0_RST_INT_N
 				vdd-supply = <&p3v3_aux>;
+				maxim,isolate-stuck-channel;
+				maxim,send-flush-out-sequence;
 			};
 		};
 		i2c@1 { // SMB_MUX_SSB_FANGRP1
@@ -35,6 +37,8 @@
 				reg = <0x70>;
 				reset-gpios = <&bmc_pex_irq 7 (GPIO_ACTIVE_LOW | GPIO_OPEN_DRAIN)>; // SMB_MUX_SSB_FANGRP1_RST_INT_N
 				vdd-supply = <&p3v3_aux>;
+				maxim,isolate-stuck-channel;
+				maxim,send-flush-out-sequence;
 			};
 		};
 		i2c@2 { // SMB_MUX_SSB_FANGRP2
@@ -49,6 +53,8 @@
 				reg = <0x70>;
 				reset-gpios = <&bmc_pex_irq 1 (GPIO_ACTIVE_LOW | GPIO_OPEN_DRAIN)>; // SMB_MUX_SSB_FANGRP2_RST_INT_N
 				vdd-supply = <&p3v3_aux>;
+				maxim,isolate-stuck-channel;
+				maxim,send-flush-out-sequence;
 			};
 		};
 		i2c@3 { // SMB_MUX_SSB_RSSD17_24
@@ -63,6 +69,8 @@
 				reg = <0x70>;
 				reset-gpios = <&bmc_pex_irq 10 (GPIO_ACTIVE_LOW | GPIO_OPEN_DRAIN)>; // SMB_MUX_SSB_RSSD17_24_RST_INT_N
 				vdd-supply = <&p3v3_aux>;
+				maxim,isolate-stuck-channel;
+				maxim,send-flush-out-sequence;
 			};
 		};
 		i2c@4 { // SMB_MUX_SSB_RSSD25_32
@@ -77,6 +85,8 @@
 				reg = <0x70>;
 				reset-gpios = <&bmc_pex_irq 15 (GPIO_ACTIVE_LOW | GPIO_OPEN_DRAIN)>; // SMB_MUX_SSB_RSSD25_32_RST_INT_N
 				vdd-supply = <&p3v3_aux>;
+				maxim,isolate-stuck-channel;
+				maxim,send-flush-out-sequence;
 			};
 		};
 		i2c@5 { // SMB_PEX_RSSD01_16
@@ -177,6 +187,8 @@
 				reg = <0x70>;
 				reset-gpios = <&bmc_pex_irq 12 (GPIO_ACTIVE_LOW | GPIO_OPEN_DRAIN)>; // SMB_MUX_RSSD17_24_RST_INT_N
 				vdd-supply = <&p3v3_aux>;
+				maxim,isolate-stuck-channel;
+				maxim,send-flush-out-sequence;
 
 				i2c@0 { // SMB_RSSD17
 					#address-cells = <1>;
@@ -232,6 +244,8 @@
 				reg = <0x70>;
 				reset-gpios = <&bmc_pex_irq 14 (GPIO_ACTIVE_LOW | GPIO_OPEN_DRAIN)>; // SMB_MUX_RSSD25_32_RST_INT_N
 				vdd-supply = <&p3v3_aux>;
+				maxim,isolate-stuck-channel;
+				maxim,send-flush-out-sequence;
 
 				i2c@0 { // SMB_RSSD25
 					#address-cells = <1>;
