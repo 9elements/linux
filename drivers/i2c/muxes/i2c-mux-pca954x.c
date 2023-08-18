@@ -57,6 +57,20 @@
 
 #define PCA954X_IRQ_OFFSET 4
 
+/*
+ * MAX7357's configuration register is writeable after POR, but
+ * can be locked by setting the basic mode bit. MAX7358 configuration
+ * register is locked by default and needs to be unlocked first.
+ * The configuration register holds the following settings:
+ */
+#define MAX7357_CONF_INT_ENABLE			BIT(0)
+#define MAX7357_CONF_FLUSH_OUT			BIT(1)
+#define MAX7357_CONF_RELEASE_INT		BIT(2)
+#define MAX7357_CONF_DISCON_SINGLE_CHAN		BIT(4)
+#define MAX7357_CONF_PRECONNECT_TEST		BIT(7)
+
+#define MAX7357_POR_DEFAULT_CONF		MAX7357_CONF_INT_ENABLE
+
 enum pca_type {
 	max_7356,
 	max_7357,
@@ -470,7 +484,26 @@ static int pca954x_init(struct i2c_client *client, struct pca954x *data)
 	else
 		data->last_chan = 0; /* Disconnect multiplexer */
 
-	ret = i2c_smbus_write_byte(client, data->last_chan);
+	if (device_is_compatible(client->dev, "maxim,max7357") && \
+	    i2c_check_functionality(adap, I2C_FUNC_SMBUS_WRITE_BYTE_DATA)) {
+		/*
+		 * The interrupt signal is shared with the reset pin. Release the
+		 * interrupt after 1.6 seconds to allow using the pin as reset.
+		 * The interrupt isn't serviced yet.
+		 */
+		conf |= MAX7357_CONF_RELEASE_INT;
+
+		/*
+		 * Enable the below features supported by the chip.
+		 */
+		conf |= MAX7357_CONF_DISCON_SINGLE_CHAN | MAX7357_CONF_FLUSH_OUT | \
+			MAX7357_CONF_PRECONNECT_TEST;
+
+		ret = i2c_smbus_write_byte_data(client, data->last_chan, conf);
+	}
+	else
+		ret = i2c_smbus_write_byte(client, data->last_chan);
+
 	if (ret < 0)
 		data->last_chan = 0;
 
