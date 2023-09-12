@@ -830,7 +830,6 @@
 					aux_ssb: regulator@3a {
 						reg = <0x3a>;
 						compatible = "maxim,max5970";
-						#io-channel-cells = <1>;
 						regulator-name = "pch_main_rails";
 						interrupt-parent = <&smb_pex_vr_ctrl>;
 						interrupts = <20 IRQ_TYPE_LEVEL_LOW>; // SMB_VR_AUX_SSB_ALERT
