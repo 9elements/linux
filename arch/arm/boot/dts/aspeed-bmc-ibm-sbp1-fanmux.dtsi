@@ -6,7 +6,6 @@
 		fan10_ssb: regulator@3a {
 			reg = <0x3a>;
 			compatible = "maxim,max5978";
-			#io-channel-cells = <1>;
 			vin-supply = <&p3v3_aux>;
 			vbus-supply = <&p3v3_aux>;
 			vss1-supply = <&p12v_a>;
@@ -34,7 +33,6 @@
 		fan12_ssb: regulator@3a {
 			reg = <0x3a>;
 			compatible = "maxim,max5978";
-			#io-channel-cells = <1>;
 			vin-supply = <&p3v3_aux>;
 			vbus-supply = <&p3v3_aux>;
 			vss1-supply = <&p12v_a>;
@@ -62,7 +60,6 @@
 		fan14_ssb: regulator@3a {
 			reg = <0x3a>;
 			compatible = "maxim,max5978";
-			#io-channel-cells = <1>;
 			vin-supply = <&p3v3_aux>;
 			vbus-supply = <&p3v3_aux>;
 			vss1-supply = <&p12v_a>;
@@ -89,7 +86,6 @@
 		fan16_ssb: regulator@3a {
 			reg = <0x3a>;
 			compatible = "maxim,max5978";
-			#io-channel-cells = <1>;
 			vin-supply = <&p3v3_aux>;
 			vbus-supply = <&p3v3_aux>;
 			vss1-supply = <&p12v_a>;
@@ -116,7 +112,6 @@
 		fan18_ssb: regulator@3a {
 			reg = <0x3a>;
 			compatible = "maxim,max5978";
-			#io-channel-cells = <1>;
 			vin-supply = <&p3v3_aux>;
 			vbus-supply = <&p3v3_aux>;
 			vss1-supply = <&p12v_a>;
@@ -143,7 +138,6 @@
 		fan20_ssb: regulator@3a {
 			reg = <0x3a>;
 			compatible = "maxim,max5978";
-			#io-channel-cells = <1>;
 			vin-supply = <&p3v3_aux>;
 			vbus-supply = <&p3v3_aux>;
 			vss1-supply = <&p12v_a>;
@@ -170,7 +164,6 @@
 		fan22_ssb: regulator@3a {
 			reg = <0x3a>;
 			compatible = "maxim,max5978";
-			#io-channel-cells = <1>;
 			vin-supply = <&p3v3_aux>;
 			vbus-supply = <&p3v3_aux>;
 			vss1-supply = <&p12v_a>;
@@ -197,7 +190,6 @@
 		fan24_ssb: regulator@3a {
 			reg = <0x3a>;
 			compatible = "maxim,max5978";
-			#io-channel-cells = <1>;
 			vin-supply = <&p3v3_aux>;
 			vbus-supply = <&p3v3_aux>;
 			vss1-supply = <&p12v_a>;
@@ -956,7 +948,6 @@
 		fan17_ssb: regulator@3a {
 			reg = <0x3a>;
 			compatible = "maxim,max5978";
-			#io-channel-cells = <1>;
 			vin-supply = <&p3v3_aux>;
 			vbus-supply = <&p3v3_aux>;
 			vss1-supply = <&p12v_a>;
@@ -983,7 +974,6 @@
 		fan19_ssb: regulator@3a {
 			reg = <0x3a>;
 			compatible = "maxim,max5978";
-			#io-channel-cells = <1>;
 			vin-supply = <&p3v3_aux>;
 			vbus-supply = <&p3v3_aux>;
 			vss1-supply = <&p12v_a>;
@@ -1010,7 +1000,6 @@
 		fan21_ssb: regulator@3a {
 			reg = <0x3a>;
 			compatible = "maxim,max5978";
-			#io-channel-cells = <1>;
 			vin-supply = <&p3v3_aux>;
 			vbus-supply = <&p3v3_aux>;
 			vss1-supply = <&p12v_a>;
@@ -1037,7 +1026,6 @@
 		fan23_ssb: regulator@3a {
 			reg = <0x3a>;
 			compatible = "maxim,max5978";
-			#io-channel-cells = <1>;
 			vin-supply = <&p3v3_aux>;
 			vbus-supply = <&p3v3_aux>;
 			vss1-supply = <&p12v_a>;
@@ -1064,7 +1052,6 @@
 		fan02_ssb: regulator@3a {
 			reg = <0x3a>;
 			compatible = "maxim,max5978";
-			#io-channel-cells = <1>;
 			vin-supply = <&p3v3_aux>;
 			vbus-supply = <&p3v3_aux>;
 			vss1-supply = <&p12v_a>;
@@ -1091,7 +1078,6 @@
 		fan04_ssb: regulator@3a {
 			reg = <0x3a>;
 			compatible = "maxim,max5978";
-			#io-channel-cells = <1>;
 			vin-supply = <&p3v3_aux>;
 			vbus-supply = <&p3v3_aux>;
 			vss1-supply = <&p12v_a>;
@@ -1118,7 +1104,6 @@
 		fan06_ssb: regulator@3a {
 			reg = <0x3a>;
 			compatible = "maxim,max5978";
-			#io-channel-cells = <1>;
 			vin-supply = <&p3v3_aux>;
 			vbus-supply = <&p3v3_aux>;
 			vss1-supply = <&p12v_a>;
@@ -1145,7 +1130,6 @@
 		fan08_ssb: regulator@3a {
 			reg = <0x3a>;
 			compatible = "maxim,max5978";
-			#io-channel-cells = <1>;
 			vin-supply = <&p3v3_aux>;
 			vbus-supply = <&p3v3_aux>;
 			vss1-supply = <&p12v_a>;
@@ -1176,7 +1160,6 @@
 		fan01_ssb: regulator@3a {
 			reg = <0x3a>;
 			compatible = "maxim,max5978";
-			#io-channel-cells = <1>;
 			vin-supply = <&p3v3_aux>;
 			vbus-supply = <&p3v3_aux>;
 			vss1-supply = <&p12v_a>;
@@ -1203,7 +1186,6 @@
 		fan03_ssb: regulator@3a {
 			reg = <0x3a>;
 			compatible = "maxim,max5978";
-			#io-channel-cells = <1>;
 			vin-supply = <&p3v3_aux>;
 			vbus-supply = <&p3v3_aux>;
 			vss1-supply = <&p12v_a>;
@@ -1230,7 +1212,6 @@
 		fan05_ssb: regulator@3a {
 			reg = <0x3a>;
 			compatible = "maxim,max5978";
-			#io-channel-cells = <1>;
 			vin-supply = <&p3v3_aux>;
 			vbus-supply = <&p3v3_aux>;
 			vss1-supply = <&p12v_a>;
@@ -1257,7 +1238,6 @@
 		fan07_ssb: regulator@3a {
 			reg = <0x3a>;
 			compatible = "maxim,max5978";
-			#io-channel-cells = <1>;
 			vin-supply = <&p3v3_aux>;
 			vbus-supply = <&p3v3_aux>;
 			vss1-supply = <&p12v_a>;
@@ -1284,7 +1264,6 @@
 		fan09_ssb: regulator@3a {
 			reg = <0x3a>;
 			compatible = "maxim,max5978";
-			#io-channel-cells = <1>;
 			vin-supply = <&p3v3_aux>;
 			vbus-supply = <&p3v3_aux>;
 			vss1-supply = <&p12v_a>;
@@ -1311,7 +1290,6 @@
 		fan11_ssb: regulator@3a {
 			reg = <0x3a>;
 			compatible = "maxim,max5978";
-			#io-channel-cells = <1>;
 			vin-supply = <&p3v3_aux>;
 			vbus-supply = <&p3v3_aux>;
 			vss1-supply = <&p12v_a>;
@@ -1338,7 +1316,6 @@
 		fan13_ssb: regulator@3a {
 			reg = <0x3a>;
 			compatible = "maxim,max5978";
-			#io-channel-cells = <1>;
 			vin-supply = <&p3v3_aux>;
 			vbus-supply = <&p3v3_aux>;
 			vss1-supply = <&p12v_a>;
@@ -1365,7 +1342,6 @@
 		fan15_ssb: regulator@3a {
 			reg = <0x3a>;
 			compatible = "maxim,max5978";
-			#io-channel-cells = <1>;
 			vin-supply = <&p3v3_aux>;
 			vbus-supply = <&p3v3_aux>;
 			vss1-supply = <&p12v_a>;
