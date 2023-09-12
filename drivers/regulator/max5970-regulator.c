@@ -597,7 +597,7 @@ static int max597x_regulator_probe(struct platform_device *pdev)
 		max597x->shunt_micro_ohms[i] = data->shunt_micro_ohms;
 	}
 
-	hwmon_dev = devm_hwmon_device_register_with_info(&i2c->dev, "max5970_hwmon", max597x,
+	hwmon_dev = devm_hwmon_device_register_with_info(&i2c->dev, "max5970", max597x,
 							 &max5970_chip_info, NULL);
 	if (IS_ERR(hwmon_dev)) {
 		return dev_err_probe(&i2c->dev, PTR_ERR(hwmon_dev), \
