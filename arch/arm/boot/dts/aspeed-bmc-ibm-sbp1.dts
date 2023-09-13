@@ -712,7 +712,7 @@
 		// Voltage sensors top to down
 		io-channels = <&p12v_vd 0>, <&p5v_aux_vd 0>, <&p5v_bmc_aux_vd 0>, <&p3v3_aux_vd 0>,
 			<&p3v3_bmc_aux_vd 0>, <&p1v8_bmc_aux_vd 0>, <&adc1 4>, <&adc0 2>, <&adc1 0>,
-			<&p2V5_aux_vd 0>, <&adc1 7>;
+			<&p2V5_aux_vd 0>, <&p3v3_rtc_vd 0>;
 	};
 
 	p12v_vd: voltage_divider1 {
@@ -797,6 +797,18 @@
 		 */
 		output-ohms = <11>;
 		full-ohms = <21>;
+	};
+
+	p3v3_rtc_vd: voltage_divider8 {
+		compatible = "voltage-divider";
+		io-channels = <&adc1 7>;
+		#io-channel-cells = <1>;
+
+		/* Scale the system voltage by 231000/100000 to fit the ADC range.
+		 * Use small nominator to prevent integer overflow.
+		 */
+		output-ohms = <100>;
+		full-ohms = <231>;
 	};
 
 	thermistor0: thermal-sensor0 {
