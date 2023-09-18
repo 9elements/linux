@@ -67,6 +67,12 @@ config SENSORS_ABITUGURU3
 	  This driver can also be built as a module. If so, the module
 	  will be called abituguru3.
 
+config SENSORS_AMDGPU
+	tristate "AMDGPU smbus"
+	depends on I2C
+	help
+	  AMDGPU smbus. Temperature and Power Sensors for AMD Radeon Pro V620.
+
 config SENSORS_SMPRO
 	tristate "Ampere's Altra SMpro hardware monitoring driver"
 	depends on MFD_SMPRO
