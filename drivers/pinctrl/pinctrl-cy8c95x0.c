@@ -794,7 +794,7 @@ static int cy8c95x0_gpio_set_pincfg(struct cy8c95x0_pinctrl *chip,
 			goto out;
 
 		__set_bit(off, chip->push_pull);
-		reg = PIN_CONFIG_DRIVE_PUSH_PULL;
+		reg = CY8C95X0_DRV_PP_FAST;
 		break;
 	default:
 		ret = -ENOTSUPP;
