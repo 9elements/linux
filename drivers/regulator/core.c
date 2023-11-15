@@ -33,6 +33,7 @@
 
 #include "dummy.h"
 #include "internal.h"
+#include "event.h"
 
 static DEFINE_WW_CLASS(regulator_ww_class);
 static DEFINE_MUTEX(regulator_nesting_mutex);
@@ -4867,12 +4868,14 @@ static int _notifier_call_chain(struct regulator_dev *rdev,
 	/* call rdev chain first */
 	ret =  blocking_notifier_call_chain(&rdev->notifier, event, data);
 
+
 	if (event & REGULATOR_EVENT_VOLTAGE_CHANGE) {
 		name = dev_attr_microvolts.attr.name;
 		sysfs_notify(&rdev->dev.kobj, NULL, name);
 	} else {
 		name = dev_attr_status.attr.name;
 		sysfs_notify(&rdev->dev.kobj, NULL, name);
+		reg_generate_netlink_event(rdev_get_name(rdev), event);
 	}
 
 	return ret;
