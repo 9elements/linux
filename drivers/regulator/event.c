@@ -1,38 +1,12 @@
 // SPDX-License-Identifier: GPL-2.0
 
+#include <regulator/regulator.h>
 #include <net/netlink.h>
 #include <net/genetlink.h>
 
 #include "regnl.h"
 
-#ifdef CONFIG_NET
 static unsigned int reg_event_seqnum;
-struct reg_genl_event {
-	char reg_name[15];
-	u64 event;
-};
-
-/* attributes of reg_genl_family */
-enum {
-	REG_GENL_ATTR_UNSPEC,
-	REG_GENL_ATTR_EVENT,	/* reg event info needed by user space */
-	__REG_GENL_ATTR_MAX,
-};
-
-#define REG_GENL_ATTR_MAX (__REG_GENL_ATTR_MAX - 1)
-
-/* commands supported by the reg_genl_family */
-enum {
-	REG_GENL_CMD_UNSPEC,
-	REG_GENL_CMD_EVENT,	/* kernel->user notifications for reg events */
-	__REG_GENL_CMD_MAX,
-};
-
-#define REG_GENL_CMD_MAX (__REG_GENL_CMD_MAX - 1)
-
-#define REG_GENL_FAMILY_NAME		"reg_event"
-#define REG_GENL_VERSION		0x01
-#define REG_GENL_MCAST_GROUP_NAME	"reg_mc_group"
 
 static const struct genl_multicast_group reg_event_mcgrps[] = {
 	{ .name = REG_GENL_MCAST_GROUP_NAME, },
@@ -99,25 +73,11 @@ int reg_generate_netlink_event(const char *reg_name, u64 event)
 
 	return 0;
 }
-EXPORT_SYMBOL(reg_generate_netlink_event);
 
 static int __init reg_event_genetlink_init(void)
 {
 	return genl_register_family(&reg_event_genl_family);
 }
-
-#else
-int reg_generate_netlink_event(const char *reg_name, u64 event)
-{
-	return 0;
-}
-EXPORT_SYMBOL(reg_generate_netlink_event);
-
-static int reg_event_genetlink_init(void)
-{
-	return -ENODEV;
-}
-#endif
 
 static int __init reg_event_init(void)
 {
