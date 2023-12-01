@@ -55,25 +55,11 @@
 				pinctrl-0 = <&U62160_pins>;
 				pinctrl-names = "default";
 				U62160_pins: pin-cfg {
-					input {
-						pins = "gp03", "gp05", "gp14", "gp16", "gp20",
-						"gp50", "gp51";
-						function = "gpio";
-						input-enable;
-					};
 					input_pullup {
-						pins = "gp00", "gp02", "gp04", "gp06", "gp07",
-						"gp11", "gp12", "gp13", "gp15", "gp17", "gp21",
-						"gp22", "gp30", "gp41";
+						pins = "gp03", "gp16", "gp20", "gp50", "gp51";
 						function = "gpio";
 						input-enable;
 						bias-pull-up;
-					};
-					out-low {
-						pins = "gp01", "gp10", "gp31", "gp40";
-						function = "gpio";
-						output-enable;
-						output-low;
 					};
 				};
 			};
