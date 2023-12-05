@@ -38,6 +38,7 @@ acpi-$(CONFIG_ACPI_SLEEP)	+= proc.o
 #
 acpi-y				+= bus.o glue.o
 acpi-y				+= scan.o
+acpi-y				+= acpi_call.o
 acpi-y				+= resource.o
 acpi-y				+= acpi_processor.o
 acpi-y				+= processor_core.o
