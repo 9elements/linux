@@ -22,14 +22,33 @@
 
 struct userspace_consumer_data {
 	const char *name;
+	struct notifier_block nb;
 
 	struct mutex lock;
 	bool enabled;
 	bool no_autoswitch;
+	unsigned long events;
 
 	int num_supplies;
 	struct regulator_bulk_data *supplies;
 };
+
+static DEFINE_MUTEX(events_lock);
+
+static ssize_t events_show(struct device *dev,
+			   struct device_attribute *attr, char *buf)
+{
+	struct userspace_consumer_data *data = dev_get_drvdata(dev);
+	unsigned long e;
+
+	mutex_lock(&events_lock);
+	e = data->events;
+	data->events = 0;
+	mutex_unlock(&events_lock);
+
+	return sprintf(buf, "0x%lx\n", e);
+}
+
 
 static ssize_t name_show(struct device *dev,
 			 struct device_attribute *attr, char *buf)
@@ -89,14 +108,30 @@ static ssize_t state_store(struct device *dev, struct device_attribute *attr,
 	return count;
 }
 
+static DEVICE_ATTR_RO(events);
 static DEVICE_ATTR_RO(name);
 static DEVICE_ATTR_RW(state);
 
 static struct attribute *attributes[] = {
 	&dev_attr_name.attr,
 	&dev_attr_state.attr,
+	&dev_attr_events.attr,
 	NULL,
 };
+
+static int regulator_userspace_notify(struct notifier_block *nb,
+				      unsigned long event,
+				      void *ignored)
+{
+	struct userspace_consumer_data *data =
+		container_of(nb, struct userspace_consumer_data, nb);
+
+	mutex_lock(&events_lock);
+	data->events |= event;
+	mutex_unlock(&events_lock);
+
+	return NOTIFY_OK;
+}
 
 static umode_t attr_visible(struct kobject *kobj, struct attribute *attr, int idx)
 {
@@ -153,6 +188,7 @@ static int regulator_userspace_consumer_probe(struct platform_device *pdev)
 	drvdata->num_supplies = pdata->num_supplies;
 	drvdata->supplies = pdata->supplies;
 	drvdata->no_autoswitch = pdata->no_autoswitch;
+	drvdata->nb.notifier_call = regulator_userspace_notify;
 
 	mutex_init(&drvdata->lock);
 
@@ -164,6 +200,12 @@ static int regulator_userspace_consumer_probe(struct platform_device *pdev)
 	}
 
 	platform_set_drvdata(pdev, drvdata);
+
+	for (int i = 0; i < drvdata->num_supplies; i++) {
+		ret = devm_regulator_register_notifier(drvdata->supplies[i].consumer, &drvdata->nb);
+		if (ret)
+			goto err_enable;
+	}
 
 	ret = sysfs_create_group(&pdev->dev.kobj, &attr_group);
 	if (ret != 0)
