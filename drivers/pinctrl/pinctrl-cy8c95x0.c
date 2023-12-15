@@ -164,6 +164,7 @@ struct cy8c95x0_pinctrl {
 	struct pinctrl_desc pinctrl_desc;
 	char name[32];
 	unsigned int tpin;
+	struct gpio_desc *gpio_reset;
 };
 
 static const struct pinctrl_pin_desc cy8c9560_pins[] = {
@@ -725,6 +726,8 @@ static int cy8c95x0_gpio_set_pincfg(struct cy8c95x0_pinctrl *chip,
 	u8 port = cypress_get_port(chip, off);
 	u8 bit = cypress_get_pin_mask(chip, off);
 	unsigned long param = pinconf_to_config_param(config);
+	unsigned long arg = pinconf_to_config_argument(config);
+	u8 outreg = CY8C95X0_OUTPUT_(port);
 	unsigned int reg;
 	int ret;
 
@@ -762,6 +765,41 @@ static int cy8c95x0_gpio_set_pincfg(struct cy8c95x0_pinctrl *chip,
 		break;
 	case PIN_CONFIG_MODE_PWM:
 		reg = CY8C95X0_PWMSEL;
+		break;
+	case PIN_CONFIG_INPUT_ENABLE:
+
+		ret = regmap_write_bits(chip->regmap, CY8C95X0_DIRECTION, bit, bit);
+		if (ret)
+			goto out;
+
+		if (test_bit(off, chip->push_pull)) {
+			/*
+			 * Disable driving the pin by forcing it to HighZ. Only setting the
+			 * direction register isn't sufficient in Push-Pull mode.
+			 */
+			reg = CY8C95X0_DRV_HIZ;
+			__clear_bit(off, chip->push_pull);
+		} else {
+			goto out;
+		}
+		break;
+	case PIN_CONFIG_OUTPUT:
+	case PIN_CONFIG_OUTPUT_ENABLE:
+		/* Set output level */
+		ret = regmap_write_bits(chip->regmap, outreg, bit, arg ? bit : 0);
+		if (ret)
+			goto out;
+
+		/* ...then direction */
+		ret = regmap_write_bits(chip->regmap, CY8C95X0_DIRECTION, bit, 0);
+		if (ret)
+			goto out;
+
+		if (param == PIN_CONFIG_OUTPUT)
+			goto out;
+
+		__set_bit(off, chip->push_pull);
+		reg = PIN_CONFIG_DRIVE_PUSH_PULL;
 		break;
 	default:
 		ret = -ENOTSUPP;
@@ -820,7 +858,7 @@ static int cy8c95x0_setup_gpiochip(struct cy8c95x0_pinctrl *chip)
 	gc->get_direction = cy8c95x0_gpio_get_direction;
 	gc->get_multiple = cy8c95x0_gpio_get_multiple;
 	gc->set_multiple = cy8c95x0_gpio_set_multiple;
-	gc->set_config = gpiochip_generic_config,
+	gc->set_config = gpiochip_generic_config;
 	gc->can_sleep = true;
 	gc->add_pin_ranges = cy8c95x0_add_pin_ranges;
 
@@ -1345,9 +1383,7 @@ static int cy8c95x0_probe(struct i2c_client *client)
 	chip->dev = &client->dev;
 
 	/* Set the device type */
-	chip->driver_data = (unsigned long)device_get_match_data(&client->dev);
-	if (!chip->driver_data)
-		chip->driver_data = i2c_match_id(cy8c95x0_id, client)->driver_data;
+	chip->driver_data = (uintptr_t)i2c_get_match_data(client);
 	if (!chip->driver_data)
 		return -ENODEV;
 
@@ -1381,6 +1417,20 @@ static int cy8c95x0_probe(struct i2c_client *client)
 			return ret;
 		}
 		chip->regulator = reg;
+	}
+
+	/* bring the chip out of reset if reset pin is provided */
+	chip->gpio_reset = devm_gpiod_get_optional(&client->dev, "reset", GPIOD_OUT_HIGH);
+	if (IS_ERR(chip->gpio_reset)) {
+		ret = dev_err_probe(chip->dev, PTR_ERR(chip->gpio_reset),
+				    "Failed to get GPIO 'reset'\n");
+		goto err_exit;
+	} else if (chip->gpio_reset) {
+		usleep_range(1000, 2000);
+		gpiod_set_value_cansleep(chip->gpio_reset, 0);
+		usleep_range(250000, 300000);
+
+		gpiod_set_consumer_name(chip->gpio_reset, "CY8C95X0 RESET");
 	}
 
 	chip->regmap = devm_regmap_init_i2c(client, &cy8c95x0_i2c_regmap);
