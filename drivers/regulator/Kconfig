@@ -56,6 +56,16 @@ config REGULATOR_USERSPACE_CONSUMER
 
 	  If unsure, say no.
 
+config REGULATOR_NETLINK_EVENTS
+	bool "Enable support for receiving regulator events via netlink"
+	depends on NET
+	help
+	  Enabling this option allows the kernel to broadcast regulator events using
+	  the netlink mechanism. User-space applications can subscribe to these events
+	  for real-time updates on various regulator events.
+
+	  If unsure, say no.
+
 config REGULATOR_88PG86X
 	tristate "Marvell 88PG86X voltage regulators"
 	depends on I2C
@@ -546,11 +556,11 @@ config REGULATOR_MAX1586
 	  regulator via I2C bus. The provided regulator is suitable
 	  for PXA27x chips to control VCC_CORE and VCC_USIM voltages.
 
-config REGULATOR_MAX597X
-	tristate "Maxim 597x power switch and monitor"
+config REGULATOR_MAX5970
+	tristate "Maxim 5970/5978 power switch and monitor"
 	depends on I2C
 	depends on OF
-	depends on MFD_MAX597X
+	depends on MFD_MAX5970
 	help
 	  This driver controls a Maxim 5970/5978 switch via I2C bus.
 	  The MAX5970/5978 is a smart switch with no output regulation, but
