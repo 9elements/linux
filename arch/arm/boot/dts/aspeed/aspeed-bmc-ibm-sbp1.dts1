@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0+
 /dts-v1/;
+
 #include <dt-bindings/gpio/aspeed-gpio.h>
 #include <dt-bindings/input/input.h>
 #include <dt-bindings/interrupt-controller/irq.h>
@@ -1644,12 +1645,16 @@
 		reg = <0x77>;
 		reset-gpios = <&gpio0 ASPEED_GPIO(R, 3) (GPIO_ACTIVE_LOW | GPIO_OPEN_DRAIN)>; // BMC_MUX_NIC_RST_INT_N
 		vdd-supply = <&p3v3_aux>;
+		maxim,isolate-stuck-channel;
+		maxim,send-flush-out-sequence;
 
 		i2c@0 {
 			#address-cells = <1>;
 			#size-cells = <0>;
 			reg = <0>;
 			smb_pex_nic: pinctrl@20 { // U62160
+				#address-cells = <1>;
+				#size-cells = <0>;
 				compatible = "cypress,cy8c9540";
 				reg = <0x20>;
 				gpio-controller;
@@ -1819,6 +1824,8 @@
 		// BMC_MUX_M2_RST_INT_N
 		reset-gpios = <&gpio0 ASPEED_GPIO(R, 7) (GPIO_ACTIVE_LOW | GPIO_OPEN_DRAIN)>;
 		vdd-supply = <&p3v3_aux>;
+		maxim,isolate-stuck-channel;
+		maxim,send-flush-out-sequence;
 
 		i2c@0 { // SMB_S3M_CPU0_LVC1
 			#address-cells = <1>;
@@ -1940,6 +1947,8 @@
 		reg = <0x77>;
 		reset-gpios = <&gpio0 ASPEED_GPIO(Z, 2) (GPIO_ACTIVE_LOW | GPIO_OPEN_DRAIN)>; // BMC_MUX_VR_PCH_CPU_RST_INT_N
 		vdd-supply = <&p3v3_aux>;
+		maxim,isolate-stuck-channel;
+		maxim,send-flush-out-sequence;
 
 		i2c@1 { // SMB_VR_P1V05_PCH_AUX
 			#address-cells = <1>;
@@ -2014,12 +2023,16 @@
 		reg = <0x77>;
 		reset-gpios = <&gpio0 ASPEED_GPIO(R, 6) (GPIO_ACTIVE_LOW | GPIO_OPEN_DRAIN)>; // BMC_MUX_CPU0_RST_INT_N
 		vdd-supply = <&p3v3_aux>;
+		maxim,isolate-stuck-channel;
+		maxim,send-flush-out-sequence;
 
 		i2c@0 { // SMB_PEX_CPU0_EVENT
 			#address-cells = <1>;
 			#size-cells = <0>;
 			reg = <0>;
 			smb_pex_cpu0_event: pinctrl@20 { // U62080
+				#address-cells = <1>;
+				#size-cells = <0>;
 				compatible = "cypress,cy8c9540";
 				reg = <0x20>;
 				gpio-controller;
@@ -2207,12 +2220,16 @@
 		reg = <0x77>;
 		reset-gpios = <&gpio0 ASPEED_GPIO(F, 3) (GPIO_ACTIVE_LOW | GPIO_OPEN_DRAIN)>; // BMC_MUX_CPU1_RST_INT_N
 		vdd-supply = <&p3v3_aux>;
+		maxim,isolate-stuck-channel;
+		maxim,send-flush-out-sequence;
 
 		i2c@0 { // SMB_PEX_CPU1_EVENT
 			#address-cells = <1>;
 			#size-cells = <0>;
 			reg = <0>;
 			smb_pex_cpu1_event: pinctrl@20 { // U62090
+				#address-cells = <1>;
+				#size-cells = <0>;
 				compatible = "cypress,cy8c9540";
 				reg = <0x20>;
 				gpio-controller;
@@ -2401,12 +2418,16 @@
 		interrupt-parent = <&gpio0>;
 		interrupts = <ASPEED_GPIO(F, 4) IRQ_TYPE_LEVEL_HIGH>; // BMC_MUX_CPU2_RST_INT_N
 		vdd-supply = <&p3v3_aux>;
+		maxim,isolate-stuck-channel;
+		maxim,send-flush-out-sequence;
 
 		i2c@0 { // SMB_PEX_CPU2_EVENT
 			#address-cells = <1>;
 			#size-cells = <0>;
 			reg = <0>;
 			smb_pex_cpu2_event: pinctrl@20 { // U62100
+				#address-cells = <1>;
+				#size-cells = <0>;
 				compatible = "cypress,cy8c9540";
 				reg = <0x20>;
 				gpio-controller;
@@ -2594,12 +2615,16 @@
 		reg = <0x77>;
 		reset-gpios = <&gpio0 ASPEED_GPIO(P, 2) (GPIO_ACTIVE_LOW | GPIO_OPEN_DRAIN)>; // BMC_MUX_CPU3_RST_INT_N
 		vdd-supply = <&p3v3_aux>;
+		maxim,isolate-stuck-channel;
+		maxim,send-flush-out-sequence;
 
 		i2c@0 { // SMB_PEX_CPU3_EVENT
 			#address-cells = <1>;
 			#size-cells = <0>;
 			reg = <0>;
 			smb_pex_cpu3_event: pinctrl@20 { // U62110
+				#address-cells = <1>;
+				#size-cells = <0>;
 				compatible = "cypress,cy8c9540";
 				reg = <0x20>;
 				gpio-controller;
@@ -2787,6 +2812,8 @@
 		reg = <0x77>;
 		reset-gpios = <&gpio0 ASPEED_GPIO(R, 1) (GPIO_ACTIVE_LOW | GPIO_OPEN_DRAIN)>; // BMC_MUX_FANPWM_RSSD01_16_RST_INT_N
 		vdd-supply = <&p3v3_aux>;
+		maxim,isolate-stuck-channel;
+		maxim,send-flush-out-sequence;
 
 		i2c@0 { // SMB_MUX_PWM_FANGRP0
 			#address-cells = <1>;
@@ -2799,6 +2826,8 @@
 				reg = <0x70>;
 				reset-gpios = <&bmc_pex_irq 11 (GPIO_ACTIVE_LOW | GPIO_OPEN_DRAIN)>; // SMB_MUX_PWM_FANGRP0_RST_INT_N
 				vdd-supply = <&p3v3_aux>;
+				maxim,isolate-stuck-channel;
+				maxim,send-flush-out-sequence;
 			};
 		};
 		i2c@1 { // SMB_MUX_PWM_FANGRP1
@@ -2813,6 +2842,8 @@
 				reg = <0x70>;
 				reset-gpios = <&bmc_pex_irq 2 (GPIO_ACTIVE_LOW | GPIO_OPEN_DRAIN)>; // SMB_MUX_PWM_FANGRP1_RST_INT_N
 				vdd-supply = <&p3v3_aux>;
+				maxim,isolate-stuck-channel;
+				maxim,send-flush-out-sequence;
 			};
 		};
 		i2c@2 { // SMB_MUX_PWM_FANGRP2
@@ -2827,6 +2858,8 @@
 				reg = <0x70>;
 				reset-gpios = <&bmc_pex_irq 0 (GPIO_ACTIVE_LOW | GPIO_OPEN_DRAIN)>; // SMB_MUX_PWM_FANGRP2_RST_INT_N
 				vdd-supply = <&p3v3_aux>;
+				maxim,isolate-stuck-channel;
+				maxim,send-flush-out-sequence;
 			};
 		};
 		i2c@3 { // SMB_MUX_SSB_RSSD01_08
@@ -2841,6 +2874,8 @@
 				reg = <0x70>;
 				reset-gpios = <&bmc_pex_irq 3 (GPIO_ACTIVE_LOW | GPIO_OPEN_DRAIN)>; // SMB_MUX_SSB_RSSD01_08_RST_INT_N
 				vdd-supply = <&p3v3_aux>;
+				maxim,isolate-stuck-channel;
+				maxim,send-flush-out-sequence;
 			};
 		};
 		i2c@4 { // SMB_MUX_SSB_RSSD09_16
@@ -2855,6 +2890,8 @@
 				reg = <0x70>;
 				reset-gpios = <&bmc_pex_irq 9 (GPIO_ACTIVE_LOW | GPIO_OPEN_DRAIN)>; // SMB_MUX_SSB_RSSD09_16_RST_INT_N
 				vdd-supply = <&p3v3_aux>;
+				maxim,isolate-stuck-channel;
+				maxim,send-flush-out-sequence;
 			};
 		};
 		i2c@5 { // SMB_PEX_RSSD17_32
@@ -3059,6 +3096,8 @@
 				reg = <0x70>;
 				reset-gpios = <&bmc_pex_irq 16 (GPIO_ACTIVE_LOW | GPIO_OPEN_DRAIN)>; // SMB_MUX_SSB_FANGRP0_RST_INT_N
 				vdd-supply = <&p3v3_aux>;
+				maxim,isolate-stuck-channel;
+				maxim,send-flush-out-sequence;
 			};
 		};
 		i2c@1 { // SMB_MUX_SSB_FANGRP1
@@ -3073,6 +3112,8 @@
 				reg = <0x70>;
 				reset-gpios = <&bmc_pex_irq 7 (GPIO_ACTIVE_LOW | GPIO_OPEN_DRAIN)>; // SMB_MUX_SSB_FANGRP1_RST_INT_N
 				vdd-supply = <&p3v3_aux>;
+				maxim,isolate-stuck-channel;
+				maxim,send-flush-out-sequence;
 			};
 		};
 		i2c@2 { // SMB_MUX_SSB_FANGRP2
@@ -3087,6 +3128,8 @@
 				reg = <0x70>;
 				reset-gpios = <&bmc_pex_irq 1 (GPIO_ACTIVE_LOW | GPIO_OPEN_DRAIN)>; // SMB_MUX_SSB_FANGRP2_RST_INT_N
 				vdd-supply = <&p3v3_aux>;
+				maxim,isolate-stuck-channel;
+				maxim,send-flush-out-sequence;
 			};
 		};
 		i2c@3 { // SMB_MUX_SSB_RSSD17_24
@@ -3101,6 +3144,8 @@
 				reg = <0x70>;
 				reset-gpios = <&bmc_pex_irq 10 (GPIO_ACTIVE_LOW | GPIO_OPEN_DRAIN)>; // SMB_MUX_SSB_RSSD17_24_RST_INT_N
 				vdd-supply = <&p3v3_aux>;
+				maxim,isolate-stuck-channel;
+				maxim,send-flush-out-sequence;
 			};
 		};
 		i2c@4 { // SMB_MUX_SSB_RSSD25_32
@@ -3115,6 +3160,8 @@
 				reg = <0x70>;
 				reset-gpios = <&bmc_pex_irq 15 (GPIO_ACTIVE_LOW | GPIO_OPEN_DRAIN)>; // SMB_MUX_SSB_RSSD25_32_RST_INT_N
 				vdd-supply = <&p3v3_aux>;
+				maxim,isolate-stuck-channel;
+				maxim,send-flush-out-sequence;
 			};
 		};
 		i2c@5 { // SMB_PEX_RSSD01_16
@@ -3192,6 +3239,8 @@
 				reg = <0x70>;
 				reset-gpios = <&bmc_pex_irq 12 (GPIO_ACTIVE_LOW | GPIO_OPEN_DRAIN)>; // SMB_MUX_RSSD17_24_RST_INT_N
 				vdd-supply = <&p3v3_aux>;
+				maxim,isolate-stuck-channel;
+				maxim,send-flush-out-sequence;
 
 				i2c@0 { // SMB_RSSD17
 					#address-cells = <1>;
@@ -3247,6 +3296,8 @@
 				reg = <0x70>;
 				reset-gpios = <&bmc_pex_irq 14 (GPIO_ACTIVE_LOW | GPIO_OPEN_DRAIN)>; // SMB_MUX_RSSD25_32_RST_INT_N
 				vdd-supply = <&p3v3_aux>;
+				maxim,isolate-stuck-channel;
+				maxim,send-flush-out-sequence;
 
 				i2c@0 { // SMB_RSSD25
 					#address-cells = <1>;
@@ -3306,12 +3357,16 @@
 		reg = <0x77>;
 		reset-gpios = <&gpio0 ASPEED_GPIO(R, 4) (GPIO_ACTIVE_LOW | GPIO_OPEN_DRAIN)>; // BMC_MUX_SVC_EXP_RST_INT_N
 		vdd-supply = <&p3v3_bmc_aux>;
+		maxim,isolate-stuck-channel;
+		maxim,send-flush-out-sequence;
 
 		i2c@0 { // SMB_PEX_VR_CTRL
 			#address-cells = <1>;
 			#size-cells = <0>;
 			reg = <0>;
 			smb_pex_vr_ctrl: pinctrl@20 { // U62120
+				#address-cells = <1>;
+				#size-cells = <0>;
 				compatible = "cypress,cy8c9540";
 				reg = <0x20>;
 				gpio-controller;
@@ -3379,6 +3434,8 @@
 			#size-cells = <0>;
 			reg = <1>;
 			bmc_pex_irq: pinctrl@20 { // U60000
+				#address-cells = <1>;
+				#size-cells = <0>;
 				compatible = "cypress,cy8c9520";
 				reg = <0x20>;
 				gpio-controller;
@@ -3433,6 +3490,8 @@
 				reg = <0x70>;
 				reset-gpios = <&gpio0 ASPEED_GPIO(P, 3) (GPIO_ACTIVE_LOW | GPIO_OPEN_DRAIN)>; // BMC_MUX_SVC_RSSD_INT
 				vdd-supply = <&p3v3_bmc_aux>;
+				maxim,isolate-stuck-channel;
+				maxim,send-flush-out-sequence;
 
 				i2c@0 { // SMB_SVC_PEX_RSSD01_16
 					#address-cells = <1>;
@@ -3440,6 +3499,8 @@
 					reg = <0>;
 
 					smb_svc_pex_rssd01_16: pinctrl@20 { // U65200
+						#address-cells = <1>;
+						#size-cells = <0>;
 						compatible = "cypress,cy8c9560";
 						reg = <0x20>;
 						gpio-controller;
@@ -3514,6 +3575,8 @@
 					reg = <1>;
 
 					smb_svc_pex_rssd17_32: pinctrl@20 { // U65300
+						#address-cells = <1>;
+						#size-cells = <0>;
 						compatible = "cypress,cy8c9560";
 						reg = <0x20>;
 						gpio-controller;
@@ -3643,6 +3706,8 @@
 					reg = <3>;
 
 					smb_svc_pex_fan_alert: pinctrl@20 { // U65600
+						#address-cells = <1>;
+						#size-cells = <0>;
 						compatible = "cypress,cy8c9560";
 						reg = <0x20>;
 						gpio-controller;
@@ -3904,6 +3969,8 @@
 				reg = <0x70>;
 				reset-gpios = <&gpio0 ASPEED_GPIO(R, 2) (GPIO_ACTIVE_LOW | GPIO_OPEN_DRAIN)>; // BMC_MUX_SVC_VR_RST_INT
 				vdd-supply = <&p3v3_bmc_aux>;
+				maxim,isolate-stuck-channel;
+				maxim,send-flush-out-sequence;
 
 				i2c@1 { // SMB_VR_P5V_AUX
 					#address-cells = <1>;
@@ -4272,6 +4339,734 @@
 	};
 };
 
+&i2cmux15 {
+	i2c@0 { // MUX_FAN01_PWM
+		#address-cells = <1>;
+		#size-cells = <0>;
+		reg = <0>;
+		fan01_pwm: hwmon@2e {
+			compatible = "maxim,max6639";
+			#address-cells = <1>;
+			#size-cells = <0>;
+			reg = <0x2e>;
+			interrupt-parent = <&smb_svc_pex_fan_alert>;
+			interrupts = <27 IRQ_TYPE_LEVEL_LOW>; // FAN01_PWM_ALERT_N
+			fan-supply = <&sw0_fan01_ssb>;
+			channel@0 {
+				reg = <0>;
+				pwm-polarity = <1>;
+				pulses-per-revolution = <1>;
+				rpm-range = <16000>;
+				pwm-init = <90>;
+				maxim,disable-therm-full-speed;
+			};
+			channel@1 {
+				reg = <1>;
+				pwm-polarity = <1>;
+				pulses-per-revolution = <1>;
+				rpm-range = <16000>;
+				pwm-init = <90>;
+				maxim,disable-therm-full-speed;
+			};
+		};
+	};
+	i2c@1 { // MUX_FAN03_PWM
+		#address-cells = <1>;
+		#size-cells = <0>;
+		reg = <1>;
+		fan03_pwm: hwmon@2e {
+			compatible = "maxim,max6639";
+			#address-cells = <1>;
+			#size-cells = <0>;
+			reg = <0x2e>;
+			interrupt-parent = <&smb_svc_pex_fan_alert>;
+			interrupts = <29 IRQ_TYPE_LEVEL_LOW>; // FAN03_PWM_ALERT_N
+			fan-supply = <&sw0_fan03_ssb>;
+			channel@0 {
+				reg = <0>;
+				pwm-polarity = <1>;
+				pulses-per-revolution = <1>;
+				rpm-range = <16000>;
+				pwm-init = <90>;
+				maxim,disable-therm-full-speed;
+			};
+			channel@1 {
+				reg = <1>;
+				pwm-polarity = <1>;
+				pulses-per-revolution = <1>;
+				rpm-range = <16000>;
+				pwm-init = <90>;
+				maxim,disable-therm-full-speed;
+			};
+		};
+	};
+	i2c@2 { // MUX_FAN05_PWM
+		#address-cells = <1>;
+		#size-cells = <0>;
+		reg = <2>;
+		fan05_pwm: hwmon@2e {
+			compatible = "maxim,max6639";
+			#address-cells = <1>;
+			#size-cells = <0>;
+			reg = <0x2e>;
+			interrupt-parent = <&smb_svc_pex_fan_alert>;
+			interrupts = <31 IRQ_TYPE_LEVEL_LOW>; // FAN05_PWM_ALERT_N
+			fan-supply = <&sw0_fan05_ssb>;
+			channel@0 {
+				reg = <0>;
+				pwm-polarity = <1>;
+				pulses-per-revolution = <1>;
+				rpm-range = <16000>;
+				pwm-init = <90>;
+				maxim,disable-therm-full-speed;
+			};
+			channel@1 {
+				reg = <1>;
+				pwm-polarity = <1>;
+				pulses-per-revolution = <1>;
+				rpm-range = <16000>;
+				pwm-init = <90>;
+				maxim,disable-therm-full-speed;
+			};
+		};
+	};
+	i2c@3 { // MUX_FAN07_PWM
+		#address-cells = <1>;
+		#size-cells = <0>;
+		reg = <3>;
+		fan07_pwm: hwmon@2e {
+			compatible = "maxim,max6639";
+			#address-cells = <1>;
+			#size-cells = <0>;
+			reg = <0x2e>;
+			interrupt-parent = <&smb_svc_pex_fan_alert>;
+			interrupts = <33 IRQ_TYPE_LEVEL_LOW>; // FAN07_PWM_ALERT_N
+			fan-supply = <&sw0_fan07_ssb>;
+			channel@0 {
+				reg = <0>;
+				pwm-polarity = <1>;
+				pulses-per-revolution = <1>;
+				rpm-range = <16000>;
+				pwm-init = <90>;
+				maxim,disable-therm-full-speed;
+			};
+			channel@1 {
+				reg = <1>;
+				pwm-polarity = <1>;
+				pulses-per-revolution = <1>;
+				rpm-range = <16000>;
+				pwm-init = <90>;
+				maxim,disable-therm-full-speed;
+			};
+		};
+	};
+	i2c@4 { // MUX_FAN09_PWM
+		#address-cells = <1>;
+		#size-cells = <0>;
+		reg = <4>;
+		fan09_pwm: hwmon@2e {
+			compatible = "maxim,max6639";
+			#address-cells = <1>;
+			#size-cells = <0>;
+			reg = <0x2e>;
+			interrupt-parent = <&smb_svc_pex_fan_alert>;
+			interrupts = <35 IRQ_TYPE_LEVEL_LOW>; // FAN09_PWM_ALERT_N
+			fan-supply = <&sw0_fan09_ssb>;
+			channel@0 {
+				reg = <0>;
+				pwm-polarity = <1>;
+				pulses-per-revolution = <1>;
+				rpm-range = <16000>;
+				pwm-init = <90>;
+				maxim,disable-therm-full-speed;
+			};
+			channel@1 {
+				reg = <1>;
+				pwm-polarity = <1>;
+				pulses-per-revolution = <1>;
+				rpm-range = <16000>;
+				pwm-init = <90>;
+				maxim,disable-therm-full-speed;
+			};
+		};
+	};
+	i2c@5 { // MUX_FAN11_PWM
+		#address-cells = <1>;
+		#size-cells = <0>;
+		reg = <5>;
+		fan11_pwm: hwmon@2e {
+			compatible = "maxim,max6639";
+			#address-cells = <1>;
+			#size-cells = <0>;
+			reg = <0x2e>;
+			interrupt-parent = <&smb_svc_pex_fan_alert>;
+			interrupts = <37 IRQ_TYPE_LEVEL_LOW>; // FAN11_PWM_ALERT_N
+			fan-supply = <&sw0_fan11_ssb>;
+			channel@0 {
+				reg = <0>;
+				pwm-polarity = <1>;
+				pulses-per-revolution = <1>;
+				rpm-range = <16000>;
+				pwm-init = <90>;
+				maxim,disable-therm-full-speed;
+			};
+			channel@1 {
+				reg = <1>;
+				pwm-polarity = <1>;
+				pulses-per-revolution = <1>;
+				rpm-range = <16000>;
+				pwm-init = <90>;
+				maxim,disable-therm-full-speed;
+			};
+		};
+	};
+	i2c@6 { // MUX_FAN13_PWM
+		#address-cells = <1>;
+		#size-cells = <0>;
+		reg = <6>;
+		fan13_pwm: hwmon@2e {
+			compatible = "maxim,max6639";
+			#address-cells = <1>;
+			#size-cells = <0>;
+			reg = <0x2e>;
+			interrupt-parent = <&smb_svc_pex_fan_alert>;
+			interrupts = <39 IRQ_TYPE_LEVEL_LOW>; // FAN13_PWM_ALERT_N
+			fan-supply = <&sw0_fan13_ssb>;
+			channel@0 {
+				reg = <0>;
+				pwm-polarity = <1>;
+				pulses-per-revolution = <1>;
+				rpm-range = <16000>;
+				pwm-init = <90>;
+				maxim,disable-therm-full-speed;
+			};
+			channel@1 {
+				reg = <1>;
+				pwm-polarity = <1>;
+				pulses-per-revolution = <1>;
+				rpm-range = <16000>;
+				pwm-init = <90>;
+				maxim,disable-therm-full-speed;
+			};
+		};
+	};
+	i2c@7 { // MUX_FAN15_PWM
+		#address-cells = <1>;
+		#size-cells = <0>;
+		reg = <7>;
+		fan15_pwm: hwmon@2e {
+			compatible = "maxim,max6639";
+			#address-cells = <1>;
+			#size-cells = <0>;
+			reg = <0x2e>;
+			interrupt-parent = <&smb_svc_pex_fan_alert>;
+			interrupts = <41 IRQ_TYPE_LEVEL_LOW>; // FAN15_PWM_ALERT_N
+			fan-supply = <&sw0_fan15_ssb>;
+			channel@0 {
+				reg = <0>;
+				pwm-polarity = <1>;
+				pulses-per-revolution = <1>;
+				rpm-range = <16000>;
+				pwm-init = <90>;
+				maxim,disable-therm-full-speed;
+			};
+			channel@1 {
+				reg = <1>;
+				pwm-polarity = <1>;
+				pulses-per-revolution = <1>;
+				rpm-range = <16000>;
+				pwm-init = <90>;
+				maxim,disable-therm-full-speed;
+			};
+		};
+	};
+};
+
+&i2cmux16 {
+	i2c@0 { // MUX_FAN17_PWM
+		#address-cells = <1>;
+		#size-cells = <0>;
+		reg = <0>;
+		fan17_pwm: hwmon@2e {
+			compatible = "maxim,max6639";
+			#address-cells = <1>;
+			#size-cells = <0>;
+			reg = <0x2e>;
+			interrupt-parent = <&smb_svc_pex_fan_alert>;
+			interrupts = <43 IRQ_TYPE_LEVEL_LOW>; // FAN17_PWM_ALERT_N
+			fan-supply = <&sw0_fan17_ssb>;
+			channel@0 {
+				reg = <0>;
+				pwm-polarity = <1>;
+				pulses-per-revolution = <1>;
+				rpm-range = <16000>;
+				pwm-init = <90>;
+				maxim,disable-therm-full-speed;
+			};
+			channel@1 {
+				reg = <1>;
+				pwm-polarity = <1>;
+				pulses-per-revolution = <1>;
+				rpm-range = <16000>;
+				pwm-init = <90>;
+				maxim,disable-therm-full-speed;
+			};
+		};
+	};
+	i2c@1 { // MUX_FAN19_PWM
+		#address-cells = <1>;
+		#size-cells = <0>;
+		reg = <1>;
+		fan19_pwm: hwmon@2e {
+			compatible = "maxim,max6639";
+			#address-cells = <1>;
+			#size-cells = <0>;
+			reg = <0x2e>;
+			interrupt-parent = <&smb_svc_pex_fan_alert>;
+			interrupts = <45 IRQ_TYPE_LEVEL_LOW>; // FAN19_PWM_ALERT_N
+			fan-supply = <&sw0_fan19_ssb>;
+			channel@0 {
+				reg = <0>;
+				pwm-polarity = <1>;
+				pulses-per-revolution = <1>;
+				rpm-range = <16000>;
+				pwm-init = <90>;
+				maxim,disable-therm-full-speed;
+			};
+			channel@1 {
+				reg = <1>;
+				pwm-polarity = <1>;
+				pulses-per-revolution = <1>;
+				rpm-range = <16000>;
+				pwm-init = <90>;
+				maxim,disable-therm-full-speed;
+			};
+		};
+	};
+	i2c@2 { // MUX_FAN21_PWM
+		#address-cells = <1>;
+		#size-cells = <0>;
+		reg = <2>;
+		fan21_pwm: hwmon@2e {
+			compatible = "maxim,max6639";
+			#address-cells = <1>;
+			#size-cells = <0>;
+			reg = <0x2e>;
+			interrupt-parent = <&smb_svc_pex_fan_alert>;
+			interrupts = <47 IRQ_TYPE_LEVEL_LOW>; // FAN21_PWM_ALERT_N
+			fan-supply = <&sw0_fan21_ssb>;
+			channel@0 {
+				reg = <0>;
+				pwm-polarity = <1>;
+				pulses-per-revolution = <1>;
+				rpm-range = <16000>;
+				pwm-init = <90>;
+				maxim,disable-therm-full-speed;
+			};
+			channel@1 {
+				reg = <1>;
+				pwm-polarity = <1>;
+				pulses-per-revolution = <1>;
+				rpm-range = <16000>;
+				pwm-init = <90>;
+				maxim,disable-therm-full-speed;
+			};
+		};
+	};
+	i2c@3 { // MUX_FAN23_PWM
+		#address-cells = <1>;
+		#size-cells = <0>;
+		reg = <3>;
+		fan23_pwm: hwmon@2e {
+			compatible = "maxim,max6639";
+			#address-cells = <1>;
+			#size-cells = <0>;
+			reg = <0x2e>;
+			interrupt-parent = <&smb_svc_pex_fan_alert>;
+			interrupts = <49 IRQ_TYPE_LEVEL_LOW>; // FAN23_PWM_ALERT_N
+			fan-supply = <&sw0_fan23_ssb>;
+			channel@0 {
+				reg = <0>;
+				pwm-polarity = <1>;
+				pulses-per-revolution = <1>;
+				rpm-range = <16000>;
+				pwm-init = <90>;
+				maxim,disable-therm-full-speed;
+			};
+			channel@1 {
+				reg = <1>;
+				pwm-polarity = <1>;
+				pulses-per-revolution = <1>;
+				rpm-range = <16000>;
+				pwm-init = <90>;
+				maxim,disable-therm-full-speed;
+			};
+		};
+	};
+	i2c@4 { // MUX_FAN02_PWM
+		#address-cells = <1>;
+		#size-cells = <0>;
+		reg = <4>;
+		fan02_pwm: hwmon@2e {
+			compatible = "maxim,max6639";
+			#address-cells = <1>;
+			#size-cells = <0>;
+			reg = <0x2e>;
+			interrupt-parent = <&smb_svc_pex_fan_alert>;
+			interrupts = <28 IRQ_TYPE_LEVEL_LOW>; // FAN02_PWM_ALERT_N
+			fan-supply = <&sw0_fan02_ssb>;
+			channel@0 {
+				reg = <0>;
+				pwm-polarity = <1>;
+				pulses-per-revolution = <1>;
+				rpm-range = <16000>;
+				pwm-init = <90>;
+				maxim,disable-therm-full-speed;
+			};
+			channel@1 {
+				reg = <1>;
+				pwm-polarity = <1>;
+				pulses-per-revolution = <1>;
+				rpm-range = <16000>;
+				pwm-init = <90>;
+				maxim,disable-therm-full-speed;
+			};
+		};
+	};
+	i2c@5 { // MUX_FAN04_PWM
+		#address-cells = <1>;
+		#size-cells = <0>;
+		reg = <5>;
+		fan04_pwm: hwmon@2e {
+			compatible = "maxim,max6639";
+			#address-cells = <1>;
+			#size-cells = <0>;
+			reg = <0x2e>;
+			interrupt-parent = <&smb_svc_pex_fan_alert>;
+			interrupts = <30 IRQ_TYPE_LEVEL_LOW>; // FAN04_PWM_ALERT_N
+			fan-supply = <&sw0_fan04_ssb>;
+			channel@0 {
+				reg = <0>;
+				pwm-polarity = <1>;
+				pulses-per-revolution = <1>;
+				rpm-range = <16000>;
+				pwm-init = <90>;
+				maxim,disable-therm-full-speed;
+			};
+			channel@1 {
+				reg = <1>;
+				pwm-polarity = <1>;
+				pulses-per-revolution = <1>;
+				rpm-range = <16000>;
+				pwm-init = <90>;
+				maxim,disable-therm-full-speed;
+			};
+		};
+	};
+	i2c@6 { // MUX_FAN06_PWM
+		#address-cells = <1>;
+		#size-cells = <0>;
+		reg = <6>;
+		fan06_pwm: hwmon@2e {
+			compatible = "maxim,max6639";
+			#address-cells = <1>;
+			#size-cells = <0>;
+			reg = <0x2e>;
+			interrupt-parent = <&smb_svc_pex_fan_alert>;
+			interrupts = <32 IRQ_TYPE_LEVEL_LOW>; // FAN06_PWM_ALERT_N
+			fan-supply = <&sw0_fan06_ssb>;
+			channel@0 {
+				reg = <0>;
+				pwm-polarity = <1>;
+				pulses-per-revolution = <1>;
+				rpm-range = <16000>;
+				pwm-init = <90>;
+				maxim,disable-therm-full-speed;
+			};
+			channel@1 {
+				reg = <1>;
+				pwm-polarity = <1>;
+				pulses-per-revolution = <1>;
+				rpm-range = <16000>;
+				pwm-init = <90>;
+				maxim,disable-therm-full-speed;
+			};
+		};
+	};
+	i2c@7 { // MUX_FAN08_PWM
+		#address-cells = <1>;
+		#size-cells = <0>;
+		reg = <7>;
+		fan08_pwm: hwmon@2e {
+			compatible = "maxim,max6639";
+			#address-cells = <1>;
+			#size-cells = <0>;
+			reg = <0x2e>;
+			interrupt-parent = <&smb_svc_pex_fan_alert>;
+			interrupts = <34 IRQ_TYPE_LEVEL_LOW>; // FAN08_PWM_ALERT_N
+			fan-supply = <&sw0_fan08_ssb>;
+			channel@0 {
+				reg = <0>;
+				pwm-polarity = <1>;
+				pulses-per-revolution = <1>;
+				rpm-range = <16000>;
+				pwm-init = <90>;
+				maxim,disable-therm-full-speed;
+			};
+			channel@1 {
+				reg = <1>;
+				pwm-polarity = <1>;
+				pulses-per-revolution = <1>;
+				rpm-range = <16000>;
+				pwm-init = <90>;
+				maxim,disable-therm-full-speed;
+			};
+		};
+	};
+};
+
+&i2cmux17 {
+	i2c@0 { // MUX_FAN10_PWM
+		#address-cells = <1>;
+		#size-cells = <0>;
+		reg = <0>;
+		fan10_pwm: hwmon@2e {
+			compatible = "maxim,max6639";
+			#address-cells = <1>;
+			#size-cells = <0>;
+			reg = <0x2e>;
+			interrupt-parent = <&smb_svc_pex_fan_alert>;
+			interrupts = <36 IRQ_TYPE_LEVEL_LOW>; // FAN10_PWM_ALERT_N
+			fan-supply = <&sw0_fan10_ssb>;
+			channel@0 {
+				reg = <0x00>;
+				pwm-polarity = <1>;
+				pulses-per-revolution = <1>;
+				rpm-range = <16000>;
+				pwm-init = <90>;
+				maxim,disable-therm-full-speed;
+			};
+			channel@1 {
+				reg = <1>;
+				pwm-polarity = <1>;
+				pulses-per-revolution = <1>;
+				rpm-range = <16000>;
+				pwm-init = <90>;
+				maxim,disable-therm-full-speed;
+			};
+		};
+	};
+	i2c@1 { // MUX_FAN12_PWM
+		#address-cells = <1>;
+		#size-cells = <0>;
+		reg = <1>;
+		fan12_pwm: hwmon@2e {
+			compatible = "maxim,max6639";
+			#address-cells = <1>;
+			#size-cells = <0>;
+			reg = <0x2e>;
+			interrupt-parent = <&smb_svc_pex_fan_alert>;
+			interrupts = <38 IRQ_TYPE_LEVEL_LOW>; // FAN12_PWM_ALERT_N
+			fan-supply = <&sw0_fan12_ssb>;
+			channel@0 {
+				reg = <0>;
+				pwm-polarity = <1>;
+				pulses-per-revolution = <1>;
+				rpm-range = <16000>;
+				pwm-init = <90>;
+				maxim,disable-therm-full-speed;
+			};
+			channel@1 {
+				reg = <1>;
+				pwm-polarity = <1>;
+				pulses-per-revolution = <1>;
+				rpm-range = <16000>;
+				pwm-init = <90>;
+				maxim,disable-therm-full-speed;
+			};
+		};
+	};
+	i2c@2 { // MUX_FAN14_PWM
+		#address-cells = <1>;
+		#size-cells = <0>;
+		reg = <2>;
+		fan14_pwm: hwmon@2e {
+			compatible = "maxim,max6639";
+			#address-cells = <1>;
+			#size-cells = <0>;
+			reg = <0x2e>;
+			interrupt-parent = <&smb_svc_pex_fan_alert>;
+			interrupts = <40 IRQ_TYPE_LEVEL_LOW>; // FAN14_PWM_ALERT_N
+			fan-supply = <&sw0_fan14_ssb>;
+			channel@0 {
+				reg = <0>;
+				pwm-polarity = <1>;
+				pulses-per-revolution = <1>;
+				rpm-range = <16000>;
+				pwm-init = <90>;
+				maxim,disable-therm-full-speed;
+			};
+			channel@1 {
+				reg = <1>;
+				pwm-polarity = <1>;
+				pulses-per-revolution = <1>;
+				rpm-range = <16000>;
+				pwm-init = <90>;
+				maxim,disable-therm-full-speed;
+			};
+		};
+	};
+	i2c@3 { // MUX_FAN16_PWM
+		#address-cells = <1>;
+		#size-cells = <0>;
+		reg = <3>;
+		fan16_pwm: hwmon@2e {
+			compatible = "maxim,max6639";
+			#address-cells = <1>;
+			#size-cells = <0>;
+			reg = <0x2e>;
+			interrupt-parent = <&smb_svc_pex_fan_alert>;
+			interrupts = <42 IRQ_TYPE_LEVEL_LOW>; // FAN16_PWM_ALERT_N
+			fan-supply = <&sw0_fan16_ssb>;
+			channel@0 {
+				reg = <0>;
+				pwm-polarity = <1>;
+				pulses-per-revolution = <1>;
+				rpm-range = <16000>;
+				pwm-init = <90>;
+				maxim,disable-therm-full-speed;
+			};
+			channel@1 {
+				reg = <1>;
+				pwm-polarity = <1>;
+				pulses-per-revolution = <1>;
+				rpm-range = <16000>;
+				pwm-init = <90>;
+				maxim,disable-therm-full-speed;
+			};
+		};
+	};
+	i2c@4 { // MUX_FAN18_PWM
+		#address-cells = <1>;
+		#size-cells = <0>;
+		reg = <4>;
+		fan18_pwm: hwmon@2e {
+			compatible = "maxim,max6639";
+			#address-cells = <1>;
+			#size-cells = <0>;
+			reg = <0x2e>;
+			interrupt-parent = <&smb_svc_pex_fan_alert>;
+			interrupts = <44 IRQ_TYPE_LEVEL_LOW>; // FAN18_PWM_ALERT_N
+			fan-supply = <&sw0_fan18_ssb>;
+			channel@0 {
+				reg = <0>;
+				pwm-polarity = <1>;
+				pulses-per-revolution = <1>;
+				rpm-range = <16000>;
+				pwm-init = <90>;
+				maxim,disable-therm-full-speed;
+			};
+			channel@1 {
+				reg = <1>;
+				pwm-polarity = <1>;
+				pulses-per-revolution = <1>;
+				rpm-range = <16000>;
+				pwm-init = <90>;
+				maxim,disable-therm-full-speed;
+			};
+		};
+	};
+	i2c@5 { // MUX_FAN20_PWM
+		#address-cells = <1>;
+		#size-cells = <0>;
+		reg = <5>;
+		fan20_pwm: hwmon@2e {
+			compatible = "maxim,max6639";
+			#address-cells = <1>;
+			#size-cells = <0>;
+			reg = <0x2e>;
+			interrupt-parent = <&smb_svc_pex_fan_alert>;
+			interrupts = <46 IRQ_TYPE_LEVEL_LOW>; // FAN20_PWM_ALERT_N
+			fan-supply = <&sw0_fan20_ssb>;
+			channel@0 {
+				reg = <0>;
+				pwm-polarity = <1>;
+				pulses-per-revolution = <1>;
+				rpm-range = <16000>;
+				pwm-init = <90>;
+				maxim,disable-therm-full-speed;
+			};
+			channel@1 {
+				reg = <1>;
+				pwm-polarity = <1>;
+				pulses-per-revolution = <1>;
+				rpm-range = <16000>;
+				pwm-init = <90>;
+				maxim,disable-therm-full-speed;
+			};
+		};
+	};
+	i2c@6 { // MUX_FAN22_PWM
+		#address-cells = <1>;
+		#size-cells = <0>;
+		reg = <6>;
+		fan22_pwm: hwmon@2e {
+			compatible = "maxim,max6639";
+			#address-cells = <1>;
+			#size-cells = <0>;
+			reg = <0x2e>;
+			interrupt-parent = <&smb_svc_pex_fan_alert>;
+			interrupts = <48 IRQ_TYPE_LEVEL_LOW>; // FAN22_PWM_ALERT_N
+			fan-supply = <&sw0_fan22_ssb>;
+			channel@0 {
+				reg = <0>;
+				pwm-polarity = <1>;
+				pulses-per-revolution = <1>;
+				rpm-range = <16000>;
+				pwm-init = <90>;
+				maxim,disable-therm-full-speed;
+			};
+			channel@1 {
+				reg = <1>;
+				pwm-polarity = <1>;
+				pulses-per-revolution = <1>;
+				rpm-range = <16000>;
+				pwm-init = <90>;
+				maxim,disable-therm-full-speed;
+			};
+		};
+	};
+	i2c@7 { // MUX_FAN24_PWM
+		#address-cells = <1>;
+		#size-cells = <0>;
+		reg = <7>;
+		fan24_pwm: hwmon@2e {
+			compatible = "maxim,max6639";
+			#address-cells = <1>;
+			#size-cells = <0>;
+			reg = <0x2e>;
+			interrupt-parent = <&smb_svc_pex_fan_alert>;
+			interrupts = <50 IRQ_TYPE_LEVEL_LOW>; // FAN24_PWM_ALERT_N
+			fan-supply = <&sw0_fan24_ssb>;
+			channel@0 {
+				reg = <0>;
+				pwm-polarity = <1>;
+				pulses-per-revolution = <1>;
+				rpm-range = <16000>;
+				pwm-init = <90>;
+				maxim,disable-therm-full-speed;
+			};
+			channel@1 {
+				reg = <1>;
+				pwm-polarity = <1>;
+				pulses-per-revolution = <1>;
+				rpm-range = <16000>;
+				pwm-init = <90>;
+				maxim,disable-therm-full-speed;
+			};
+		};
+	};
+};
 
 &i2cmux7 {
 	i2c@0 { // MUX_FAN17_SSB
