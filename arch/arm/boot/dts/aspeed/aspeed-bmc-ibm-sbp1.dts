@@ -9,7 +9,7 @@
 
 / {
 	model = "IBM SBP1";
-	compatible = "aspeed,ast2600";
+	compatible = "ibm,sbp1-bmc", "aspeed,ast2600";
 
 	chosen {
 		stdout-path = &uart1;
@@ -2153,7 +2153,7 @@
 				// using  SMB_VR_PVCCD_HV_CPU0_ALERT_N
 				interrupt-parent = <&smb_pex_cpu0_event>;
 				interrupts = <11 IRQ_TYPE_LEVEL_LOW>;
-				infineon,en-pin-fixed-level = <0>;
+				infineon,en-pin-fixed-level;
 				regulators {
 					pvccd_hv_cpu0: vout0 {
 						regulator-compatible = "vout0";
@@ -2346,7 +2346,7 @@
 				// using  SMB_VR_PVCCD_HV_CPU1_ALERT_N
 				interrupt-parent = <&smb_pex_cpu1_event>;
 				interrupts = <11 IRQ_TYPE_LEVEL_LOW>;
-				infineon,en-pin-fixed-level = <0>;
+				infineon,en-pin-fixed-level;
 				regulators {
 					pvccd_hv_cpu1: vout0 {
 						regulator-compatible = "vout0";
@@ -2540,7 +2540,7 @@
 				// using  SMB_VR_PVCCD_HV_CPU2_ALERT_N
 				interrupt-parent = <&smb_pex_cpu2_event>;
 				interrupts = <11 IRQ_TYPE_LEVEL_LOW>;
-				infineon,en-pin-fixed-level = <0>;
+				infineon,en-pin-fixed-level;
 				regulators {
 					pvccd_hv_cpu2: vout0 {
 						regulator-compatible = "vout0";
@@ -2733,7 +2733,7 @@
 				// using  SMB_VR_PVCCD_HV_CPU3_ALERT_N
 				interrupt-parent = <&smb_pex_cpu3_event>;
 				interrupts = <11 IRQ_TYPE_LEVEL_LOW>;
-				infineon,en-pin-fixed-level = <0>;
+				infineon,en-pin-fixed-level;
 				regulators {
 					pvccd_hv_cpu3: vout0 {
 						regulator-compatible = "vout0";
