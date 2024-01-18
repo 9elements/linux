@@ -30,6 +30,15 @@ properties:
       unconnected(has internal pull-down).
     type: boolean
 
+  interrupts:
+    maxItems: 1
+
+  regulators:
+    $ref: /schemas/regulator/regulator.yaml#
+    type: object
+    description: |
+      list of regulators provided by this controller.
+
 required:
   - compatible
   - reg
