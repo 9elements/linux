@@ -74,6 +74,9 @@ properties:
             description: |
               The value of current sense resistor in microohms.
 
+          regulator-compatible:
+            pattern: "^SW[0-1]$"
+
         required:
           - shunt-resistor-micro-ohms
 
