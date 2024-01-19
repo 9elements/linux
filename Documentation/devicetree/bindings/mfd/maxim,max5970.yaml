@@ -66,7 +66,7 @@ properties:
       Properties for both hot swap control/switch.
 
     patternProperties:
-      "^sw[0-1]$":
+      "^SW[0-1]$":
         $ref: /schemas/regulator/regulator.yaml#
         type: object
         properties:
@@ -110,7 +110,7 @@ examples:
             vss1-supply = <&p3v3>;
 
             regulators {
-                sw0_ref_0: sw0 {
+                sw0_ref_0: SW0 {
                     shunt-resistor-micro-ohms = <12000>;
                 };
             };
@@ -144,10 +144,10 @@ examples:
             vss2-supply = <&p5v>;
 
             regulators {
-                sw0_ref_1: sw0 {
+                sw0_ref_1: SW0 {
                     shunt-resistor-micro-ohms = <12000>;
                 };
-                sw1_ref_1: sw1 {
+                sw1_ref_1: SW1 {
                     shunt-resistor-micro-ohms = <10000>;
                 };
             };
