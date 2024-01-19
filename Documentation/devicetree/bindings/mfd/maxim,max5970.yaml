@@ -74,6 +74,9 @@ properties:
             description: |
               The value of current sense resistor in microohms.
 
+          regulator-compatible:
+            pattern: "^SW[0-1]$"
+
         required:
           - shunt-resistor-micro-ohms
 
@@ -111,6 +114,8 @@ examples:
 
             regulators {
                 sw0_ref_0: sw0 {
+                    regulator-compatible = "SW0";
+                    regulator-name = "p5v";
                     shunt-resistor-micro-ohms = <12000>;
                 };
             };
@@ -145,9 +150,13 @@ examples:
 
             regulators {
                 sw0_ref_1: sw0 {
+                    regulator-compatible = "SW0";
+                    regulator-name = "p5v_aux";
                     shunt-resistor-micro-ohms = <12000>;
                 };
                 sw1_ref_1: sw1 {
+                    regulator-compatible = "SW1";
+                    regulator-name = "p3v3_aux";
                     shunt-resistor-micro-ohms = <10000>;
                 };
             };
