@@ -38,6 +38,9 @@ properties:
     maxItems: 1
     description: |
       Channel node of a voltage io-channel.
+ 
+  '#io-channel-cells':
+    const: 0
 
   output-ohms:
     description:
