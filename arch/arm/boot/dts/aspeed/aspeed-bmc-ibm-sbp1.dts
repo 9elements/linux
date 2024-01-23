@@ -717,7 +717,7 @@
 	p12v_vd: voltage_divider1 {
 		compatible = "voltage-divider";
 		io-channels = <&adc1 3>;
-		#io-channel-cells = <1>;
+		#io-channel-cells = <0>;
 
 		/* Scale the system voltage by 1127/127 to fit the ADC range.
 		 * Use small nominator to prevent integer overflow.
@@ -729,7 +729,7 @@
 	p5v_aux_vd: voltage_divider2 {
 		compatible = "voltage-divider";
 		io-channels = <&adc1 5>;
-		#io-channel-cells = <1>;
+		#io-channel-cells = <0>;
 
 		/* Scale the system voltage by 1365/365 to fit the ADC range.
 		 * Use small nominator to prevent integer overflow.
@@ -741,7 +741,7 @@
 	p5v_bmc_aux_vd: voltage_divider3 {
 		compatible = "voltage-divider";
 		io-channels = <&adc0 3>;
-		#io-channel-cells = <1>;
+		#io-channel-cells = <0>;
 
 		/* Scale the system voltage by 1365/365 to fit the ADC range.
 		 * Use small nominator to prevent integer overflow.
@@ -753,7 +753,7 @@
 	p3v3_aux_vd: voltage_divider4 {
 		compatible = "voltage-divider";
 		io-channels = <&adc1 2>;
-		#io-channel-cells = <1>;
+		#io-channel-cells = <0>;
 
 		/* Scale the system voltage by 1698/698 to fit the ADC range.
 		 * Use small nominator to prevent integer overflow.
@@ -765,7 +765,7 @@
 	p3v3_bmc_aux_vd: voltage_divider5 {
 		compatible = "voltage-divider";
 		io-channels = <&adc0 7>;
-		#io-channel-cells = <1>;
+		#io-channel-cells = <0>;
 
 		/* Scale the system voltage by 1698/698 to fit the ADC range.
 		 * Use small nominator to prevent integer overflow.
@@ -777,7 +777,7 @@
 	p1v8_bmc_aux_vd: voltage_divider6 {
 		compatible = "voltage-divider";
 		io-channels = <&adc0 6>;
-		#io-channel-cells = <1>;
+		#io-channel-cells = <0>;
 
 		/* Scale the system voltage by 4000/3000 to fit the ADC range.
 		 * Use small nominator to prevent integer overflow.
@@ -789,7 +789,7 @@
 	p2V5_aux_vd: voltage_divider7 {
 		compatible = "voltage-divider";
 		io-channels = <&adc1 1>;
-		#io-channel-cells = <1>;
+		#io-channel-cells = <0>;
 
 		/* Scale the system voltage by 2100/1100 to fit the ADC range.
 		 * Use small nominator to prevent integer overflow.
@@ -801,7 +801,7 @@
 	p3v3_rtc_vd: voltage_divider8 {
 		compatible = "voltage-divider";
 		io-channels = <&adc1 7>;
-		#io-channel-cells = <1>;
+		#io-channel-cells = <0>;
 
 		/* Scale the system voltage by 231000/100000 to fit the ADC range.
 		 * Use small nominator to prevent integer overflow.
