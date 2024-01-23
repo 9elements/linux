@@ -1662,7 +1662,7 @@
 				// Reset is PEX_NIC_RST
 				reset-gpios = <&gpio0 ASPEED_GPIO(Q, 3) GPIO_ACTIVE_HIGH>;
 
-				ngpios = <38>;
+
 				gpio-reserved-ranges = <19 1>, <22 6>, <30 6>, <38 2>;
 
 				gpio-line-names =
@@ -2031,7 +2031,7 @@
 				vdd-supply = <&p3v3_aux>;
 				// Reset is PEX_CPU0_EVENT_RST
 				reset-gpios = <&smb_svc_pex_cpu0_led 16 GPIO_ACTIVE_HIGH>;
-				ngpios = <17>;
+
 				gpio-reserved-ranges = <14 2>, <21 1>, <25 3>, <33 1>;
 
 				gpio-line-names =
@@ -2224,7 +2224,7 @@
 				vdd-supply = <&p3v3_aux>;
 				// Reset is PEX_CPU1_EVENT_RST
 				reset-gpios = <&smb_svc_pex_cpu1_led 16 GPIO_ACTIVE_HIGH>;
-				ngpios = <17>;
+
 				gpio-reserved-ranges = <14 2>, <21 1>, <25 3>, <33 1>;
 
 				gpio-line-names =
@@ -2418,7 +2418,7 @@
 				vdd-supply = <&p3v3_aux>;
 				// Reset is PEX_CPU2_EVENT_RST
 				reset-gpios = <&smb_svc_pex_cpu2_led 16 GPIO_ACTIVE_HIGH>;
-				ngpios = <17>;
+
 				gpio-reserved-ranges = <14 2>, <21 1>, <25 3>, <33 1>;
 
 				gpio-line-names =
@@ -2611,7 +2611,7 @@
 				vdd-supply = <&p3v3_aux>;
 				// Reset is PEX_CPU3_EVENT_RST
 				reset-gpios = <&smb_svc_pex_cpu3_led 16 GPIO_ACTIVE_HIGH>;
-				ngpios = <17>;
+
 				gpio-reserved-ranges = <14 2>, <21 1>, <25 3>, <33 1>;
 
 				gpio-line-names =
@@ -2863,8 +2863,6 @@
 			reg = <5>;
 
 			smb_pex_rssd17_32: pinctrl@20 { // U62150
-				#address-cells = <1>;
-				#size-cells = <0>;
 				compatible = "cypress,cy8c9560";
 				reg = <0x20>;
 				gpio-controller;
@@ -2878,7 +2876,7 @@
 				// Reset is PEX_RSSD17_32_RST
 				reset-gpios = <&bmc_pex_irq 19 GPIO_ACTIVE_HIGH>;
 
-				ngpios = <48>;
+
 				gpio-reserved-ranges = <48 12>;
 
 				gpio-line-names =
@@ -3136,7 +3134,7 @@
 				vdd-supply = <&p3v3_aux>;
 				// Reset is PEX_RSSD01_16_RST
 				reset-gpios = <&bmc_pex_irq 18 GPIO_ACTIVE_HIGH>;
-				ngpios = <48>;
+
 				gpio-reserved-ranges = <48 12>;
 
 				gpio-line-names =
@@ -3391,7 +3389,7 @@
 				// reset is PEX_BMC_RST
 				reset-gpios = <&gpio0 ASPEED_GPIO(Q, 1) GPIO_ACTIVE_HIGH>;
 
-				ngpios = <17>;
+
 
 				gpio-line-names =
 
@@ -3590,8 +3588,6 @@
 					reg = <2>;
 
 					smb_svc_pex_cpu1_led: pinctrl@20 { // U65500
-						#address-cells = <1>;
-						#size-cells = <0>;
 						compatible = "cypress,cy8c9540";
 						reg = <0x20>;
 						gpio-controller;
@@ -3656,7 +3652,7 @@
 						// reset is PEX_FAN_ALERT_RST
 						reset-gpios = <&bmc_pex_irq 17 GPIO_ACTIVE_HIGH>;
 
-						ngpios = <51>;
+
 						gpio-reserved-ranges = <24 3>, <51 9>;
 
 						gpio-line-names =
@@ -3729,8 +3725,6 @@
 					reg = <4>;
 
 					smb_svc_pex_cpu2_led: pinctrl@20 { // U65800
-						#address-cells = <1>;
-						#size-cells = <0>;
 						compatible = "cypress,cy8c9540";
 						reg = <0x20>;
 						gpio-controller;
@@ -3781,8 +3775,6 @@
 					reg = <5>;
 
 					smb_svc_pex_cpu3_led: pinctrl@20 { // U65900
-						#address-cells = <1>;
-						#size-cells = <0>;
 						compatible = "cypress,cy8c9540";
 						reg = <0x20>;
 						gpio-controller;
@@ -3795,7 +3787,7 @@
 						// reset is PEX_CPU3_LED_RST
 						reset-gpios = <&gpio0 ASPEED_GPIO(Q, 7) GPIO_ACTIVE_HIGH>;
 
-						ngpios = <59>;
+
 						gpio-reserved-ranges = <17 3>;
 
 						gpio-line-names =
@@ -3833,8 +3825,6 @@
 					reg = <6>;
 
 					smb_svc_pex_cpu0_led: pinctrl@20 { // U65400
-						#address-cells = <1>;
-						#size-cells = <0>;
 						compatible = "cypress,cy8c9540";
 						reg = <0x20>;
 						gpio-controller;
@@ -3847,7 +3837,7 @@
 						// reset is PEX_CPU0_LED_RST
 						reset-gpios = <&gpio0 ASPEED_GPIO(Q, 4) GPIO_ACTIVE_HIGH>;
 
-						ngpios = <59>;
+
 						gpio-reserved-ranges = <18 2>, <36 2>;
 
 						gpio-line-names =
