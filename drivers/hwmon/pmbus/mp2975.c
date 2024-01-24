@@ -377,6 +377,62 @@ static int mp2973_read_word_data(struct i2c_client *client, int page,
 	return ret;
 }
 
+static int mp2973_write_word_data(struct i2c_client *client, int page,
+				  int reg, u16 word)
+{
+	u8 target, mask;
+	int ret;
+
+	if (reg != PMBUS_SMBALERT_MASK)
+		return -ENODATA;
+
+	/*
+	 * Vendor-specific SMBALERT_MASK register with 16 maskable bits.
+	 */
+	ret = pmbus_read_word_data(client, 0, 0, PMBUS_SMBALERT_MASK);
+	if (ret < 0)
+		return ret;
+
+	target = word & 0xff;
+	mask = word >> 8;
+
+#define SWAP(cond, bit) ret = (cond) ? (ret & ~BIT(bit)) : (ret | BIT(bit))
+	switch (target) {
+	case PMBUS_STATUS_CML:
+		SWAP(mask & PB_CML_FAULT_INVALID_DATA, 8);
+		SWAP(mask & PB_CML_FAULT_INVALID_COMMAND,  9);
+		SWAP(mask & PB_CML_FAULT_OTHER_COMM, 5);
+		SWAP(mask & PB_CML_FAULT_PACKET_ERROR, 7);
+		break;
+	case PMBUS_STATUS_VOUT:
+		SWAP(mask & PB_VOLTAGE_UV_FAULT, 13);
+		SWAP(mask & PB_VOLTAGE_OV_FAULT, 14);
+		break;
+	case PMBUS_STATUS_IOUT:
+		SWAP(mask & PB_IOUT_OC_FAULT, 11);
+		SWAP(mask & PB_IOUT_OC_LV_FAULT, 10);
+		break;
+	case PMBUS_STATUS_TEMPERATURE:
+		SWAP(mask & PB_TEMP_OT_FAULT, 0);
+		break;
+	/*
+	 * Map remaining bits to MFR specific to let the PMBUS core mask
+	 * those bits by default.
+	 */
+	case PMBUS_STATUS_MFR_SPECIFIC:
+		SWAP(mask & BIT(1), 1);
+		SWAP(mask & BIT(3), 3);
+		SWAP(mask & BIT(4), 4);
+		SWAP(mask & BIT(6), 6);
+		break;
+	default:
+		return 0;
+	}
+#undef SWAP
+
+	return pmbus_write_word_data(client, 0, PMBUS_SMBALERT_MASK, ret);
+}
+
 static int mp2975_read_word_data(struct i2c_client *client, int page,
 				 int phase, int reg)
 {
@@ -891,6 +947,7 @@ static struct pmbus_driver_info mp2973_info = {
 		PMBUS_HAVE_TEMP | PMBUS_HAVE_STATUS_TEMP | PMBUS_HAVE_POUT |
 		PMBUS_HAVE_PIN | PMBUS_HAVE_STATUS_INPUT,
 	.read_word_data = mp2973_read_word_data,
+	.write_word_data = mp2973_write_word_data,
 #if IS_ENABLED(CONFIG_SENSORS_MP2975_REGULATOR)
 	.num_regulators = 1,
 	.reg_desc = mp2975_reg_desc,
