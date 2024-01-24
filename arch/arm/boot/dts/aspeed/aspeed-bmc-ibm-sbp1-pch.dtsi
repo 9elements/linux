@@ -20,7 +20,9 @@
 			ir38263_p1v05_pch_aux@40 {
 				compatible = "infineon,ir38263";
 				reg = <0x40>;
-
+				// using SMB_VR_P1V05_PCH_AUX_ALERT_N
+				interrupt-parent = <&smb_pex_vr_ctrl>;
+				interrupts = <9 IRQ_TYPE_LEVEL_LOW>;
 				regulators {
 					p1v05_pch_aux: vout0 {
 						regulator-compatible = "vout0";
@@ -39,7 +41,9 @@
 			ir38060_p1v8_pch_aux@40 {
 				compatible = "infineon,ir38060";
 				reg = <0x40>;
-
+				// using SMB_VR_P1V8_PCH_AUX_ALERT_N
+				interrupt-parent = <&smb_pex_vr_ctrl>;
+				interrupts = <32 IRQ_TYPE_LEVEL_LOW>;
 				regulators {
 					p1v8_pch_aux: vout0 {
 						regulator-compatible = "vout0";
