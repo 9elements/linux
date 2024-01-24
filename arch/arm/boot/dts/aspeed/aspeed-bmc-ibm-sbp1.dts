@@ -1685,13 +1685,11 @@
 
 				pinctrl-0 = <&U62160_pins>;
 				pinctrl-names = "default";
-				U62160_pins: pin-cfg {
-					input_pullup {
+				U62160_pins: cfg-pins {
 						pins = "gp03", "gp16", "gp20", "gp50", "gp51";
 						function = "gpio";
 						input-enable;
 						bias-pull-up;
-					};
 				};
 			};
 		};
@@ -2064,13 +2062,11 @@
 
 				pinctrl-0 = <&U62080_pins>;
 				pinctrl-names = "default";
-				U62080_pins: pin-cfg {
-					input_pullup {
+				U62080_pins: cfg-pins {
 						pins = "gp10", "gp11", "gp12", "gp13", "gp14";
 						function = "gpio";
 						input-enable;
 						bias-pull-up;
-					};
 				};
 			};
 		};
@@ -2257,13 +2253,11 @@
 
 				pinctrl-0 = <&U62090_pins>;
 				pinctrl-names = "default";
-				U62090_pins: pin-cfg {
-					input_pullup {
+				U62090_pins: cfg-pins {
 						pins = "gp10", "gp11", "gp12", "gp13", "gp14";
 						function = "gpio";
 						input-enable;
 						bias-pull-up;
-					};
 				};
 			};
 		};
@@ -2451,13 +2445,11 @@
 
 				pinctrl-0 = <&U62100_pins>;
 				pinctrl-names = "default";
-				U62100_pins: pin-cfg {
-					input_pullup {
+				U62100_pins: cfg-pins {
 						pins = "gp10", "gp11", "gp12", "gp13", "gp14";
 						function = "gpio";
 						input-enable;
 						bias-pull-up;
-					};
 				};
 			};
 		};
@@ -2644,13 +2636,11 @@
 
 				pinctrl-0 = <&U62110_pins>;
 				pinctrl-names = "default";
-				U62110_pins: pin-cfg {
-					input_pullup {
+				U62110_pins: cfg-pins {
 						pins = "gp10", "gp11", "gp12", "gp13", "gp14";
 						function = "gpio";
 						input-enable;
 						bias-pull-up;
-					};
 				};
 			};
 		};
@@ -3121,8 +3111,6 @@
 			reg = <5>;
 
 			smb_pex_rssd_01_16: U62140@20 {
-				#address-cells = <1>;
-				#size-cells = <0>;
 				compatible = "cypress,cy8c9560";
 				reg = <0x20>;
 				gpio-controller;
@@ -3353,22 +3341,20 @@
 					"LED_ID_M2_SSD2", "LED_ID_M2_SSD1",
 					"PLUG_DETECT_M2_SSD_CARRIER2", "M2_SSD2_SSB_ALERT_N";
 
-				pinctrl-0 = <&U62120_pins>;
+				pinctrl-0 = <&U62120_input &U62120_input_pullup>;
 				pinctrl-names = "default";
-				U62120_pins: pin-cfg {
-					input {
-						pins = "gp04", "gp05", "gp06", "gp07", "gp10";
-						function = "gpio";
-						input-enable;
-						bias-disable;
-					};
-					input_pullup {
+				U62120_input: input-pins {
+					pins = "gp04", "gp05", "gp06", "gp07", "gp10";
+					function = "gpio";
+					input-enable;
+					bias-disable;
+				};
+				U62120_input_pullup: input_pullup-pins {
 						pins = "gp01", "gp02", "gp03", "gp11", "gp12", "gp13",
 						"gp23", "gp30", "gp40", "gp42", "gp44", "gp53";
 						function = "gpio";
 						input-enable;
 						bias-pull-up;
-					};
 				};
 			};
 		};
@@ -3409,13 +3395,11 @@
 
 				pinctrl-0 = <&U60000_pins>;
 				pinctrl-names = "default";
-				U60000_pins: pin-cfg {
-					input {
+				U60000_pins: cfg-pins {
 						pins = "gp06", "gp10", "gp15";
 						function = "gpio";
 						input-enable;
 						bias-disable;
-					};
 				};
 			};
 		};
@@ -3493,8 +3477,7 @@
 
 						pinctrl-0 = <&U65200_pins>;
 						pinctrl-names = "default";
-						U65200_pins: pin-cfg {
-							input_pullup {
+						U65200_pins: cfg-pins {
 								pins =  "gp60", "gp61", "gp62",
 								"gp63", "gp64", "gp65", "gp66",
 								"gp67", "gp70", "gp71", "gp72",
@@ -3502,7 +3485,6 @@
 								function = "gpio";
 								input-enable;
 								bias-pull-up;
-							};
 						};
 					};
 				};
@@ -3567,8 +3549,7 @@
 
 						pinctrl-0 = <&U65300_pins>;
 						pinctrl-names = "default";
-						U65300_pins: pin-cfg {
-							input_pullup {
+						U65300_pins: cfg-pins {
 								pins = "gp60", "gp61", "gp62",
 								"gp63", "gp64", "gp65", "gp66",
 								"gp67", "gp70", "gp71", "gp72",
@@ -3577,7 +3558,6 @@
 								function = "gpio";
 								input-enable;
 								bias-pull-up;
-							};
 						};
 					};
 				};
@@ -3697,8 +3677,7 @@
 
 						pinctrl-0 = <&U65600_pins>;
 						pinctrl-names = "default";
-						U65600_pins: pin-cfg {
-							input_pullup {
+						U65600_pins: cfg-pins {
 								pins = "gp00", "gp01", "gp02",
 								"gp03", "gp04", "gp05", "gp06",
 								"gp07", "gp10", "gp11", "gp12",
@@ -3715,7 +3694,6 @@
 								function = "gpio";
 								input-enable;
 								bias-pull-up;
-							};
 						};
 					};
 				};
