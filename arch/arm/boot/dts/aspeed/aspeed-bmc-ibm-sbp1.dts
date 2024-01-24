@@ -1686,10 +1686,10 @@
 				pinctrl-0 = <&U62160_pins>;
 				pinctrl-names = "default";
 				U62160_pins: cfg-pins {
-						pins = "gp03", "gp16", "gp20", "gp50", "gp51";
-						function = "gpio";
-						input-enable;
-						bias-pull-up;
+					pins = "gp03", "gp16", "gp20", "gp50", "gp51";
+					function = "gpio";
+					input-enable;
+					bias-pull-up;
 				};
 			};
 		};
@@ -2063,10 +2063,10 @@
 				pinctrl-0 = <&U62080_pins>;
 				pinctrl-names = "default";
 				U62080_pins: cfg-pins {
-						pins = "gp10", "gp11", "gp12", "gp13", "gp14";
-						function = "gpio";
-						input-enable;
-						bias-pull-up;
+					pins = "gp10", "gp11", "gp12", "gp13", "gp14";
+					function = "gpio";
+					input-enable;
+					bias-pull-up;
 				};
 			};
 		};
@@ -2254,10 +2254,10 @@
 				pinctrl-0 = <&U62090_pins>;
 				pinctrl-names = "default";
 				U62090_pins: cfg-pins {
-						pins = "gp10", "gp11", "gp12", "gp13", "gp14";
-						function = "gpio";
-						input-enable;
-						bias-pull-up;
+					pins = "gp10", "gp11", "gp12", "gp13", "gp14";
+					function = "gpio";
+					input-enable;
+					bias-pull-up;
 				};
 			};
 		};
@@ -2446,10 +2446,10 @@
 				pinctrl-0 = <&U62100_pins>;
 				pinctrl-names = "default";
 				U62100_pins: cfg-pins {
-						pins = "gp10", "gp11", "gp12", "gp13", "gp14";
-						function = "gpio";
-						input-enable;
-						bias-pull-up;
+					pins = "gp10", "gp11", "gp12", "gp13", "gp14";
+					function = "gpio";
+					input-enable;
+					bias-pull-up;
 				};
 			};
 		};
@@ -2637,10 +2637,10 @@
 				pinctrl-0 = <&U62110_pins>;
 				pinctrl-names = "default";
 				U62110_pins: cfg-pins {
-						pins = "gp10", "gp11", "gp12", "gp13", "gp14";
-						function = "gpio";
-						input-enable;
-						bias-pull-up;
+					pins = "gp10", "gp11", "gp12", "gp13", "gp14";
+					function = "gpio";
+					input-enable;
+					bias-pull-up;
 				};
 			};
 		};
@@ -3350,11 +3350,11 @@
 					bias-disable;
 				};
 				U62120_input_pullup: input_pullup-pins {
-						pins = "gp01", "gp02", "gp03", "gp11", "gp12", "gp13",
-						"gp23", "gp30", "gp40", "gp42", "gp44", "gp53";
-						function = "gpio";
-						input-enable;
-						bias-pull-up;
+					pins = "gp01", "gp02", "gp03", "gp11", "gp12", "gp13",
+					"gp23", "gp30", "gp40", "gp42", "gp44", "gp53";
+					function = "gpio";
+					input-enable;
+					bias-pull-up;
 				};
 			};
 		};
@@ -3375,8 +3375,6 @@
 				// reset is PEX_BMC_RST
 				reset-gpios = <&gpio0 ASPEED_GPIO(Q, 1) GPIO_ACTIVE_HIGH>;
 
-
-
 				gpio-line-names =
 
 				/* GPORT0 */
@@ -3396,10 +3394,10 @@
 				pinctrl-0 = <&U60000_pins>;
 				pinctrl-names = "default";
 				U60000_pins: cfg-pins {
-						pins = "gp06", "gp10", "gp15";
-						function = "gpio";
-						input-enable;
-						bias-disable;
+					pins = "gp06", "gp10", "gp15";
+					function = "gpio";
+					input-enable;
+					bias-disable;
 				};
 			};
 		};
@@ -3478,13 +3476,13 @@
 						pinctrl-0 = <&U65200_pins>;
 						pinctrl-names = "default";
 						U65200_pins: cfg-pins {
-								pins =  "gp60", "gp61", "gp62",
-								"gp63", "gp64", "gp65", "gp66",
-								"gp67", "gp70", "gp71", "gp72",
-								"gp73", "gp74", "gp75", "gp76", "gp77";
-								function = "gpio";
-								input-enable;
-								bias-pull-up;
+							pins =  "gp60", "gp61", "gp62",
+							"gp63", "gp64", "gp65", "gp66",
+							"gp67", "gp70", "gp71", "gp72",
+							"gp73", "gp74", "gp75", "gp76", "gp77";
+							function = "gpio";
+							input-enable;
+							bias-pull-up;
 						};
 					};
 				};
@@ -3550,14 +3548,14 @@
 						pinctrl-0 = <&U65300_pins>;
 						pinctrl-names = "default";
 						U65300_pins: cfg-pins {
-								pins = "gp60", "gp61", "gp62",
-								"gp63", "gp64", "gp65", "gp66",
-								"gp67", "gp70", "gp71", "gp72",
-								"gp73", "gp74", "gp75", "gp76",
-								"gp77";
-								function = "gpio";
-								input-enable;
-								bias-pull-up;
+							pins = "gp60", "gp61", "gp62",
+							"gp63", "gp64", "gp65", "gp66",
+							"gp67", "gp70", "gp71", "gp72",
+							"gp73", "gp74", "gp75", "gp76",
+							"gp77";
+							function = "gpio";
+							input-enable;
+							bias-pull-up;
 						};
 					};
 				};
@@ -3612,7 +3610,7 @@
 						"FM_CPU1_SKTOCC_N", "LED_ID_CPU1";
 					};
 				};
-				
+
 				i2c@3 { // SMB_SVC_PEX_FAN_ALERT
 					#address-cells = <1>;
 					#size-cells = <0>;
@@ -3678,22 +3676,22 @@
 						pinctrl-0 = <&U65600_pins>;
 						pinctrl-names = "default";
 						U65600_pins: cfg-pins {
-								pins = "gp00", "gp01", "gp02",
-								"gp03", "gp04", "gp05", "gp06",
-								"gp07", "gp10", "gp11", "gp12",
-								"gp13", "gp14", "gp15", "gp16",
-								"gp17", "gp20", "gp21", "gp22",
-								"gp23", "gp30", "gp31", "gp32",
-								"gp33", "gp37", "gp40", "gp41",
-								"gp42", "gp43", "gp44", "gp45",
-								"gp46", "gp47", "gp50", "gp51",
-								"gp52", "gp53", "gp54", "gp55",
-								"gp56", "gp57", "gp60", "gp61",
-								"gp62", "gp63", "gp64", "gp65",
-								"gp66";
-								function = "gpio";
-								input-enable;
-								bias-pull-up;
+							pins = "gp00", "gp01", "gp02",
+							"gp03", "gp04", "gp05", "gp06",
+							"gp07", "gp10", "gp11", "gp12",
+							"gp13", "gp14", "gp15", "gp16",
+							"gp17", "gp20", "gp21", "gp22",
+							"gp23", "gp30", "gp31", "gp32",
+							"gp33", "gp37", "gp40", "gp41",
+							"gp42", "gp43", "gp44", "gp45",
+							"gp46", "gp47", "gp50", "gp51",
+							"gp52", "gp53", "gp54", "gp55",
+							"gp56", "gp57", "gp60", "gp61",
+							"gp62", "gp63", "gp64", "gp65",
+							"gp66";
+							function = "gpio";
+							input-enable;
+							bias-pull-up;
 						};
 					};
 				};
