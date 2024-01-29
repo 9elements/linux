@@ -21,9 +21,37 @@ static const struct regulator_desc __maybe_unused tda38640_reg_desc[] = {
 struct tda38640_data {
 	struct pmbus_driver_info info;
 	u32 en_pin_lvl;
+	int svid;
+	struct i2c_client *dummy;
 };
 
 #define to_tda38640_data(x)  container_of(x, struct tda38640_data, info)
+
+static s32 tda_i2c_smbus_write_word_data(const struct i2c_client *client, u8 command, u16 value)
+{
+	const struct pmbus_driver_info *info = pmbus_get_driver_info(client);
+	struct tda38640_data *data = to_tda38640_data(info);
+	const struct i2c_client *dummy;
+	union i2c_smbus_data sdata;
+
+	if (!data)
+		return -1;
+
+	dummy = data->dummy;
+	sdata.word = value;
+
+	return i2c_smbus_xfer(dummy->adapter, dummy->addr, dummy->flags,
+			      I2C_SMBUS_WRITE, command,
+			      I2C_SMBUS_WORD_DATA, &sdata);
+}
+
+static void clear_tda38640_fault(struct i2c_client *client, int page)
+{
+	dev_dbg(&client->dev, "Clearing fault with tda38640 workaround");
+	tda_i2c_smbus_write_word_data(client, 0xd4, 0x5);
+	tda_i2c_smbus_write_word_data(client, 0xd8, 0x0);
+	tda_i2c_smbus_write_word_data(client, 0xc2, 0x1);
+}
 
 /*
  * Map PB_ON_OFF_CONFIG_POLARITY_HIGH to PB_OPERATION_CONTROL_ON.
@@ -33,6 +61,40 @@ static int tda38640_read_byte_data(struct i2c_client *client, int page, int reg)
 	const struct pmbus_driver_info *info = pmbus_get_driver_info(client);
 	struct tda38640_data *data = to_tda38640_data(info);
 	int ret, on_off_config, enabled;
+
+	if (reg == PMBUS_STATUS_TEMPERATURE)
+		dev_err(&client->dev, "temp_read", ret);
+
+	switch (reg) {
+	case PMBUS_STATUS_VOUT:
+		ret = pmbus_read_byte_data(client, page, reg);
+		if (ret < 0)
+			return ret;
+		if (ret & (PB_VOLTAGE_UV_FAULT | PB_VOLTAGE_OV_FAULT))
+			clear_tda38640_fault(client, page);
+		return ret;
+	case PMBUS_STATUS_IOUT:
+		ret = pmbus_read_byte_data(client, page, reg);
+		if (ret < 0)
+			return ret;
+		if (ret & PB_IOUT_OC_FAULT)
+			clear_tda38640_fault(client, page);
+		return ret;
+	case PMBUS_STATUS_TEMPERATURE:
+		dev_err(&client->dev, "temp_read2", ret);
+		ret = pmbus_read_byte_data(client, page, reg);
+			dev_err(&client->dev, "ret %x", ret);
+		if (ret < 0)
+			return ret;
+		if (ret & PB_TEMP_OT_FAULT) {
+			dev_err(&client->dev, "ret %x", ret);
+			clear_tda38640_fault(client, page);
+		}
+		return ret;
+	}
+
+	if (!data->svid)
+		return -ENODATA;
 
 	if (reg != PMBUS_OPERATION)
 		return -ENODATA;
@@ -66,6 +128,9 @@ static int tda38640_write_byte_data(struct i2c_client *client, int page,
 	const struct pmbus_driver_info *info = pmbus_get_driver_info(client);
 	struct tda38640_data *data = to_tda38640_data(info);
 	int enable, ret;
+
+	if (!data->svid)
+		return -ENODATA;
 
 	if (reg != PMBUS_OPERATION)
 		return -ENODATA;
@@ -162,7 +227,7 @@ static struct pmbus_driver_info tda38640_info = {
 static int tda38640_probe(struct i2c_client *client)
 {
 	struct tda38640_data *data;
-	int svid;
+	int svid, ret;
 
 	data = devm_kzalloc(&client->dev, sizeof(*data), GFP_KERNEL);
 	if (!data)
@@ -186,12 +251,17 @@ static int tda38640_probe(struct i2c_client *client)
 		 * are ignored by the device.
 		 * Only PB_ON_OFF_CONFIG_POLARITY_HIGH has an effect.
 		 */
-		if (svid) {
-			data->info.read_byte_data = tda38640_read_byte_data;
-			data->info.write_byte_data = tda38640_write_byte_data;
-		}
+		data->svid = svid;
 	}
-	return pmbus_do_probe(client, &data->info);
+
+	data->info.read_byte_data = tda38640_read_byte_data;
+	data->info.write_byte_data = tda38640_write_byte_data;
+
+	ret = pmbus_do_probe(client, &data->info);
+
+	data->dummy = devm_i2c_new_dummy_device(&client->dev, client->adapter, 0x10);
+
+	return ret;
 }
 
 static const struct i2c_device_id tda38640_id[] = {
