@@ -10,6 +10,7 @@
 #include <linux/bitops.h>
 #include <linux/device.h>
 #include <linux/err.h>
+#include <linux/hwmon.h>
 #include <linux/module.h>
 #include <linux/io.h>
 #include <linux/of.h>
@@ -20,9 +21,9 @@
 #include <linux/regulator/of_regulator.h>
 #include <linux/platform_device.h>
 
-#include <linux/mfd/max597x.h>
+#include <linux/mfd/max5970.h>
 
-struct max597x_regulator {
+struct max5970_regulator {
 	int num_switches, mon_rng, irng, shunt_micro_ohms, lim_uA;
 	struct regmap *regmap;
 };
@@ -30,6 +31,132 @@ struct max597x_regulator {
 enum max597x_regulator_id {
 	MAX597X_SW0,
 	MAX597X_SW1,
+};
+
+static int max5970_read_adc(struct regmap *regmap, int reg, long *val)
+{
+	u8 reg_data[2];
+	int ret;
+
+	ret = regmap_bulk_read(regmap, reg, &reg_data[0], 2);
+	if (ret < 0)
+		return ret;
+
+	*val = (reg_data[0] << 2) | (reg_data[1] & 3);
+
+	return 0;
+}
+
+static int max5970_read(struct device *dev, enum hwmon_sensor_types type,
+			u32 attr, int channel, long *val)
+{
+	struct regulator_dev **rdevs = dev_get_drvdata(dev);
+	struct max5970_regulator *ddata = rdev_get_drvdata(rdevs[channel]);
+	struct regmap *regmap = ddata->regmap;
+	int ret;
+
+	switch (type) {
+	case hwmon_curr:
+		switch (attr) {
+		case hwmon_curr_input:
+			ret = max5970_read_adc(regmap, MAX5970_REG_CURRENT_H(channel), val);
+			if (ret < 0)
+				return ret;
+			/*
+			 * Calculate current from ADC value, IRNG range & shunt resistor value.
+			 * ddata->irng holds the voltage corresponding to the maximum value the
+			 * 10-bit ADC can measure.
+			 * To obtain the output, multiply the ADC value by the IRNG range (in
+			 * millivolts) and then divide it by the maximum value of the 10-bit ADC.
+			 */
+			*val = (*val * ddata->irng) >> 10;
+			/* Convert the voltage meansurement across shunt resistor to current */
+			*val = (*val * 1000) / ddata->shunt_micro_ohms;
+			return 0;
+		default:
+			return -EOPNOTSUPP;
+		}
+
+	case hwmon_in:
+		switch (attr) {
+		case hwmon_in_input:
+			ret = max5970_read_adc(regmap, MAX5970_REG_VOLTAGE_H(channel), val);
+			if (ret < 0)
+				return ret;
+			/*
+			 * Calculate voltage from ADC value and MON range.
+			 * ddata->mon_rng holds the voltage corresponding to the maximum value the
+			 * 10-bit ADC can measure.
+			 * To obtain the output, multiply the ADC value by the MON range (in
+			 * microvolts) and then divide it by the maximum value of the 10-bit ADC.
+			 */
+			*val = mul_u64_u32_shr(*val, ddata->mon_rng, 10);
+			/* uV to mV */
+			*val = *val / 1000;
+			return 0;
+		default:
+			return -EOPNOTSUPP;
+		}
+	default:
+		return -EOPNOTSUPP;
+	}
+}
+
+static umode_t max5970_is_visible(const void *data,
+				  enum hwmon_sensor_types type,
+				  u32 attr, int channel)
+{
+	struct regulator_dev **rdevs = (struct regulator_dev **)data;
+	struct max5970_regulator *ddata;
+
+	if (channel >= MAX5970_NUM_SWITCHES || !rdevs[channel])
+		return 0;
+
+	ddata = rdev_get_drvdata(rdevs[channel]);
+
+	if (channel >= ddata->num_switches)
+		return 0;
+
+	switch (type) {
+	case hwmon_in:
+		switch (attr) {
+		case hwmon_in_input:
+			return 0444;
+		default:
+			break;
+		}
+		break;
+	case hwmon_curr:
+		switch (attr) {
+		case hwmon_curr_input:
+			/* Current measurement requires knowledge of the shunt resistor value. */
+			if (ddata->shunt_micro_ohms)
+				return 0444;
+			break;
+		default:
+			break;
+		}
+		break;
+	default:
+		break;
+	}
+	return 0;
+}
+
+static const struct hwmon_ops max5970_hwmon_ops = {
+	.is_visible = max5970_is_visible,
+	.read = max5970_read,
+};
+
+static const struct hwmon_channel_info *max5970_info[] = {
+	HWMON_CHANNEL_INFO(in, HWMON_I_INPUT, HWMON_I_INPUT),
+	HWMON_CHANNEL_INFO(curr, HWMON_C_INPUT, HWMON_C_INPUT),
+	NULL
+};
+
+static const struct hwmon_chip_info max5970_chip_info = {
+	.ops = &max5970_hwmon_ops,
+	.info = max5970_info,
 };
 
 static int max597x_uvp_ovp_check_mode(struct regulator_dev *rdev, int severity)
@@ -58,7 +185,7 @@ static int max597x_set_vp(struct regulator_dev *rdev, int lim_uV, int severity,
 			  bool enable, bool overvoltage)
 {
 	int off_h, off_l, reg, ret;
-	struct max597x_regulator *data = rdev_get_drvdata(rdev);
+	struct max5970_regulator *data = rdev_get_drvdata(rdev);
 	int channel = rdev_get_id(rdev);
 
 	if (overvoltage) {
@@ -140,7 +267,7 @@ static int max597x_set_ocp(struct regulator_dev *rdev, int lim_uA,
 	int val, reg;
 	unsigned int vthst, vthfst;
 
-	struct max597x_regulator *data = rdev_get_drvdata(rdev);
+	struct max5970_regulator *data = rdev_get_drvdata(rdev);
 	int rdev_id = rdev_get_id(rdev);
 	/*
 	 * MAX5970 doesn't has enable control for ocp.
@@ -222,7 +349,7 @@ static int max597x_dt_parse(struct device_node *np,
 			    const struct regulator_desc *desc,
 			    struct regulator_config *cfg)
 {
-	struct max597x_regulator *data = cfg->driver_data;
+	struct max5970_regulator *data = cfg->driver_data;
 	int ret = 0;
 
 	ret =
@@ -265,7 +392,7 @@ static int max597x_regmap_read_clear(struct regmap *map, unsigned int reg,
 		return ret;
 
 	if (*val)
-		return regmap_write(map, reg, *val);
+		return regmap_write(map, reg, 0);
 
 	return 0;
 }
@@ -274,7 +401,7 @@ static int max597x_irq_handler(int irq, struct regulator_irq_data *rid,
 			       unsigned long *dev_mask)
 {
 	struct regulator_err_state *stat;
-	struct max597x_regulator *d = (struct max597x_regulator *)rid->data;
+	struct max5970_regulator *d = (struct max5970_regulator *)rid->data;
 	int val, ret, i;
 
 	ret = max597x_regmap_read_clear(d->regmap, MAX5970_REG_FAULT0, &val);
@@ -394,7 +521,7 @@ static int max597x_adc_range(struct regmap *regmap, const int ch,
 static int max597x_setup_irq(struct device *dev,
 			     int irq,
 			     struct regulator_dev *rdevs[MAX5970_NUM_SWITCHES],
-			     int num_switches, struct max597x_regulator *data)
+			     int num_switches, struct max5970_regulator *data)
 {
 	struct regulator_irq_desc max597x_notif = {
 		.name = "max597x-irq",
@@ -425,38 +552,43 @@ static int max597x_setup_irq(struct device *dev,
 
 static int max597x_regulator_probe(struct platform_device *pdev)
 {
-	struct max597x_data *max597x;
+	struct max5970_data *max597x;
 	struct regmap *regmap = dev_get_regmap(pdev->dev.parent, NULL);
-	struct max597x_regulator *data;
+	struct max5970_regulator *data;
 	struct i2c_client *i2c = to_i2c_client(pdev->dev.parent);
 	struct regulator_config config = { };
 	struct regulator_dev *rdev;
-	struct regulator_dev *rdevs[MAX5970_NUM_SWITCHES];
+	struct regulator_dev **rdevs = NULL;
+	struct device *hwmon_dev;
 	int num_switches;
 	int ret, i;
 
 	if (!regmap)
 		return -EPROBE_DEFER;
 
-	max597x = devm_kzalloc(&i2c->dev, sizeof(struct max597x_data), GFP_KERNEL);
+	max597x = devm_kzalloc(&i2c->dev, sizeof(struct max5970_data), GFP_KERNEL);
 	if (!max597x)
+		return -ENOMEM;
+
+	rdevs = devm_kcalloc(&i2c->dev, MAX5970_NUM_SWITCHES, sizeof(struct regulator_dev *),
+			     GFP_KERNEL);
+	if (!rdevs)
 		return -ENOMEM;
 
 	i2c_set_clientdata(i2c, max597x);
 
 	if (of_device_is_compatible(i2c->dev.of_node, "maxim,max5978"))
-		max597x->num_switches = MAX597x_TYPE_MAX5978;
+		max597x->num_switches = MAX5978_NUM_SWITCHES;
 	else if (of_device_is_compatible(i2c->dev.of_node, "maxim,max5970"))
-		max597x->num_switches = MAX597x_TYPE_MAX5970;
+		max597x->num_switches = MAX5970_NUM_SWITCHES;
 	else
 		return -ENODEV;
 
-	i2c_set_clientdata(i2c, max597x);
 	num_switches = max597x->num_switches;
 
 	for (i = 0; i < num_switches; i++) {
 		data =
-		    devm_kzalloc(&i2c->dev, sizeof(struct max597x_regulator),
+		    devm_kzalloc(&i2c->dev, sizeof(struct max5970_regulator),
 				 GFP_KERNEL);
 		if (!data)
 			return -ENOMEM;
@@ -485,6 +617,15 @@ static int max597x_regulator_probe(struct platform_device *pdev)
 		max597x->shunt_micro_ohms[i] = data->shunt_micro_ohms;
 	}
 
+	if (IS_REACHABLE(CONFIG_HWMON)) {
+		hwmon_dev = devm_hwmon_device_register_with_info(&i2c->dev, "max5970", rdevs,
+								 &max5970_chip_info, NULL);
+		if (IS_ERR(hwmon_dev)) {
+			return dev_err_probe(&i2c->dev, PTR_ERR(hwmon_dev),
+					     "Unable to register hwmon device\n");
+		}
+	}
+
 	if (i2c->irq) {
 		ret =
 		    max597x_setup_irq(&i2c->dev, i2c->irq, rdevs, num_switches,
@@ -500,7 +641,7 @@ static int max597x_regulator_probe(struct platform_device *pdev)
 
 static struct platform_driver max597x_regulator_driver = {
 	.driver = {
-		.name = "max597x-regulator",
+		.name = "max5970-regulator",
 		.probe_type = PROBE_PREFER_ASYNCHRONOUS,
 	},
 	.probe = max597x_regulator_probe,
