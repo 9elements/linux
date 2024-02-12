@@ -2761,6 +2761,11 @@ static int _pmbus_is_enabled(struct i2c_client *client, u8 page)
 
 	ret = _pmbus_read_byte_data(client, page, PMBUS_OPERATION);
 
+	if (ret < 0) {
+		dev_err(&client->dev, "Retrying..");
+		ret = _pmbus_read_byte_data(client, page, PMBUS_OPERATION);
+	}
+
 	if (ret < 0)
 		return ret;
 
@@ -2908,8 +2913,24 @@ static int pmbus_regulator_is_enabled(struct regulator_dev *rdev)
 {
 	struct device *dev = rdev_get_dev(rdev);
 	struct i2c_client *client = to_i2c_client(dev->parent);
+	struct pmbus_data *data = i2c_get_clientdata(client);
+	int ret, ret2, status;
 
-	return pmbus_is_enabled(client, rdev_get_id(rdev));
+	ret = pmbus_is_enabled(client, rdev_get_id(rdev));
+	if (ret < 0) {
+		mutex_lock(&data->update_lock);
+		status = pmbus_get_status(client, rdev_get_id(rdev), PMBUS_STATUS_WORD);
+		if (status >= 0)
+			dev_err(dev, "pmbus_is_enabled failed with %d. PMBUS_STATUS_WORD = 0x%x\n", ret, status);
+		else
+			dev_err(dev, "pmbus_is_enabled failed with %d. Reading PMBUS_STATUS_WORD also failed.\n", ret);
+
+		ret2 = pmbus_is_enabled(client, rdev_get_id(rdev));
+		dev_err(dev, "pmbus_is_enabled read again results in %d\n", ret2);
+
+		mutex_unlock(&data->update_lock);
+	}
+	return ret;
 }
 
 static int _pmbus_regulator_on_off(struct regulator_dev *rdev, bool enable)
@@ -3198,7 +3219,7 @@ static int pmbus_regulator_notify(struct pmbus_data *data, int page, int event)
 
 static int pmbus_write_smbalert_mask(struct i2c_client *client, u8 page, u8 reg, u8 val)
 {
-	return pmbus_write_word_data(client, page, PMBUS_SMBALERT_MASK, reg | (val << 8));
+	return _pmbus_write_word_data(client, page, PMBUS_SMBALERT_MASK, reg | (val << 8));
 }
 
 static irqreturn_t pmbus_fault_handler(int irq, void *pdata)
