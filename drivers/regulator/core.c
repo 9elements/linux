@@ -2855,13 +2855,16 @@ static int _regulator_handle_consumer_disable(struct regulator *regulator)
 	struct regulator_dev *rdev = regulator->rdev;
 
 	lockdep_assert_held_once(&rdev->mutex.base);
+	if (!regulator->enable_count && regulator_is_enabled(regulator))
+		rdev_err(rdev, "%s is enabled but enable count is zero\n", rdev_get_name(rdev));
 
-	if (!regulator->enable_count) {
+	if (!regulator->enable_count && !regulator_is_enabled(regulator)) {
 		rdev_err(rdev, "Underflow of regulator enable count\n");
 		return -EINVAL;
 	}
+	if (regulator->enable_count > 0)
+		regulator->enable_count--;
 
-	regulator->enable_count--;
 	if (regulator->uA_load && regulator->enable_count == 0)
 		return drms_uA_update(rdev);
 
