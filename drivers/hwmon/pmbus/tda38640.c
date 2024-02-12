@@ -6,6 +6,7 @@
  *
  */
 
+#include <linux/delay.h>
 #include <linux/err.h>
 #include <linux/i2c.h>
 #include <linux/init.h>
@@ -21,9 +22,57 @@ static const struct regulator_desc __maybe_unused tda38640_reg_desc[] = {
 struct tda38640_data {
 	struct pmbus_driver_info info;
 	u32 en_pin_lvl;
+	struct i2c_client *secondary;
 };
 
 #define to_tda38640_data(x)  container_of(x, struct tda38640_data, info)
+
+static void clear_tda38640_fault(struct i2c_client *client)
+{
+
+	const struct pmbus_driver_info *info;
+	struct tda38640_data *data;
+	const struct i2c_client *secondary;
+	int ret;
+
+	info = pmbus_get_driver_info(client);
+	if (!info)
+		return;
+
+	data = to_tda38640_data(info);
+	if (!data)
+		return;
+
+	secondary = data->secondary;
+	if (!secondary)
+		return;
+
+	/* Set bit 0xD4[1] to 0 */
+	dev_dbg(&client->dev, "Clearing fault with tda38640 workaround");
+	ret = i2c_smbus_read_word_data(secondary, 0xd4);
+	ret &= ~BIT(1);
+	i2c_smbus_write_word_data(secondary, 0xd4, ret);
+
+	/* 2.Write 0000 into register 0xD8[15:0] */
+	i2c_smbus_write_word_data(secondary, 0xd8, 0x0);
+
+	/* 3.Read 0xA0[1] and continue to next step if it is 1 */
+	ret = i2c_smbus_read_word_data(secondary, 0xa0);
+
+	if (ret & BIT(1)) {
+		/* 4.Set bit 0xC2[0] to 1 */
+		ret = i2c_smbus_read_word_data(secondary, 0xc2);
+		ret |= BIT(0);
+		i2c_smbus_write_word_data(secondary, 0xc2, ret);
+               udelay(1000);
+
+		/* 5.Set bit 0xD4[1] to 1 */
+		ret = i2c_smbus_read_word_data(secondary, 0xd4);
+		ret |= BIT(1);
+		i2c_smbus_write_word_data(secondary, 0xd4, ret);
+	}
+	fsleep(50);
+}
 
 /*
  * Map PB_ON_OFF_CONFIG_POLARITY_HIGH to PB_OPERATION_CONTROL_ON.
@@ -57,6 +106,12 @@ static int tda38640_read_byte_data(struct i2c_client *client, int page, int reg)
 	return ret;
 }
 
+static int tda38640_write_byte(struct i2c_client *client, int page, u8 value)
+{
+	if (value == PMBUS_CLEAR_FAULTS)
+		clear_tda38640_fault(client);
+	return -ENODATA;
+}
 /*
  * Map PB_OPERATION_CONTROL_ON to PB_ON_OFF_CONFIG_POLARITY_HIGH.
  */
@@ -191,6 +246,8 @@ static int tda38640_probe(struct i2c_client *client)
 			data->info.write_byte_data = tda38640_write_byte_data;
 		}
 	}
+	data->info.write_byte = tda38640_write_byte;
+	data->secondary = devm_i2c_new_dummy_device(&client->dev, client->adapter, 0x10);
 	return pmbus_do_probe(client, &data->info);
 }
 
