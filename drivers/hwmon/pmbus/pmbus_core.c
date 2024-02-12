@@ -2761,6 +2761,11 @@ static int _pmbus_is_enabled(struct i2c_client *client, u8 page)
 
 	ret = _pmbus_read_byte_data(client, page, PMBUS_OPERATION);
 
+	if (ret < 0) {
+		dev_err(&client->dev, "Retrying..");
+		ret = _pmbus_read_byte_data(client, page, PMBUS_OPERATION);
+	}
+
 	if (ret < 0)
 		return ret;
 
