@@ -169,7 +169,13 @@ static int regulator_userspace_consumer_probe(struct platform_device *pdev)
 	if (ret != 0)
 		return ret;
 
-	if (pdata->init_on && !pdata->no_autoswitch) {
+	ret = regulator_is_enabled(pdata->supplies[0].consumer);
+	if (ret < 0) {
+		dev_err(&pdev->dev, "Failed to get regulator status\n");
+		goto err_enable;
+	}
+
+	if ((pdata->init_on && !pdata->no_autoswitch) || ret > 0) {
 		ret = regulator_bulk_enable(drvdata->num_supplies,
 					    drvdata->supplies);
 		if (ret) {
@@ -177,14 +183,8 @@ static int regulator_userspace_consumer_probe(struct platform_device *pdev)
 				"Failed to set initial state: %d\n", ret);
 			goto err_enable;
 		}
+		drvdata->enabled = true;
 	}
-
-	ret = regulator_is_enabled(pdata->supplies[0].consumer);
-	if (ret < 0) {
-		dev_err(&pdev->dev, "Failed to get regulator status\n");
-		goto err_enable;
-	}
-	drvdata->enabled = !!ret;
 
 	return 0;
 
