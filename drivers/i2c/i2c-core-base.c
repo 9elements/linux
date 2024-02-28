@@ -2225,7 +2225,7 @@ static int i2c_check_for_quirks(struct i2c_adapter *adap, struct i2c_msg *msgs, 
 int __i2c_transfer(struct i2c_adapter *adap, struct i2c_msg *msgs, int num)
 {
 	unsigned long orig_jiffies;
-	int ret, try, ret2;
+	int ret, try;
 
 	if (WARN_ON(!msgs || num < 1))
 		return -EINVAL;
@@ -2258,33 +2258,6 @@ int __i2c_transfer(struct i2c_adapter *adap, struct i2c_msg *msgs, int num)
 			ret = adap->algo->master_xfer_atomic(adap, msgs, num);
 		else
 			ret = adap->algo->master_xfer(adap, msgs, num);
-
-		if (ret == -EIO || ret == -ENXIO) {
-			for (int i = 0; i < 10; i++) {
-				if (i2c_in_atomic_xfer_mode() && adap->algo->master_xfer_atomic)
-					ret2 = adap->algo->master_xfer_atomic(adap, msgs, num);
-				else
-					ret2 = adap->algo->master_xfer(adap, msgs, num);
-
-				if (ret2 >= 0) {
-					char *debugmsg = kmalloc (4096, GFP_KERNEL);
-					sprintf(debugmsg, "Got ERR %d but worked after %d retries. Message was:", ret, i + 1);
-
-					for (int j = 0; j < num; j++) {
-						sprintf(&debugmsg[strlen(debugmsg)], "\n%s@0x%02x(%d bytes) = ", (msgs[j].flags & I2C_M_RD) ? " READ" : "WRITE", msgs[j].addr, msgs[j].len);
-						for (int k = 0; k < msgs[j].len; k++) {
-							sprintf(&debugmsg[strlen(debugmsg)], "%02x ", msgs[j].buf[k]);
-							if (k > 0 && k % 16 == 0)
-								sprintf(&debugmsg[strlen(debugmsg)], "\n");
-						}
-					}
-					dev_err(&adap->dev, "%s\n", debugmsg);
-					kfree(debugmsg);
-					ret = ret2;
-					break;
-				}
-			}
-		}
 
 		if (ret != -EAGAIN)
 			break;
