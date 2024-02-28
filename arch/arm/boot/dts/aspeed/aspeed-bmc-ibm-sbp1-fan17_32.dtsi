@@ -10,6 +10,8 @@
 		reg = <0x77>;
 		reset-gpios = <&gpio0 ASPEED_GPIO(R, 0) (GPIO_ACTIVE_LOW | GPIO_OPEN_DRAIN)>; // BMC_MUX_FANSSB_RSSD17_32_RST_INT_N
 		vdd-supply = <&p3v3_aux>;
+		maxim,isolate-stuck-channel;
+		maxim,send-flush-out-sequence;
 
 		i2c@0 { // SMB_MUX_SSB_FANGRP0
 			#address-cells = <1>;
