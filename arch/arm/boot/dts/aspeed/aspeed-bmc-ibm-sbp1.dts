@@ -6221,3 +6221,4 @@
 		};
 	};
 };
+#include "ibm-sbp1-misc.dtsi"
