@@ -976,7 +976,7 @@ static int cy8c95x0_gpio_set_pincfg(struct cy8c95x0_pinctrl *chip,
 		if (ret)
 			goto out;
 
-		reg = (dir & 1) ? CY8C95X0_DRV_HIZ : CY8C95X0_DRV_PP_FAST;
+		reg = (dir & bit) ? CY8C95X0_DRV_HIZ : CY8C95X0_DRV_PP_FAST;
 		break;
 	default:
 		ret = -ENOTSUPP;
