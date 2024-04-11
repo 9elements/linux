@@ -20,6 +20,7 @@
 #include <linux/err.h>
 #include <linux/mutex.h>
 #include <linux/platform_data/max6639.h>
+#include <linux/pwm.h>
 
 /* Addresses to scan */
 static const unsigned short normal_i2c[] = { 0x2c, 0x2e, 0x2f, I2C_CLIENT_END };
@@ -54,10 +55,19 @@ static const unsigned short normal_i2c[] = { 0x2c, 0x2e, 0x2f, I2C_CLIENT_END };
 #define MAX6639_GCONFIG_PWM_FREQ_HI		0x08
 
 #define MAX6639_FAN_CONFIG1_PWM			0x80
+#define MAX6639_REG_FAN_CONFIG2a_PWM_POL	0x02
+#define MAX6639_FAN_CONFIG3_FREQ_MASK		0x03
+#define MAX6639_REG_TARGTDUTY_SLOT		120
 
 #define MAX6639_FAN_CONFIG3_THERM_FULL_SPEED	0x40
 
+#define MAX6639_NDEV				2
+
 static const int rpm_ranges[] = { 2000, 4000, 8000, 16000 };
+
+/* Supported PWM frequency */
+static const unsigned int freq_table[] = { 20, 33, 50, 100, 5000, 8333, 12500,
+					   25000 };
 
 #define FAN_FROM_REG(val, rpm_range)	((val) == 0 || (val) == 255 ? \
 				0 : (rpm_ranges[rpm_range] * 30) / (val))
@@ -90,6 +100,9 @@ struct max6639_data {
 
 	/* Optional regulator for FAN supply */
 	struct regulator *reg;
+	/* max6639 pwm chip */
+	struct pwm_chip chip;
+	struct pwm_device *pwmd[MAX6639_NDEV]; /* max6639 has two pwm device */
 };
 
 static struct max6639_data *max6639_update_device(struct device *dev)
@@ -280,8 +293,11 @@ static ssize_t pwm_show(struct device *dev, struct device_attribute *dev_attr,
 {
 	struct sensor_device_attribute *attr = to_sensor_dev_attr(dev_attr);
 	struct max6639_data *data = dev_get_drvdata(dev);
+	struct pwm_state state;
 
-	return sprintf(buf, "%d\n", data->pwm[attr->index] * 255 / 120);
+	pwm_get_state(data->pwmd[attr->index], &state);
+
+	return sprintf(buf, "%d\n", pwm_get_relative_duty_cycle(&state, 255));
 }
 
 static ssize_t pwm_store(struct device *dev,
@@ -290,7 +306,7 @@ static ssize_t pwm_store(struct device *dev,
 {
 	struct sensor_device_attribute *attr = to_sensor_dev_attr(dev_attr);
 	struct max6639_data *data = dev_get_drvdata(dev);
-	struct i2c_client *client = data->client;
+	struct pwm_state state;
 	unsigned long val;
 	int res;
 
@@ -300,12 +316,10 @@ static ssize_t pwm_store(struct device *dev,
 
 	val = clamp_val(val, 0, 255);
 
-	mutex_lock(&data->update_lock);
-	data->pwm[attr->index] = (u8)(val * 120 / 255);
-	i2c_smbus_write_byte_data(client,
-				  MAX6639_REG_TARGTDUTY(attr->index),
-				  data->pwm[attr->index]);
-	mutex_unlock(&data->update_lock);
+	pwm_get_state(data->pwmd[attr->index], &state);
+	pwm_set_relative_duty_cycle(&state, val, 255);
+	pwm_apply_state(data->pwmd[attr->index], &state);
+
 	return count;
 }
 
@@ -385,6 +399,174 @@ static struct attribute *max6639_attrs[] = {
 };
 ATTRIBUTE_GROUPS(max6639);
 
+static struct max6639_data *to_max6639_pwm(struct pwm_chip *chip)
+{
+	return container_of(chip, struct max6639_data, chip);
+}
+
+static int max6639_pwm_get_state(struct pwm_chip *chip,
+				  struct pwm_device *pwm,
+				  struct pwm_state *state)
+{
+
+	struct max6639_data *data = to_max6639_pwm(chip);
+	struct i2c_client *client = data->client;
+	int value, i = pwm->hwpwm, x;
+	unsigned int freq;
+
+	mutex_lock(&data->update_lock);
+
+	value = i2c_smbus_read_byte_data(client, MAX6639_REG_FAN_CONFIG1(i));
+	if (value < 0)
+		goto abort;
+
+	if (value & MAX6639_FAN_CONFIG1_PWM) {
+		state->enabled = true;
+
+		/* Determine frequency from respective registers */
+		value = i2c_smbus_read_byte_data(client,
+						 MAX6639_REG_FAN_CONFIG3(i));
+		if (value < 0)
+			goto abort;
+		x = value & MAX6639_FAN_CONFIG3_FREQ_MASK;
+
+		value = i2c_smbus_read_byte_data(client, MAX6639_REG_GCONFIG);
+		if (value < 0)
+			goto abort;
+		if (value & MAX6639_GCONFIG_PWM_FREQ_HI)
+			x |= 0x4;
+		x &= 0x7;
+		freq = freq_table[x];
+
+		state->period = DIV_ROUND_UP(NSEC_PER_SEC, freq);
+
+		value = i2c_smbus_read_byte_data(client,
+						 MAX6639_REG_TARGTDUTY(i));
+		if (value < 0)
+			goto abort;
+		/* max6639 supports 120 slots only */
+		state->duty_cycle = mul_u64_u32_div(state->period, value, 120);
+
+		value = i2c_smbus_read_byte_data(client,
+						 MAX6639_REG_FAN_CONFIG2a(i));
+		if (value < 0)
+			goto abort;
+		value &= MAX6639_REG_FAN_CONFIG2a_PWM_POL;
+		state->polarity = (value != 0);
+	} else
+		state->enabled = false;
+
+abort:
+	mutex_unlock(&data->update_lock);
+	return value;
+}
+
+static int max6639_pwm_apply(struct pwm_chip *chip, struct pwm_device *pwm,
+			     const struct pwm_state *state)
+{
+	struct max6639_data *data = to_max6639_pwm(chip);
+	struct i2c_client *client = data->client;
+	int value = 0, i = pwm->hwpwm, x;
+	unsigned int freq;
+	struct pwm_state cstate;
+
+	cstate = pwm->state;
+
+	mutex_lock(&data->update_lock);
+
+	if (state->period != cstate.period) {
+		/* Configure frequency */
+		freq = DIV_ROUND_UP_ULL(NSEC_PER_SEC, state->period);
+
+		/* Chip supports limited number of frequency */
+		for (x = 0; x < sizeof(freq_table); x++)
+			if (freq <= freq_table[x])
+				break;
+
+		value = i2c_smbus_read_byte_data(client,
+						 MAX6639_REG_FAN_CONFIG3(i));
+		if (value < 0)
+			goto abort;
+
+		value &= ~MAX6639_FAN_CONFIG3_FREQ_MASK;
+		value |= (x & MAX6639_FAN_CONFIG3_FREQ_MASK);
+		value = i2c_smbus_write_byte_data(client,
+						  MAX6639_REG_FAN_CONFIG3(i),
+						  value);
+		if (value < 0)
+			goto abort;
+
+		value = i2c_smbus_read_byte_data(client, MAX6639_REG_GCONFIG);
+		if (value < 0)
+			goto abort;
+
+		if (x >> 2)
+			value &= ~MAX6639_GCONFIG_PWM_FREQ_HI;
+		else
+			value |= MAX6639_GCONFIG_PWM_FREQ_HI;
+		value = i2c_smbus_write_byte_data(client, MAX6639_REG_GCONFIG,
+						  value);
+		if (value < 0)
+			goto abort;
+	}
+
+	/* Configure dutycycle */
+	if (state->duty_cycle != cstate.duty_cycle ||
+	    state->period != cstate.period) {
+		value = DIV_ROUND_DOWN_ULL(
+				state->duty_cycle * MAX6639_REG_TARGTDUTY_SLOT,
+				state->period);
+		value = i2c_smbus_write_byte_data(client,
+						  MAX6639_REG_TARGTDUTY(i),
+						  value);
+		if (value < 0)
+			goto abort;
+	}
+
+	/* Configure polarity */
+	if (state->polarity != cstate.polarity) {
+		value = i2c_smbus_read_byte_data(client,
+						 MAX6639_REG_FAN_CONFIG2a(i));
+		if (value < 0)
+			goto abort;
+		if (state->polarity == PWM_POLARITY_NORMAL)
+			value |= MAX6639_REG_FAN_CONFIG2a_PWM_POL;
+		else
+			value &= ~MAX6639_REG_FAN_CONFIG2a_PWM_POL;
+		value = i2c_smbus_write_byte_data(client,
+						  MAX6639_REG_FAN_CONFIG2a(i),
+						  value);
+		if (value < 0)
+			goto abort;
+	}
+
+	if (state->enabled != cstate.enabled) {
+		value = i2c_smbus_read_byte_data(client, MAX6639_REG_FAN_CONFIG1(i));
+		if (value < 0)
+			goto abort;
+		if (state->enabled)
+			value |= MAX6639_FAN_CONFIG1_PWM;
+		else
+			value &= ~MAX6639_FAN_CONFIG1_PWM;
+
+		value = i2c_smbus_write_byte_data(client, MAX6639_REG_FAN_CONFIG1(i),
+						value);
+		if (value < 0)
+			goto abort;
+	}
+	value = 0;
+
+abort:
+	mutex_unlock(&data->update_lock);
+
+	return value;
+}
+
+static const struct pwm_ops max6639_pwm_ops = {
+	.apply = max6639_pwm_apply,
+	.get_state = max6639_pwm_get_state,
+};
+
 /*
  *  returns respective index in rpm_ranges table
  *  1 by default on invalid range
@@ -408,6 +590,7 @@ static int max6639_init_client(struct i2c_client *client,
 		dev_get_platdata(&client->dev);
 	int i;
 	int rpm_range = 1; /* default: 4000 RPM */
+	struct pwm_state state;
 	int err;
 
 	/* Reset chip to default values, see below for GCONFIG setup */
@@ -483,12 +666,15 @@ static int max6639_init_client(struct i2c_client *client,
 		if (err)
 			goto exit;
 
-		/* PWM 120/120 (i.e. 100%) */
-		data->pwm[i] = 120;
-		err = i2c_smbus_write_byte_data(client,
-				MAX6639_REG_TARGTDUTY(i), data->pwm[i]);
-		if (err)
-			goto exit;
+		dev_dbg(&client->dev, "Using chip default PWM");
+		data->pwmd[i] = pwm_request_from_chip(&data->chip, i, NULL);
+		if (IS_ERR(data->pwmd[i]))
+			return PTR_ERR(data->pwmd[i]);
+		pwm_get_state(data->pwmd[i], &state);
+		state.period = DIV_ROUND_UP(NSEC_PER_SEC, 25000);
+		state.polarity = PWM_POLARITY_NORMAL;
+		pwm_set_relative_duty_cycle(&state, 0, 255);
+		pwm_apply_state(data->pwmd[i], &state);
 	}
 	/* Start monitoring */
 	err = i2c_smbus_write_byte_data(client, MAX6639_REG_GCONFIG,
@@ -536,6 +722,14 @@ static int max6639_probe(struct i2c_client *client)
 		return -ENOMEM;
 
 	data->client = client;
+
+	/* Add PWM controller of max6639 */
+	data->chip.dev = dev;
+	data->chip.ops = &max6639_pwm_ops;
+	data->chip.npwm = MAX6639_NDEV;
+	err = devm_pwmchip_add(dev, &data->chip);
+	if (err < 0)
+		return dev_err_probe(dev, err, "failed to add PWM chip\n");
 
 	data->reg = devm_regulator_get_optional(dev, "fan");
 	if (IS_ERR(data->reg)) {
