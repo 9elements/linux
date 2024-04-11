@@ -77,6 +77,7 @@ static const unsigned int freq_table[] = { 20, 33, 50, 100, 5000, 8333, 12500,
  */
 struct max6639_data {
 	struct i2c_client *client;
+	struct device *hwmon_dev;
 	struct mutex update_lock;
 	bool valid;		/* true if following fields are valid */
 	unsigned long last_updated;	/* In jiffies */
@@ -84,6 +85,7 @@ struct max6639_data {
 	/* Register values sampled regularly */
 	u16 temp[2];		/* Temperature, in 1/8 C, 0..255 C */
 	bool temp_fault[2];	/* Detected temperature diode failure */
+	bool fan_enable[2];
 	u8 fan[2];		/* Register value: TACH count for fans >=30 */
 	u8 status;		/* Detected channel alarms and fan failures */
 
@@ -94,8 +96,8 @@ struct max6639_data {
 	u8 temp_ot[2];		/* OT Temperature, 0..255 C (->_emergency) */
 
 	/* Register values initialized only once */
-	u8 ppr;			/* Pulses per rotation 0..3 for 1..4 ppr */
-	u8 rpm_range;		/* Index in above rpm_ranges table */
+	u8 ppr[2];		/* Pulses per rotation 0..3 for 1..4 ppr */
+	u8 rpm_range[2];	/* Index in above rpm_ranges table */
 
 	/* Optional regulator for FAN supply */
 	struct regulator *reg;
@@ -164,239 +166,345 @@ abort:
 	return ret;
 }
 
-static ssize_t temp_input_show(struct device *dev,
-			       struct device_attribute *dev_attr, char *buf)
+static int max6639_temp_set_max(struct max6639_data *data, int channel, unsigned long val)
 {
-	long temp;
+	int res;
+
+	mutex_lock(&data->update_lock);
+	data->temp_therm[channel] = TEMP_LIMIT_TO_REG(val);
+	res = i2c_smbus_write_byte_data(data->client,
+				  MAX6639_REG_THERM_LIMIT(channel),
+				  data->temp_therm[channel]);
+	mutex_unlock(&data->update_lock);
+	return res;
+}
+
+static int max6639_temp_set_crit(struct max6639_data *data, int channel, unsigned long val)
+{
+	int res;
+
+	mutex_lock(&data->update_lock);
+	data->temp_alert[channel] = TEMP_LIMIT_TO_REG(val);
+	res = i2c_smbus_write_byte_data(data->client,
+					MAX6639_REG_ALERT_LIMIT(channel),
+					data->temp_alert[channel]);
+	mutex_unlock(&data->update_lock);
+	return res;
+}
+
+static int max6639_temp_set_emergency(struct max6639_data *data, int channel, unsigned long val)
+{
+	int res;
+
+	mutex_lock(&data->update_lock);
+	data->temp_ot[channel] = TEMP_LIMIT_TO_REG(val);
+	res = i2c_smbus_write_byte_data(data->client,
+					MAX6639_REG_OT_LIMIT(channel),
+					data->temp_ot[channel]);
+	mutex_unlock(&data->update_lock);
+	return res;
+}
+
+static int set_ppr(struct max6639_data *data, u8 channel, u8 ppr)
+{
+	return i2c_smbus_write_byte_data(data->client, MAX6639_REG_FAN_PPR(channel),
+					 (ppr - 1) << 6);
+
+}
+
+static int max6639_read_fan(struct device *dev, u32 attr, int channel,
+			    long *val)
+{
 	struct max6639_data *data = max6639_update_device(dev);
-	struct sensor_device_attribute *attr = to_sensor_dev_attr(dev_attr);
 
 	if (IS_ERR(data))
 		return PTR_ERR(data);
 
-	temp = data->temp[attr->index] * 125;
-	return sprintf(buf, "%ld\n", temp);
+	switch (attr) {
+	case hwmon_fan_input:
+		*val = FAN_FROM_REG(data->fan[channel], data->rpm_range[channel]);
+		return 0;
+	case hwmon_fan_fault:
+		*val = !!(data->status & (2 >> channel));
+		return 0;
+	case hwmon_fan_pulses:
+		*val = data->ppr[channel];
+		return 0;
+	default:
+		return -EOPNOTSUPP;
+	}
 }
 
-static ssize_t temp_fault_show(struct device *dev,
-			       struct device_attribute *dev_attr, char *buf)
+static int max6639_write_fan(struct device *dev, u32 attr, int channel,
+			    long val)
 {
 	struct max6639_data *data = max6639_update_device(dev);
-	struct sensor_device_attribute *attr = to_sensor_dev_attr(dev_attr);
+	int err;
+	if (IS_ERR(data))
+		return PTR_ERR(data);
+
+	switch (attr) {
+	case hwmon_fan_pulses:
+		if (val <= 0 || val > 5) {
+			dev_err(dev, "invalid pulses-per-revolution %ld. Valid range id 1 - 4.", val);
+			return -EINVAL;
+		}
+		/* Set Fan pulse per revolution */
+		err = set_ppr(data, channel, val);
+		if (err)
+			dev_err(dev, "Failed to set pulses-per-revolution");
+		else
+			data->ppr[channel] = val;
+		return 0;
+	default:
+		return -EOPNOTSUPP;
+	}
+}
+
+static umode_t max6639_fan_is_visible(const void *_data, u32 attr, int channel)
+{
+	struct max6639_data *data = (struct max6639_data *) _data;
 
 	if (IS_ERR(data))
 		return PTR_ERR(data);
 
-	return sprintf(buf, "%d\n", data->temp_fault[attr->index]);
+	switch (attr) {
+	case hwmon_fan_input:
+	case hwmon_fan_fault:
+		if (data->fan_enable[channel])
+			return 0444;
+		else
+			return 0;
+	case hwmon_fan_pulses:
+		if (data->fan_enable[channel])
+			return 0644;
+		else
+			return 0;
+	default:
+		return 0;
+	}
 }
 
-static ssize_t temp_max_show(struct device *dev,
-			     struct device_attribute *dev_attr, char *buf)
+static int max6639_read_pwm(struct device *dev, u32 attr, int channel,
+			    long *val)
 {
-	struct sensor_device_attribute *attr = to_sensor_dev_attr(dev_attr);
-	struct max6639_data *data = dev_get_drvdata(dev);
-
-	return sprintf(buf, "%d\n", (data->temp_therm[attr->index] * 1000));
-}
-
-static ssize_t temp_max_store(struct device *dev,
-			      struct device_attribute *dev_attr,
-			      const char *buf, size_t count)
-{
-	struct sensor_device_attribute *attr = to_sensor_dev_attr(dev_attr);
-	struct max6639_data *data = dev_get_drvdata(dev);
-	struct i2c_client *client = data->client;
-	unsigned long val;
-	int res;
-
-	res = kstrtoul(buf, 10, &val);
-	if (res)
-		return res;
-
-	mutex_lock(&data->update_lock);
-	data->temp_therm[attr->index] = TEMP_LIMIT_TO_REG(val);
-	i2c_smbus_write_byte_data(client,
-				  MAX6639_REG_THERM_LIMIT(attr->index),
-				  data->temp_therm[attr->index]);
-	mutex_unlock(&data->update_lock);
-	return count;
-}
-
-static ssize_t temp_crit_show(struct device *dev,
-			      struct device_attribute *dev_attr, char *buf)
-{
-	struct sensor_device_attribute *attr = to_sensor_dev_attr(dev_attr);
-	struct max6639_data *data = dev_get_drvdata(dev);
-
-	return sprintf(buf, "%d\n", (data->temp_alert[attr->index] * 1000));
-}
-
-static ssize_t temp_crit_store(struct device *dev,
-			       struct device_attribute *dev_attr,
-			       const char *buf, size_t count)
-{
-	struct sensor_device_attribute *attr = to_sensor_dev_attr(dev_attr);
-	struct max6639_data *data = dev_get_drvdata(dev);
-	struct i2c_client *client = data->client;
-	unsigned long val;
-	int res;
-
-	res = kstrtoul(buf, 10, &val);
-	if (res)
-		return res;
-
-	mutex_lock(&data->update_lock);
-	data->temp_alert[attr->index] = TEMP_LIMIT_TO_REG(val);
-	i2c_smbus_write_byte_data(client,
-				  MAX6639_REG_ALERT_LIMIT(attr->index),
-				  data->temp_alert[attr->index]);
-	mutex_unlock(&data->update_lock);
-	return count;
-}
-
-static ssize_t temp_emergency_show(struct device *dev,
-				   struct device_attribute *dev_attr,
-				   char *buf)
-{
-	struct sensor_device_attribute *attr = to_sensor_dev_attr(dev_attr);
-	struct max6639_data *data = dev_get_drvdata(dev);
-
-	return sprintf(buf, "%d\n", (data->temp_ot[attr->index] * 1000));
-}
-
-static ssize_t temp_emergency_store(struct device *dev,
-				    struct device_attribute *dev_attr,
-				    const char *buf, size_t count)
-{
-	struct sensor_device_attribute *attr = to_sensor_dev_attr(dev_attr);
-	struct max6639_data *data = dev_get_drvdata(dev);
-	struct i2c_client *client = data->client;
-	unsigned long val;
-	int res;
-
-	res = kstrtoul(buf, 10, &val);
-	if (res)
-		return res;
-
-	mutex_lock(&data->update_lock);
-	data->temp_ot[attr->index] = TEMP_LIMIT_TO_REG(val);
-	i2c_smbus_write_byte_data(client,
-				  MAX6639_REG_OT_LIMIT(attr->index),
-				  data->temp_ot[attr->index]);
-	mutex_unlock(&data->update_lock);
-	return count;
-}
-
-static ssize_t pwm_show(struct device *dev, struct device_attribute *dev_attr,
-			char *buf)
-{
-	struct sensor_device_attribute *attr = to_sensor_dev_attr(dev_attr);
-	struct max6639_data *data = dev_get_drvdata(dev);
+	struct max6639_data *data = max6639_update_device(dev);
 	struct pwm_state state;
 
-	pwm_get_state(data->pwmd[attr->index], &state);
+	if (IS_ERR(data))
+		return PTR_ERR(data);
 
-	return sprintf(buf, "%d\n", pwm_get_relative_duty_cycle(&state, 255));
+	switch (attr) {
+	case hwmon_pwm_input:
+		pwm_get_state(data->pwmd[channel], &state);
+		*val = pwm_get_relative_duty_cycle(&state, 255);
+		return 0;
+	case hwmon_pwm_freq:
+		pwm_get_state(data->pwmd[channel], &state);
+		*val = DIV_ROUND_UP_ULL(NSEC_PER_SEC, state.period);
+		return 0;
+	default:
+		return -EOPNOTSUPP;
+	}
 }
 
-static ssize_t pwm_store(struct device *dev,
-			 struct device_attribute *dev_attr, const char *buf,
-			 size_t count)
+static int max6639_write_pwm(struct device *dev, u32 attr, int channel,
+			    long val)
 {
-	struct sensor_device_attribute *attr = to_sensor_dev_attr(dev_attr);
-	struct max6639_data *data = dev_get_drvdata(dev);
+	struct max6639_data *data = max6639_update_device(dev);
 	struct pwm_state state;
-	unsigned long val;
-	int res;
-
-	res = kstrtoul(buf, 10, &val);
-	if (res)
-		return res;
-
-	val = clamp_val(val, 0, 255);
-
-	pwm_get_state(data->pwmd[attr->index], &state);
-	pwm_set_relative_duty_cycle(&state, val, 255);
-	pwm_apply_state(data->pwmd[attr->index], &state);
-
-	return count;
-}
-
-static ssize_t fan_input_show(struct device *dev,
-			      struct device_attribute *dev_attr, char *buf)
-{
-	struct max6639_data *data = max6639_update_device(dev);
-	struct sensor_device_attribute *attr = to_sensor_dev_attr(dev_attr);
+	int err, duty_cycle;
 
 	if (IS_ERR(data))
 		return PTR_ERR(data);
 
-	return sprintf(buf, "%d\n", FAN_FROM_REG(data->fan[attr->index],
-		       data->rpm_range));
+	switch (attr) {
+	case hwmon_pwm_input:
+		val = clamp_val(val, 0, 255);
+		pwm_get_state(data->pwmd[channel], &state);
+		pwm_set_relative_duty_cycle(&state, val, 255);
+		err = pwm_apply_state(data->pwmd[channel], &state);
+		return err;
+
+	case hwmon_pwm_freq:
+		val = clamp_val(val, 0, 25000);
+		pwm_get_state(data->pwmd[channel], &state);
+		duty_cycle = pwm_get_relative_duty_cycle(&state, 255);
+		state.period = DIV_ROUND_UP_ULL(NSEC_PER_SEC, val);
+		pwm_set_relative_duty_cycle(&state, duty_cycle, 255);
+		err = pwm_apply_state(data->pwmd[channel], &state);
+		return err;
+	default:
+		return -EOPNOTSUPP;
+	}
 }
 
-static ssize_t alarm_show(struct device *dev,
-			  struct device_attribute *dev_attr, char *buf)
+static umode_t max6639_pwm_is_visible(const void *_data, u32 attr, int channel)
 {
-	struct max6639_data *data = max6639_update_device(dev);
-	struct sensor_device_attribute *attr = to_sensor_dev_attr(dev_attr);
+	struct max6639_data *data = (struct max6639_data *) _data;
 
 	if (IS_ERR(data))
 		return PTR_ERR(data);
 
-	return sprintf(buf, "%d\n", !!(data->status & (1 << attr->index)));
+	if (IS_ERR(data->pwmd[channel]))
+		return 0;
+
+	switch (attr) {
+	case hwmon_pwm_input:
+	case hwmon_pwm_freq:
+		if (data->fan_enable[channel])
+			return 0644;
+		else
+			return 0;
+	default:
+		return 0;
+	}
 }
 
-static SENSOR_DEVICE_ATTR_RO(temp1_input, temp_input, 0);
-static SENSOR_DEVICE_ATTR_RO(temp2_input, temp_input, 1);
-static SENSOR_DEVICE_ATTR_RO(temp1_fault, temp_fault, 0);
-static SENSOR_DEVICE_ATTR_RO(temp2_fault, temp_fault, 1);
-static SENSOR_DEVICE_ATTR_RW(temp1_max, temp_max, 0);
-static SENSOR_DEVICE_ATTR_RW(temp2_max, temp_max, 1);
-static SENSOR_DEVICE_ATTR_RW(temp1_crit, temp_crit, 0);
-static SENSOR_DEVICE_ATTR_RW(temp2_crit, temp_crit, 1);
-static SENSOR_DEVICE_ATTR_RW(temp1_emergency, temp_emergency, 0);
-static SENSOR_DEVICE_ATTR_RW(temp2_emergency, temp_emergency, 1);
-static SENSOR_DEVICE_ATTR_RW(pwm1, pwm, 0);
-static SENSOR_DEVICE_ATTR_RW(pwm2, pwm, 1);
-static SENSOR_DEVICE_ATTR_RO(fan1_input, fan_input, 0);
-static SENSOR_DEVICE_ATTR_RO(fan2_input, fan_input, 1);
-static SENSOR_DEVICE_ATTR_RO(fan1_fault, alarm, 1);
-static SENSOR_DEVICE_ATTR_RO(fan2_fault, alarm, 0);
-static SENSOR_DEVICE_ATTR_RO(temp1_max_alarm, alarm, 3);
-static SENSOR_DEVICE_ATTR_RO(temp2_max_alarm, alarm, 2);
-static SENSOR_DEVICE_ATTR_RO(temp1_crit_alarm, alarm, 7);
-static SENSOR_DEVICE_ATTR_RO(temp2_crit_alarm, alarm, 6);
-static SENSOR_DEVICE_ATTR_RO(temp1_emergency_alarm, alarm, 5);
-static SENSOR_DEVICE_ATTR_RO(temp2_emergency_alarm, alarm, 4);
+static int max6639_read_temp(struct device *dev, u32 attr, int channel,
+			    long *val)
+{
+	struct max6639_data *data = max6639_update_device(dev);
 
+	switch (attr) {
+	case hwmon_temp_input:
+		*val = data->temp[channel] * 125;
+		return 0;
+	case hwmon_temp_fault:
+		*val = data->temp_fault[channel] * 125;
+		return 0;
+	case hwmon_temp_max:
+		*val = data->temp_therm[channel] * 1000;
+		return 0;
+	case hwmon_temp_crit:
+		*val = data->temp_alert[channel] * 1000;
+		return 0;
+	case hwmon_temp_emergency:
+		*val = data->temp_ot[channel] * 1000;
+		return 0;
+	case hwmon_temp_max_alarm:
+		*val = !!(data->status & (0x08 >> channel));
+		return 0;
+	case hwmon_temp_crit_alarm:
+		*val = !!(data->status & (0x80 >> channel));
+		return 0;
+	case hwmon_temp_emergency_alarm:
+		*val = !!(data->status & (0x20 >> channel));
+		return 0;
+	default:
+		return -EOPNOTSUPP;
+	}
+}
 
-static struct attribute *max6639_attrs[] = {
-	&sensor_dev_attr_temp1_input.dev_attr.attr,
-	&sensor_dev_attr_temp2_input.dev_attr.attr,
-	&sensor_dev_attr_temp1_fault.dev_attr.attr,
-	&sensor_dev_attr_temp2_fault.dev_attr.attr,
-	&sensor_dev_attr_temp1_max.dev_attr.attr,
-	&sensor_dev_attr_temp2_max.dev_attr.attr,
-	&sensor_dev_attr_temp1_crit.dev_attr.attr,
-	&sensor_dev_attr_temp2_crit.dev_attr.attr,
-	&sensor_dev_attr_temp1_emergency.dev_attr.attr,
-	&sensor_dev_attr_temp2_emergency.dev_attr.attr,
-	&sensor_dev_attr_pwm1.dev_attr.attr,
-	&sensor_dev_attr_pwm2.dev_attr.attr,
-	&sensor_dev_attr_fan1_input.dev_attr.attr,
-	&sensor_dev_attr_fan2_input.dev_attr.attr,
-	&sensor_dev_attr_fan1_fault.dev_attr.attr,
-	&sensor_dev_attr_fan2_fault.dev_attr.attr,
-	&sensor_dev_attr_temp1_max_alarm.dev_attr.attr,
-	&sensor_dev_attr_temp2_max_alarm.dev_attr.attr,
-	&sensor_dev_attr_temp1_crit_alarm.dev_attr.attr,
-	&sensor_dev_attr_temp2_crit_alarm.dev_attr.attr,
-	&sensor_dev_attr_temp1_emergency_alarm.dev_attr.attr,
-	&sensor_dev_attr_temp2_emergency_alarm.dev_attr.attr,
+static int max6639_write_temp(struct device *dev, u32 attr, int channel,
+			    long val)
+{
+	struct max6639_data *data = max6639_update_device(dev);
+
+	switch (attr) {
+	case hwmon_temp_max:
+		return max6639_temp_set_max(data, channel, val);
+	case hwmon_temp_crit:
+		return max6639_temp_set_crit(data, channel, val);
+	case hwmon_temp_emergency:
+		return max6639_temp_set_emergency(data, channel, val);
+	default:
+		return -EOPNOTSUPP;
+	}
+}
+
+static umode_t max6639_temp_is_visible(const void *_data, u32 attr, int channel)
+{
+
+	switch (attr) {
+	case hwmon_temp_input:
+	case hwmon_temp_fault:
+	case hwmon_temp_max_alarm:
+	case hwmon_temp_crit_alarm:
+	case hwmon_temp_emergency_alarm:
+		return 0444;
+	case hwmon_temp_max:
+	case hwmon_temp_crit:
+	case hwmon_temp_emergency:
+		return 0644;
+	default:
+		return 0;
+	}
+}
+
+static int max6639_read(struct device *dev, enum hwmon_sensor_types type,
+			u32 attr, int channel, long *val)
+{
+	switch (type) {
+	case hwmon_fan:
+		return max6639_read_fan(dev, attr, channel, val);
+	case hwmon_pwm:
+		return max6639_read_pwm(dev, attr, channel, val);
+	case hwmon_temp:
+		return max6639_read_temp(dev, attr, channel, val);
+	default:
+		return -EOPNOTSUPP;
+	}
+}
+
+static int max6639_write(struct device *dev, enum hwmon_sensor_types type,
+			u32 attr, int channel, long val)
+{
+	switch (type) {
+	case hwmon_fan:
+		return max6639_write_fan(dev, attr, channel, val);
+	case hwmon_pwm:
+		return max6639_write_pwm(dev, attr, channel, val);
+	case hwmon_temp:
+		return max6639_write_temp(dev, attr, channel, val);
+	default:
+		return -EOPNOTSUPP;
+	}
+}
+
+static umode_t max6639_is_visible(const void *data,
+				  enum hwmon_sensor_types type,
+				  u32 attr, int channel)
+{
+	switch (type) {
+	case hwmon_fan:
+		return max6639_fan_is_visible(data, attr, channel);
+	case hwmon_pwm:
+		return max6639_pwm_is_visible(data, attr, channel);
+	case hwmon_temp:
+		return max6639_temp_is_visible(data, attr, channel);
+	default:
+		return 0;
+	}
+}
+
+static const struct hwmon_channel_info * const max6639_info[] = {
+	HWMON_CHANNEL_INFO(fan,
+			HWMON_F_INPUT | HWMON_F_FAULT | HWMON_F_PULSES,
+			HWMON_F_INPUT | HWMON_F_FAULT | HWMON_F_PULSES),
+	HWMON_CHANNEL_INFO(pwm,
+			HWMON_PWM_INPUT | HWMON_PWM_FREQ,
+			HWMON_PWM_INPUT | HWMON_PWM_FREQ),
+	HWMON_CHANNEL_INFO(temp,
+			HWMON_T_INPUT | HWMON_T_FAULT | HWMON_T_MAX | HWMON_T_MAX_ALARM |
+			HWMON_T_CRIT | HWMON_T_CRIT_ALARM | HWMON_T_EMERGENCY |
+			HWMON_T_EMERGENCY_ALARM,
+			HWMON_T_INPUT | HWMON_T_FAULT | HWMON_T_MAX | HWMON_T_MAX_ALARM |
+			HWMON_T_CRIT | HWMON_T_CRIT_ALARM | HWMON_T_EMERGENCY |
+			HWMON_T_EMERGENCY_ALARM),
 	NULL
 };
-ATTRIBUTE_GROUPS(max6639);
+
+static const struct hwmon_ops max6639_hwmon_ops = {
+	.is_visible = max6639_is_visible,
+	.read = max6639_read,
+	.write = max6639_write,
+};
+
+static const struct hwmon_chip_info max6639_chip_info = {
+	.ops = &max6639_hwmon_ops,
+	.info = max6639_info,
+};
 
 static struct max6639_data *to_max6639_pwm(struct pwm_chip *chip)
 {
@@ -568,18 +676,18 @@ static const struct pwm_ops max6639_pwm_ops = {
 
 /*
  *  returns respective index in rpm_ranges table
- *  1 by default on invalid range
+ *  3 by default on invalid range
  */
 static int rpm_range_to_reg(int range)
 {
 	int i;
 
 	for (i = 0; i < ARRAY_SIZE(rpm_ranges); i++) {
-		if (rpm_ranges[i] == range)
+		if (range <= rpm_ranges[i])
 			return i;
 	}
 
-	return 1; /* default: 4000 RPM */
+	return 3; /* default: 16000 RPM */
 }
 
 static int max6639_init_client(struct i2c_client *client,
@@ -590,7 +698,7 @@ static int max6639_init_client(struct i2c_client *client,
 	int i;
 	int rpm_range = 1; /* default: 4000 RPM */
 	struct pwm_state state;
-	int err;
+	int err, ppr = 2;
 
 	/* Reset chip to default values, see below for GCONFIG setup */
 	err = i2c_smbus_write_byte_data(client, MAX6639_REG_GCONFIG,
@@ -601,28 +709,29 @@ static int max6639_init_client(struct i2c_client *client,
 	/* Fans pulse per revolution is 2 by default */
 	if (max6639_info && max6639_info->ppr > 0 &&
 			max6639_info->ppr < 5)
-		data->ppr = max6639_info->ppr;
-	else
-		data->ppr = 2;
-	data->ppr -= 1;
+		ppr = max6639_info->ppr;
+	ppr -= 1;
+	data->ppr[0] = ppr;
+	data->ppr[1] = ppr;
 
 	if (max6639_info)
 		rpm_range = rpm_range_to_reg(max6639_info->rpm_range);
-	data->rpm_range = rpm_range;
+	data->rpm_range[0] = rpm_range;
+	data->rpm_range[1] = rpm_range;
 
 	for (i = 0; i < 2; i++) {
 
 		/* Set Fan pulse per revolution */
 		err = i2c_smbus_write_byte_data(client,
 				MAX6639_REG_FAN_PPR(i),
-				data->ppr << 6);
+				data->ppr[i] << 6);
 		if (err)
 			goto exit;
 
 		/* Fans config PWM, RPM */
 		err = i2c_smbus_write_byte_data(client,
 			MAX6639_REG_FAN_CONFIG1(i),
-			MAX6639_FAN_CONFIG1_PWM | rpm_range);
+			MAX6639_FAN_CONFIG1_PWM | data->rpm_range[i]);
 		if (err)
 			goto exit;
 
@@ -650,6 +759,8 @@ static int max6639_init_client(struct i2c_client *client,
 		data->temp_therm[i] = 80;
 		data->temp_alert[i] = 90;
 		data->temp_ot[i] = 100;
+		data->fan_enable[i] = true;
+
 		err = i2c_smbus_write_byte_data(client,
 				MAX6639_REG_THERM_LIMIT(i),
 				data->temp_therm[i]);
@@ -713,7 +824,6 @@ static int max6639_probe(struct i2c_client *client)
 {
 	struct device *dev = &client->dev;
 	struct max6639_data *data;
-	struct device *hwmon_dev;
 	int err;
 
 	data = devm_kzalloc(dev, sizeof(struct max6639_data), GFP_KERNEL);
@@ -758,10 +868,14 @@ static int max6639_probe(struct i2c_client *client)
 	if (err < 0)
 		return err;
 
-	hwmon_dev = devm_hwmon_device_register_with_groups(dev, client->name,
-							   data,
-							   max6639_groups);
-	return PTR_ERR_OR_ZERO(hwmon_dev);
+	data->hwmon_dev = devm_hwmon_device_register_with_info(dev, "max6639_fan_temp",
+						     data, &max6639_chip_info,
+						     NULL);
+
+	if (IS_ERR(data->hwmon_dev))
+		return dev_err_probe(dev, PTR_ERR(data->hwmon_dev),
+				     "unable to register hwmon device\n");
+	return 0;
 }
 
 static int max6639_suspend(struct device *dev)
