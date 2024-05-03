@@ -21,22 +21,22 @@
 				};
 			};
 			regulators {
-				sw0_ssb_rssd19: sw0 {
-					vss1-supply = <&p3v3_aux>;
-					regulator-compatible = "SW0";
-					regulator-name = "rssd19_3v3";
-					shunt-resistor-micro-ohms = <100000>;
-					regulator-over-current-protection;
-					regulator-oc-protection-microamp = <410000>;
-					regulator-enable-ramp-delay = <1000>;
-				};
-				sw1_ssb_rssd19: sw1 {
+				sw1_ssb_rssd19: sw0 {
 					vss2-supply = <&p12v_a>;
-					regulator-compatible = "SW1";
+					regulator-compatible = "SW0";
 					regulator-name = "rssd19_12v";
 					shunt-resistor-micro-ohms = <9000>;
 					regulator-over-current-protection;
 					regulator-oc-protection-microamp = <4500000>;
+					regulator-enable-ramp-delay = <1000>;
+				};
+				sw0_ssb_rssd19: sw1 {
+					vss1-supply = <&p3v3_aux>;
+					regulator-compatible = "SW1";
+					regulator-name = "rssd19_3v3";
+					shunt-resistor-micro-ohms = <100000>;
+					regulator-over-current-protection;
+					regulator-oc-protection-microamp = <410000>;
 					regulator-enable-ramp-delay = <1000>;
 				};
 			};
@@ -63,22 +63,22 @@
 				};
 			};
 			regulators {
-				sw0_ssb_rssd18: sw0 {
-					vss1-supply = <&p3v3_aux>;
-					regulator-compatible = "SW0";
-					regulator-name = "rssd18_3v3";
-					shunt-resistor-micro-ohms = <100000>;
-					regulator-over-current-protection;
-					regulator-oc-protection-microamp = <410000>;
-					regulator-enable-ramp-delay = <1000>;
-				};
-				sw1_ssb_rssd18: sw1 {
+				sw1_ssb_rssd18: sw0 {
 					vss2-supply = <&p12v_a>;
-					regulator-compatible = "SW1";
+					regulator-compatible = "SW0";
 					regulator-name = "rssd18_12v";
 					shunt-resistor-micro-ohms = <9000>;
 					regulator-over-current-protection;
 					regulator-oc-protection-microamp = <4500000>;
+					regulator-enable-ramp-delay = <1000>;
+				};
+				sw0_ssb_rssd18: sw1 {
+					vss1-supply = <&p3v3_aux>;
+					regulator-compatible = "SW1";
+					regulator-name = "rssd18_3v3";
+					shunt-resistor-micro-ohms = <100000>;
+					regulator-over-current-protection;
+					regulator-oc-protection-microamp = <410000>;
 					regulator-enable-ramp-delay = <1000>;
 				};
 			};
@@ -105,22 +105,22 @@
 				};
 			};
 			regulators {
-				sw0_ssb_rssd17: sw0 {
-					vss1-supply = <&p3v3_aux>;
-					regulator-compatible = "SW0";
-					regulator-name = "rssd17_3v3";
-					shunt-resistor-micro-ohms = <100000>;
-					regulator-over-current-protection;
-					regulator-oc-protection-microamp = <410000>;
-					regulator-enable-ramp-delay = <1000>;
-				};
-				sw1_ssb_rssd17: sw1 {
+				sw1_ssb_rssd17: sw0 {
 					vss2-supply = <&p12v_a>;
-					regulator-compatible = "SW1";
+					regulator-compatible = "SW0";
 					regulator-name = "rssd17_12v";
 					shunt-resistor-micro-ohms = <9000>;
 					regulator-over-current-protection;
 					regulator-oc-protection-microamp = <4500000>;
+					regulator-enable-ramp-delay = <1000>;
+				};
+				sw0_ssb_rssd17: sw1 {
+					vss1-supply = <&p3v3_aux>;
+					regulator-compatible = "SW1";
+					regulator-name = "rssd17_3v3";
+					shunt-resistor-micro-ohms = <100000>;
+					regulator-over-current-protection;
+					regulator-oc-protection-microamp = <410000>;
 					regulator-enable-ramp-delay = <1000>;
 				};
 			};
@@ -147,22 +147,22 @@
 				};
 			};
 			regulators {
-				sw0_ssb_rssd20: sw0 {
-					vss1-supply = <&p3v3_aux>;
-					regulator-compatible = "SW0";
-					regulator-name = "rssd20_3v3";
-					shunt-resistor-micro-ohms = <100000>;
-					regulator-over-current-protection;
-					regulator-oc-protection-microamp = <410000>;
-					regulator-enable-ramp-delay = <1000>;
-				};
-				sw1_ssb_rssd20: sw1 {
+				sw1_ssb_rssd20: sw0 {
 					vss2-supply = <&p12v_a>;
-					regulator-compatible = "SW1";
+					regulator-compatible = "SW0";
 					regulator-name = "rssd20_12v";
 					shunt-resistor-micro-ohms = <9000>;
 					regulator-over-current-protection;
 					regulator-oc-protection-microamp = <4500000>;
+					regulator-enable-ramp-delay = <1000>;
+				};
+				sw0_ssb_rssd20: sw1 {
+					vss1-supply = <&p3v3_aux>;
+					regulator-compatible = "SW1";
+					regulator-name = "rssd20_3v3";
+					shunt-resistor-micro-ohms = <100000>;
+					regulator-over-current-protection;
+					regulator-oc-protection-microamp = <410000>;
 					regulator-enable-ramp-delay = <1000>;
 				};
 			};
@@ -189,22 +189,22 @@
 				};
 			};
 			regulators {
-				sw0_ssb_rssd21: sw0 {
-					vss1-supply = <&p3v3_aux>;
-					regulator-compatible = "SW0";
-					regulator-name = "rssd21_3v3";
-					shunt-resistor-micro-ohms = <100000>;
-					regulator-over-current-protection;
-					regulator-oc-protection-microamp = <410000>;
-					regulator-enable-ramp-delay = <1000>;
-				};
-				sw1_ssb_rssd21: sw1 {
+				sw1_ssb_rssd21: sw0 {
 					vss2-supply = <&p12v_a>;
-					regulator-compatible = "SW1";
+					regulator-compatible = "SW0";
 					regulator-name = "rssd21_12v";
 					shunt-resistor-micro-ohms = <9000>;
 					regulator-over-current-protection;
 					regulator-oc-protection-microamp = <4500000>;
+					regulator-enable-ramp-delay = <1000>;
+				};
+				sw0_ssb_rssd21: sw1 {
+					vss1-supply = <&p3v3_aux>;
+					regulator-compatible = "SW1";
+					regulator-name = "rssd21_3v3";
+					shunt-resistor-micro-ohms = <100000>;
+					regulator-over-current-protection;
+					regulator-oc-protection-microamp = <410000>;
 					regulator-enable-ramp-delay = <1000>;
 				};
 			};
@@ -231,22 +231,22 @@
 				};
 			};
 			regulators {
-				sw0_ssb_rssd22: sw0 {
-					vss1-supply = <&p3v3_aux>;
-					regulator-compatible = "SW0";
-					regulator-name = "rssd22_3v3";
-					shunt-resistor-micro-ohms = <100000>;
-					regulator-over-current-protection;
-					regulator-oc-protection-microamp = <410000>;
-					regulator-enable-ramp-delay = <1000>;
-				};
-				sw1_ssb_rssd22: sw1 {
+				sw1_ssb_rssd22: sw0 {
 					vss2-supply = <&p12v_a>;
-					regulator-compatible = "SW1";
+					regulator-compatible = "SW0";
 					regulator-name = "rssd22_12v";
 					shunt-resistor-micro-ohms = <9000>;
 					regulator-over-current-protection;
 					regulator-oc-protection-microamp = <4500000>;
+					regulator-enable-ramp-delay = <1000>;
+				};
+				sw0_ssb_rssd22: sw1 {
+					vss1-supply = <&p3v3_aux>;
+					regulator-compatible = "SW1";
+					regulator-name = "rssd22_3v3";
+					shunt-resistor-micro-ohms = <100000>;
+					regulator-over-current-protection;
+					regulator-oc-protection-microamp = <410000>;
 					regulator-enable-ramp-delay = <1000>;
 				};
 			};
@@ -273,22 +273,22 @@
 				};
 			};
 			regulators {
-				sw0_ssb_rssd24: sw0 {
-					vss1-supply = <&p3v3_aux>;
-					regulator-compatible = "SW0";
-					regulator-name = "rssd24_3v3";
-					shunt-resistor-micro-ohms = <100000>;
-					regulator-over-current-protection;
-					regulator-oc-protection-microamp = <410000>;
-					regulator-enable-ramp-delay = <1000>;
-				};
-				sw1_ssb_rssd24: sw1 {
+				sw1_ssb_rssd24: sw0 {
 					vss2-supply = <&p12v_a>;
-					regulator-compatible = "SW1";
+					regulator-compatible = "SW0";
 					regulator-name = "rssd24_12v";
 					shunt-resistor-micro-ohms = <9000>;
 					regulator-over-current-protection;
 					regulator-oc-protection-microamp = <4500000>;
+					regulator-enable-ramp-delay = <1000>;
+				};
+				sw0_ssb_rssd24: sw1 {
+					vss1-supply = <&p3v3_aux>;
+					regulator-compatible = "SW1";
+					regulator-name = "rssd24_3v3";
+					shunt-resistor-micro-ohms = <100000>;
+					regulator-over-current-protection;
+					regulator-oc-protection-microamp = <410000>;
 					regulator-enable-ramp-delay = <1000>;
 				};
 			};
@@ -315,22 +315,22 @@
 				};
 			};
 			regulators {
-				sw0_ssb_rssd23: sw0 {
-					vss1-supply = <&p3v3_aux>;
-					regulator-compatible = "SW0";
-					regulator-name = "rssd23_3v3";
-					shunt-resistor-micro-ohms = <100000>;
-					regulator-over-current-protection;
-					regulator-oc-protection-microamp = <410000>;
-					regulator-enable-ramp-delay = <1000>;
-				};
-				sw1_ssb_rssd23: sw1 {
+				sw1_ssb_rssd23: sw0 {
 					vss2-supply = <&p12v_a>;
-					regulator-compatible = "SW1";
+					regulator-compatible = "SW0";
 					regulator-name = "rssd23_12v";
 					shunt-resistor-micro-ohms = <9000>;
 					regulator-over-current-protection;
 					regulator-oc-protection-microamp = <4500000>;
+					regulator-enable-ramp-delay = <1000>;
+				};
+				sw0_ssb_rssd23: sw1 {
+					vss1-supply = <&p3v3_aux>;
+					regulator-compatible = "SW1";
+					regulator-name = "rssd23_3v3";
+					shunt-resistor-micro-ohms = <100000>;
+					regulator-over-current-protection;
+					regulator-oc-protection-microamp = <410000>;
 					regulator-enable-ramp-delay = <1000>;
 				};
 			};
@@ -360,22 +360,22 @@
 				};
 			};
 			regulators {
-				sw0_ssb_rssd25: sw0 {
-					vss1-supply = <&p3v3_aux>;
-					regulator-compatible = "SW0";
-					regulator-name = "rssd25_3v3";
-					shunt-resistor-micro-ohms = <100000>;
-					regulator-over-current-protection;
-					regulator-oc-protection-microamp = <410000>;
-					regulator-enable-ramp-delay = <1000>;
-				};
-				sw1_ssb_rssd25: sw1 {
+				sw1_ssb_rssd25: sw0 {
 					vss2-supply = <&p12v_a>;
-					regulator-compatible = "SW1";
+					regulator-compatible = "SW0";
 					regulator-name = "rssd25_12v";
 					shunt-resistor-micro-ohms = <9000>;
 					regulator-over-current-protection;
 					regulator-oc-protection-microamp = <4500000>;
+					regulator-enable-ramp-delay = <1000>;
+				};
+				sw0_ssb_rssd25: sw1 {
+					vss1-supply = <&p3v3_aux>;
+					regulator-compatible = "SW1";
+					regulator-name = "rssd25_3v3";
+					shunt-resistor-micro-ohms = <100000>;
+					regulator-over-current-protection;
+					regulator-oc-protection-microamp = <410000>;
 					regulator-enable-ramp-delay = <1000>;
 				};
 			};
@@ -402,22 +402,22 @@
 				};
 			};
 			regulators {
-				sw0_ssb_rssd26: sw0 {
-					vss1-supply = <&p3v3_aux>;
-					regulator-compatible = "SW0";
-					regulator-name = "rssd26_3v3";
-					shunt-resistor-micro-ohms = <100000>;
-					regulator-over-current-protection;
-					regulator-oc-protection-microamp = <410000>;
-					regulator-enable-ramp-delay = <1000>;
-				};
-				sw1_ssb_rssd26: sw1 {
+				sw1_ssb_rssd26: sw0 {
 					vss2-supply = <&p12v_a>;
-					regulator-compatible = "SW1";
+					regulator-compatible = "SW0";
 					regulator-name = "rssd26_12v";
 					shunt-resistor-micro-ohms = <9000>;
 					regulator-over-current-protection;
 					regulator-oc-protection-microamp = <4500000>;
+					regulator-enable-ramp-delay = <1000>;
+				};
+				sw0_ssb_rssd26: sw1 {
+					vss1-supply = <&p3v3_aux>;
+					regulator-compatible = "SW1";
+					regulator-name = "rssd26_3v3";
+					shunt-resistor-micro-ohms = <100000>;
+					regulator-over-current-protection;
+					regulator-oc-protection-microamp = <410000>;
 					regulator-enable-ramp-delay = <1000>;
 				};
 			};
@@ -444,22 +444,22 @@
 				};
 			};
 			regulators {
-				sw0_ssb_rssd27: sw0 {
-					vss1-supply = <&p3v3_aux>;
-					regulator-compatible = "SW0";
-					regulator-name = "rssd27_3v3";
-					shunt-resistor-micro-ohms = <100000>;
-					regulator-over-current-protection;
-					regulator-oc-protection-microamp = <410000>;
-					regulator-enable-ramp-delay = <1000>;
-				};
-				sw1_ssb_rssd27: sw1 {
+				sw1_ssb_rssd27: sw0 {
 					vss2-supply = <&p12v_a>;
-					regulator-compatible = "SW1";
+					regulator-compatible = "SW0";
 					regulator-name = "rssd27_12v";
 					shunt-resistor-micro-ohms = <9000>;
 					regulator-over-current-protection;
 					regulator-oc-protection-microamp = <4500000>;
+					regulator-enable-ramp-delay = <1000>;
+				};
+				sw0_ssb_rssd27: sw1 {
+					vss1-supply = <&p3v3_aux>;
+					regulator-compatible = "SW1";
+					regulator-name = "rssd27_3v3";
+					shunt-resistor-micro-ohms = <100000>;
+					regulator-over-current-protection;
+					regulator-oc-protection-microamp = <410000>;
 					regulator-enable-ramp-delay = <1000>;
 				};
 			};
@@ -486,22 +486,22 @@
 				};
 			};
 			regulators {
-				sw0_ssb_rssd32: sw0 {
-					vss1-supply = <&p3v3_aux>;
-					regulator-compatible = "SW0";
-					regulator-name = "rssd32_3v3";
-					shunt-resistor-micro-ohms = <100000>;
-					regulator-over-current-protection;
-					regulator-oc-protection-microamp = <410000>;
-					regulator-enable-ramp-delay = <1000>;
-				};
-				sw1_ssb_rssd32: sw1 {
+				sw1_ssb_rssd32: sw0 {
 					vss2-supply = <&p12v_a>;
-					regulator-compatible = "SW1";
+					regulator-compatible = "SW0";
 					regulator-name = "rssd32_12v";
 					shunt-resistor-micro-ohms = <9000>;
 					regulator-over-current-protection;
 					regulator-oc-protection-microamp = <4500000>;
+					regulator-enable-ramp-delay = <1000>;
+				};
+				sw0_ssb_rssd32: sw1 {
+					vss1-supply = <&p3v3_aux>;
+					regulator-compatible = "SW1";
+					regulator-name = "rssd32_3v3";
+					shunt-resistor-micro-ohms = <100000>;
+					regulator-over-current-protection;
+					regulator-oc-protection-microamp = <410000>;
 					regulator-enable-ramp-delay = <1000>;
 				};
 			};
@@ -528,22 +528,22 @@
 				};
 			};
 			regulators {
-				sw0_ssb_rssd31: sw0 {
-					vss1-supply = <&p3v3_aux>;
-					regulator-compatible = "SW0";
-					regulator-name = "rssd31_3v3";
-					shunt-resistor-micro-ohms = <100000>;
-					regulator-over-current-protection;
-					regulator-oc-protection-microamp = <410000>;
-					regulator-enable-ramp-delay = <1000>;
-				};
-				sw1_ssb_rssd31: sw1 {
+				sw1_ssb_rssd31: sw0 {
 					vss2-supply = <&p12v_a>;
-					regulator-compatible = "SW1";
+					regulator-compatible = "SW0";
 					regulator-name = "rssd31_12v";
 					shunt-resistor-micro-ohms = <9000>;
 					regulator-over-current-protection;
 					regulator-oc-protection-microamp = <4500000>;
+					regulator-enable-ramp-delay = <1000>;
+				};
+				sw0_ssb_rssd31: sw1 {
+					vss1-supply = <&p3v3_aux>;
+					regulator-compatible = "SW1";
+					regulator-name = "rssd31_3v3";
+					shunt-resistor-micro-ohms = <100000>;
+					regulator-over-current-protection;
+					regulator-oc-protection-microamp = <410000>;
 					regulator-enable-ramp-delay = <1000>;
 				};
 			};
@@ -570,22 +570,22 @@
 				};
 			};
 			regulators {
-				sw0_ssb_rssd30: sw0 {
-					vss1-supply = <&p3v3_aux>;
-					regulator-compatible = "SW0";
-					regulator-name = "rssd30_3v3";
-					shunt-resistor-micro-ohms = <100000>;
-					regulator-over-current-protection;
-					regulator-oc-protection-microamp = <410000>;
-					regulator-enable-ramp-delay = <1000>;
-				};
-				sw1_ssb_rssd30: sw1 {
+				sw1_ssb_rssd30: sw0 {
 					vss2-supply = <&p12v_a>;
-					regulator-compatible = "SW1";
+					regulator-compatible = "SW0";
 					regulator-name = "rssd30_12v";
 					shunt-resistor-micro-ohms = <9000>;
 					regulator-over-current-protection;
 					regulator-oc-protection-microamp = <4500000>;
+					regulator-enable-ramp-delay = <1000>;
+				};
+				sw0_ssb_rssd30: sw1 {
+					vss1-supply = <&p3v3_aux>;
+					regulator-compatible = "SW1";
+					regulator-name = "rssd30_3v3";
+					shunt-resistor-micro-ohms = <100000>;
+					regulator-over-current-protection;
+					regulator-oc-protection-microamp = <410000>;
 					regulator-enable-ramp-delay = <1000>;
 				};
 			};
@@ -612,22 +612,22 @@
 				};
 			};
 			regulators {
-				sw0_ssb_rssd29: sw0 {
-					vss1-supply = <&p3v3_aux>;
-					regulator-compatible = "SW0";
-					regulator-name = "rssd29_3v3";
-					shunt-resistor-micro-ohms = <100000>;
-					regulator-over-current-protection;
-					regulator-oc-protection-microamp = <410000>;
-					regulator-enable-ramp-delay = <1000>;
-				};
-				sw1_ssb_rssd29: sw1 {
+				sw1_ssb_rssd29: sw0 {
 					vss2-supply = <&p12v_a>;
-					regulator-compatible = "SW1";
+					regulator-compatible = "SW0";
 					regulator-name = "rssd29_12v";
 					shunt-resistor-micro-ohms = <9000>;
 					regulator-over-current-protection;
 					regulator-oc-protection-microamp = <4500000>;
+					regulator-enable-ramp-delay = <1000>;
+				};
+				sw0_ssb_rssd29: sw1 {
+					vss1-supply = <&p3v3_aux>;
+					regulator-compatible = "SW1";
+					regulator-name = "rssd29_3v3";
+					shunt-resistor-micro-ohms = <100000>;
+					regulator-over-current-protection;
+					regulator-oc-protection-microamp = <410000>;
 					regulator-enable-ramp-delay = <1000>;
 				};
 			};
@@ -654,22 +654,22 @@
 				};
 			};
 			regulators {
-				sw0_ssb_rssd28: sw0 {
-					vss1-supply = <&p3v3_aux>;
-					regulator-compatible = "SW0";
-					regulator-name = "rssd28_3v3";
-					shunt-resistor-micro-ohms = <100000>;
-					regulator-over-current-protection;
-					regulator-oc-protection-microamp = <410000>;
-					regulator-enable-ramp-delay = <1000>;
-				};
-				sw1_ssb_rssd28: sw1 {
+				sw1_ssb_rssd28: sw0 {
 					vss2-supply = <&p12v_a>;
-					regulator-compatible = "SW1";
+					regulator-compatible = "SW0";
 					regulator-name = "rssd28_12v";
 					shunt-resistor-micro-ohms = <9000>;
 					regulator-over-current-protection;
 					regulator-oc-protection-microamp = <4500000>;
+					regulator-enable-ramp-delay = <1000>;
+				};
+				sw0_ssb_rssd28: sw1 {
+					vss1-supply = <&p3v3_aux>;
+					regulator-compatible = "SW1";
+					regulator-name = "rssd28_3v3";
+					shunt-resistor-micro-ohms = <100000>;
+					regulator-over-current-protection;
+					regulator-oc-protection-microamp = <410000>;
 					regulator-enable-ramp-delay = <1000>;
 				};
 			};
@@ -699,22 +699,22 @@
 				};
 			};
 			regulators {
-				sw0_ssb_rssd03: sw0 {
-					vss1-supply = <&p3v3_aux>;
-					regulator-compatible = "SW0";
-					regulator-name = "rssd03_3v3";
-					shunt-resistor-micro-ohms = <100000>;
-					regulator-over-current-protection;
-					regulator-oc-protection-microamp = <410000>;
-					regulator-enable-ramp-delay = <1000>;
-				};
-				sw1_ssb_rssd03: sw1 {
+				sw1_ssb_rssd03: sw0 {
 					vss2-supply = <&p12v_a>;
-					regulator-compatible = "SW1";
+					regulator-compatible = "SW0";
 					regulator-name = "rssd03_12v";
 					shunt-resistor-micro-ohms = <9000>;
 					regulator-over-current-protection;
 					regulator-oc-protection-microamp = <4500000>;
+					regulator-enable-ramp-delay = <1000>;
+				};
+				sw0_ssb_rssd03: sw1 {
+					vss1-supply = <&p3v3_aux>;
+					regulator-compatible = "SW1";
+					regulator-name = "rssd03_3v3";
+					shunt-resistor-micro-ohms = <100000>;
+					regulator-over-current-protection;
+					regulator-oc-protection-microamp = <410000>;
 					regulator-enable-ramp-delay = <1000>;
 				};
 			};
@@ -741,22 +741,22 @@
 				};
 			};
 			regulators {
-				sw0_ssb_rssd02: sw0 {
-					vss1-supply = <&p3v3_aux>;
-					regulator-compatible = "SW0";
-					regulator-name = "rssd02_3v3";
-					shunt-resistor-micro-ohms = <100000>;
-					regulator-over-current-protection;
-					regulator-oc-protection-microamp = <410000>;
-					regulator-enable-ramp-delay = <1000>;
-				};
-				sw1_ssb_rssd02: sw1 {
+				sw1_ssb_rssd02: sw0 {
 					vss2-supply = <&p12v_a>;
-					regulator-compatible = "SW1";
+					regulator-compatible = "SW0";
 					regulator-name = "rssd02_12v";
 					shunt-resistor-micro-ohms = <9000>;
 					regulator-over-current-protection;
 					regulator-oc-protection-microamp = <4500000>;
+					regulator-enable-ramp-delay = <1000>;
+				};
+				sw0_ssb_rssd02: sw1 {
+					vss1-supply = <&p3v3_aux>;
+					regulator-compatible = "SW1";
+					regulator-name = "rssd02_3v3";
+					shunt-resistor-micro-ohms = <100000>;
+					regulator-over-current-protection;
+					regulator-oc-protection-microamp = <410000>;
 					regulator-enable-ramp-delay = <1000>;
 				};
 			};
@@ -783,22 +783,22 @@
 				};
 			};
 			regulators {
-				sw0_ssb_rssd01: sw0 {
-					vss1-supply = <&p3v3_aux>;
-					regulator-compatible = "SW0";
-					regulator-name = "rssd01_3v3";
-					shunt-resistor-micro-ohms = <100000>;
-					regulator-over-current-protection;
-					regulator-oc-protection-microamp = <410000>;
-					regulator-enable-ramp-delay = <1000>;
-				};
-				sw1_ssb_rssd01: sw1 {
+				sw1_ssb_rssd01: sw0 {
 					vss2-supply = <&p12v_a>;
-					regulator-compatible = "SW1";
+					regulator-compatible = "SW0";
 					regulator-name = "rssd01_12v";
 					shunt-resistor-micro-ohms = <9000>;
 					regulator-over-current-protection;
 					regulator-oc-protection-microamp = <4500000>;
+					regulator-enable-ramp-delay = <1000>;
+				};
+				sw0_ssb_rssd01: sw1 {
+					vss1-supply = <&p3v3_aux>;
+					regulator-compatible = "SW1";
+					regulator-name = "rssd01_3v3";
+					shunt-resistor-micro-ohms = <100000>;
+					regulator-over-current-protection;
+					regulator-oc-protection-microamp = <410000>;
 					regulator-enable-ramp-delay = <1000>;
 				};
 			};
@@ -825,22 +825,22 @@
 				};
 			};
 			regulators {
-				sw0_ssb_rssd04: sw0 {
-					vss1-supply = <&p3v3_aux>;
-					regulator-compatible = "SW0";
-					regulator-name = "rssd04_3v3";
-					shunt-resistor-micro-ohms = <100000>;
-					regulator-over-current-protection;
-					regulator-oc-protection-microamp = <410000>;
-					regulator-enable-ramp-delay = <1000>;
-				};
-				sw1_ssb_rssd04: sw1 {
+				sw1_ssb_rssd04: sw0 {
 					vss2-supply = <&p12v_a>;
-					regulator-compatible = "SW1";
+					regulator-compatible = "SW0";
 					regulator-name = "rssd04_12v";
 					shunt-resistor-micro-ohms = <9000>;
 					regulator-over-current-protection;
 					regulator-oc-protection-microamp = <4500000>;
+					regulator-enable-ramp-delay = <1000>;
+				};
+				sw0_ssb_rssd04: sw1 {
+					vss1-supply = <&p3v3_aux>;
+					regulator-compatible = "SW1";
+					regulator-name = "rssd04_3v3";
+					shunt-resistor-micro-ohms = <100000>;
+					regulator-over-current-protection;
+					regulator-oc-protection-microamp = <410000>;
 					regulator-enable-ramp-delay = <1000>;
 				};
 			};
@@ -867,22 +867,22 @@
 				};
 			};
 			regulators {
-				sw0_ssb_rssd05: sw0 {
-					vss1-supply = <&p3v3_aux>;
-					regulator-compatible = "SW0";
-					regulator-name = "rssd05_3v3";
-					shunt-resistor-micro-ohms = <100000>;
-					regulator-over-current-protection;
-					regulator-oc-protection-microamp = <410000>;
-					regulator-enable-ramp-delay = <1000>;
-				};
-				sw1_ssb_rssd05: sw1 {
+				sw1_ssb_rssd05: sw0 {
 					vss2-supply = <&p12v_a>;
-					regulator-compatible = "SW1";
+					regulator-compatible = "SW0";
 					regulator-name = "rssd05_12v";
 					shunt-resistor-micro-ohms = <9000>;
 					regulator-over-current-protection;
 					regulator-oc-protection-microamp = <4500000>;
+					regulator-enable-ramp-delay = <1000>;
+				};
+				sw0_ssb_rssd05: sw1 {
+					vss1-supply = <&p3v3_aux>;
+					regulator-compatible = "SW1";
+					regulator-name = "rssd05_3v3";
+					shunt-resistor-micro-ohms = <100000>;
+					regulator-over-current-protection;
+					regulator-oc-protection-microamp = <410000>;
 					regulator-enable-ramp-delay = <1000>;
 				};
 			};
@@ -909,22 +909,22 @@
 				};
 			};
 			regulators {
-				sw0_ssb_rssd08: sw0 {
-					vss1-supply = <&p3v3_aux>;
-					regulator-compatible = "SW0";
-					regulator-name = "rssd08_3v3";
-					shunt-resistor-micro-ohms = <100000>;
-					regulator-over-current-protection;
-					regulator-oc-protection-microamp = <410000>;
-					regulator-enable-ramp-delay = <1000>;
-				};
-				sw1_ssb_rssd08: sw1 {
+				sw1_ssb_rssd08: sw0 {
 					vss2-supply = <&p12v_a>;
-					regulator-compatible = "SW1";
+					regulator-compatible = "SW0";
 					regulator-name = "rssd08_12v";
 					shunt-resistor-micro-ohms = <9000>;
 					regulator-over-current-protection;
 					regulator-oc-protection-microamp = <4500000>;
+					regulator-enable-ramp-delay = <1000>;
+				};
+				sw0_ssb_rssd08: sw1 {
+					vss1-supply = <&p3v3_aux>;
+					regulator-compatible = "SW1";
+					regulator-name = "rssd08_3v3";
+					shunt-resistor-micro-ohms = <100000>;
+					regulator-over-current-protection;
+					regulator-oc-protection-microamp = <410000>;
 					regulator-enable-ramp-delay = <1000>;
 				};
 			};
@@ -951,22 +951,22 @@
 				};
 			};
 			regulators {
-				sw0_ssb_rssd07: sw0 {
-					vss1-supply = <&p3v3_aux>;
-					regulator-compatible = "SW0";
-					regulator-name = "rssd07_3v3";
-					shunt-resistor-micro-ohms = <100000>;
-					regulator-over-current-protection;
-					regulator-oc-protection-microamp = <410000>;
-					regulator-enable-ramp-delay = <1000>;
-				};
-				sw1_ssb_rssd07: sw1 {
+				sw1_ssb_rssd07: sw0 {
 					vss2-supply = <&p12v_a>;
-					regulator-compatible = "SW1";
+					regulator-compatible = "SW0";
 					regulator-name = "rssd07_12v";
 					shunt-resistor-micro-ohms = <9000>;
 					regulator-over-current-protection;
 					regulator-oc-protection-microamp = <4500000>;
+					regulator-enable-ramp-delay = <1000>;
+				};
+				sw0_ssb_rssd07: sw1 {
+					vss1-supply = <&p3v3_aux>;
+					regulator-compatible = "SW1";
+					regulator-name = "rssd07_3v3";
+					shunt-resistor-micro-ohms = <100000>;
+					regulator-over-current-protection;
+					regulator-oc-protection-microamp = <410000>;
 					regulator-enable-ramp-delay = <1000>;
 				};
 			};
@@ -993,22 +993,22 @@
 				};
 			};
 			regulators {
-				sw0_ssb_rssd06: sw0 {
-					vss1-supply = <&p3v3_aux>;
-					regulator-compatible = "SW0";
-					regulator-name = "rssd06_3v3";
-					shunt-resistor-micro-ohms = <100000>;
-					regulator-over-current-protection;
-					regulator-oc-protection-microamp = <410000>;
-					regulator-enable-ramp-delay = <1000>;
-				};
-				sw1_ssb_rssd06: sw1 {
+				sw1_ssb_rssd06: sw0 {
 					vss2-supply = <&p12v_a>;
-					regulator-compatible = "SW1";
+					regulator-compatible = "SW0";
 					regulator-name = "rssd06_12v";
 					shunt-resistor-micro-ohms = <9000>;
 					regulator-over-current-protection;
 					regulator-oc-protection-microamp = <4500000>;
+					regulator-enable-ramp-delay = <1000>;
+				};
+				sw0_ssb_rssd06: sw1 {
+					vss1-supply = <&p3v3_aux>;
+					regulator-compatible = "SW1";
+					regulator-name = "rssd06_3v3";
+					shunt-resistor-micro-ohms = <100000>;
+					regulator-over-current-protection;
+					regulator-oc-protection-microamp = <410000>;
 					regulator-enable-ramp-delay = <1000>;
 				};
 			};
@@ -1038,22 +1038,22 @@
 				};
 			};
 			regulators {
-				sw0_ssb_rssd14: sw0 {
-					vss1-supply = <&p3v3_aux>;
-					regulator-compatible = "SW0";
-					regulator-name = "rssd14_3v3";
-					shunt-resistor-micro-ohms = <100000>;
-					regulator-over-current-protection;
-					regulator-oc-protection-microamp = <410000>;
-					regulator-enable-ramp-delay = <1000>;
-				};
-				sw1_ssb_rssd14: sw1 {
+				sw1_ssb_rssd14: sw0 {
 					vss2-supply = <&p12v_a>;
-					regulator-compatible = "SW1";
+					regulator-compatible = "SW0";
 					regulator-name = "rssd14_12v";
 					shunt-resistor-micro-ohms = <9000>;
 					regulator-over-current-protection;
 					regulator-oc-protection-microamp = <4500000>;
+					regulator-enable-ramp-delay = <1000>;
+				};
+				sw0_ssb_rssd14: sw1 {
+					vss1-supply = <&p3v3_aux>;
+					regulator-compatible = "SW1";
+					regulator-name = "rssd14_3v3";
+					shunt-resistor-micro-ohms = <100000>;
+					regulator-over-current-protection;
+					regulator-oc-protection-microamp = <410000>;
 					regulator-enable-ramp-delay = <1000>;
 				};
 			};
@@ -1080,22 +1080,22 @@
 				};
 			};
 			regulators {
-				sw0_ssb_rssd13: sw0 {
-					vss1-supply = <&p3v3_aux>;
-					regulator-compatible = "SW0";
-					regulator-name = "rssd13_3v3";
-					shunt-resistor-micro-ohms = <100000>;
-					regulator-over-current-protection;
-					regulator-oc-protection-microamp = <410000>;
-					regulator-enable-ramp-delay = <1000>;
-				};
-				sw1_ssb_rssd13: sw1 {
+				sw1_ssb_rssd13: sw0 {
 					vss2-supply = <&p12v_a>;
-					regulator-compatible = "SW1";
+					regulator-compatible = "SW0";
 					regulator-name = "rssd13_12v";
 					shunt-resistor-micro-ohms = <9000>;
 					regulator-over-current-protection;
 					regulator-oc-protection-microamp = <4500000>;
+					regulator-enable-ramp-delay = <1000>;
+				};
+				sw0_ssb_rssd13: sw1 {
+					vss1-supply = <&p3v3_aux>;
+					regulator-compatible = "SW1";
+					regulator-name = "rssd13_3v3";
+					shunt-resistor-micro-ohms = <100000>;
+					regulator-over-current-protection;
+					regulator-oc-protection-microamp = <410000>;
 					regulator-enable-ramp-delay = <1000>;
 				};
 			};
@@ -1122,22 +1122,22 @@
 				};
 			};
 			regulators {
-				sw0_ssb_rssd12: sw0 {
-					vss1-supply = <&p3v3_aux>;
-					regulator-compatible = "SW0";
-					regulator-name = "rssd12_3v3";
-					shunt-resistor-micro-ohms = <100000>;
-					regulator-over-current-protection;
-					regulator-oc-protection-microamp = <410000>;
-					regulator-enable-ramp-delay = <1000>;
-				};
-				sw1_ssb_rssd12: sw1 {
+				sw1_ssb_rssd12: sw0 {
 					vss2-supply = <&p12v_a>;
-					regulator-compatible = "SW1";
+					regulator-compatible = "SW0";
 					regulator-name = "rssd12_12v";
 					shunt-resistor-micro-ohms = <9000>;
 					regulator-over-current-protection;
 					regulator-oc-protection-microamp = <4500000>;
+					regulator-enable-ramp-delay = <1000>;
+				};
+				sw0_ssb_rssd12: sw1 {
+					vss1-supply = <&p3v3_aux>;
+					regulator-compatible = "SW1";
+					regulator-name = "rssd12_3v3";
+					shunt-resistor-micro-ohms = <100000>;
+					regulator-over-current-protection;
+					regulator-oc-protection-microamp = <410000>;
 					regulator-enable-ramp-delay = <1000>;
 				};
 			};
@@ -1164,22 +1164,22 @@
 				};
 			};
 			regulators {
-				sw0_ssb_rssd11: sw0 {
-					vss1-supply = <&p3v3_aux>;
-					regulator-compatible = "SW0";
-					regulator-name = "rssd11_3v3";
-					shunt-resistor-micro-ohms = <100000>;
-					regulator-over-current-protection;
-					regulator-oc-protection-microamp = <410000>;
-					regulator-enable-ramp-delay = <1000>;
-				};
-				sw1_ssb_rssd11: sw1 {
+				sw1_ssb_rssd11: sw0 {
 					vss2-supply = <&p12v_a>;
-					regulator-compatible = "SW1";
+					regulator-compatible = "SW0";
 					regulator-name = "rssd11_12v";
 					shunt-resistor-micro-ohms = <9000>;
 					regulator-over-current-protection;
 					regulator-oc-protection-microamp = <4500000>;
+					regulator-enable-ramp-delay = <1000>;
+				};
+				sw0_ssb_rssd11: sw1 {
+					vss1-supply = <&p3v3_aux>;
+					regulator-compatible = "SW1";
+					regulator-name = "rssd11_3v3";
+					shunt-resistor-micro-ohms = <100000>;
+					regulator-over-current-protection;
+					regulator-oc-protection-microamp = <410000>;
 					regulator-enable-ramp-delay = <1000>;
 				};
 			};
@@ -1206,22 +1206,22 @@
 				};
 			};
 			regulators {
-				sw0_ssb_rssd10: sw0 {
-					vss1-supply = <&p3v3_aux>;
-					regulator-compatible = "SW0";
-					regulator-name = "rssd10_3v3";
-					shunt-resistor-micro-ohms = <100000>;
-					regulator-over-current-protection;
-					regulator-oc-protection-microamp = <410000>;
-					regulator-enable-ramp-delay = <1000>;
-				};
-				sw1_ssb_rssd10: sw1 {
+				sw1_ssb_rssd10: sw0 {
 					vss2-supply = <&p12v_a>;
-					regulator-compatible = "SW1";
+					regulator-compatible = "SW0";
 					regulator-name = "rssd10_12v";
 					shunt-resistor-micro-ohms = <9000>;
 					regulator-over-current-protection;
 					regulator-oc-protection-microamp = <4500000>;
+					regulator-enable-ramp-delay = <1000>;
+				};
+				sw0_ssb_rssd10: sw1 {
+					vss1-supply = <&p3v3_aux>;
+					regulator-compatible = "SW1";
+					regulator-name = "rssd10_3v3";
+					shunt-resistor-micro-ohms = <100000>;
+					regulator-over-current-protection;
+					regulator-oc-protection-microamp = <410000>;
 					regulator-enable-ramp-delay = <1000>;
 				};
 			};
@@ -1248,22 +1248,22 @@
 				};
 			};
 			regulators {
-				sw0_ssb_rssd09: sw0 {
-					vss1-supply = <&p3v3_aux>;
-					regulator-compatible = "SW0";
-					regulator-name = "rssd09_3v3";
-					shunt-resistor-micro-ohms = <100000>;
-					regulator-over-current-protection;
-					regulator-oc-protection-microamp = <410000>;
-					regulator-enable-ramp-delay = <1000>;
-				};
-				sw1_ssb_rssd09: sw1 {
+				sw1_ssb_rssd09: sw0 {
 					vss2-supply = <&p12v_a>;
-					regulator-compatible = "SW1";
+					regulator-compatible = "SW0";
 					regulator-name = "rssd09_12v";
 					shunt-resistor-micro-ohms = <9000>;
 					regulator-over-current-protection;
 					regulator-oc-protection-microamp = <4500000>;
+					regulator-enable-ramp-delay = <1000>;
+				};
+				sw0_ssb_rssd09: sw1 {
+					vss1-supply = <&p3v3_aux>;
+					regulator-compatible = "SW1";
+					regulator-name = "rssd09_3v3";
+					shunt-resistor-micro-ohms = <100000>;
+					regulator-over-current-protection;
+					regulator-oc-protection-microamp = <410000>;
 					regulator-enable-ramp-delay = <1000>;
 				};
 			};
@@ -1290,22 +1290,22 @@
 				};
 			};
 			regulators {
-				sw0_ssb_rssd15: sw0 {
-					vss1-supply = <&p3v3_aux>;
-					regulator-compatible = "SW0";
-					regulator-name = "rssd15_3v3";
-					shunt-resistor-micro-ohms = <100000>;
-					regulator-over-current-protection;
-					regulator-oc-protection-microamp = <410000>;
-					regulator-enable-ramp-delay = <1000>;
-				};
-				sw1_ssb_rssd15: sw1 {
+				sw1_ssb_rssd15: sw0 {
 					vss2-supply = <&p12v_a>;
-					regulator-compatible = "SW1";
+					regulator-compatible = "SW0";
 					regulator-name = "rssd15_12v";
 					shunt-resistor-micro-ohms = <9000>;
 					regulator-over-current-protection;
 					regulator-oc-protection-microamp = <4500000>;
+					regulator-enable-ramp-delay = <1000>;
+				};
+				sw0_ssb_rssd15: sw1 {
+					vss1-supply = <&p3v3_aux>;
+					regulator-compatible = "SW1";
+					regulator-name = "rssd15_3v3";
+					shunt-resistor-micro-ohms = <100000>;
+					regulator-over-current-protection;
+					regulator-oc-protection-microamp = <410000>;
 					regulator-enable-ramp-delay = <1000>;
 				};
 			};
@@ -1332,22 +1332,22 @@
 				};
 			};
 			regulators {
-				sw0_ssb_rssd16: sw0 {
-					vss1-supply = <&p3v3_aux>;
-					regulator-compatible = "SW0";
-					regulator-name = "rssd16_3v3";
-					shunt-resistor-micro-ohms = <100000>;
-					regulator-over-current-protection;
-					regulator-oc-protection-microamp = <410000>;
-					regulator-enable-ramp-delay = <1000>;
-				};
-				sw1_ssb_rssd16: sw1 {
+				sw1_ssb_rssd16: sw0 {
 					vss2-supply = <&p12v_a>;
-					regulator-compatible = "SW1";
+					regulator-compatible = "SW0";
 					regulator-name = "rssd16_12v";
 					shunt-resistor-micro-ohms = <9000>;
 					regulator-over-current-protection;
 					regulator-oc-protection-microamp = <4500000>;
+					regulator-enable-ramp-delay = <1000>;
+				};
+				sw0_ssb_rssd16: sw1 {
+					vss1-supply = <&p3v3_aux>;
+					regulator-compatible = "SW1";
+					regulator-name = "rssd16_3v3";
+					shunt-resistor-micro-ohms = <100000>;
+					regulator-over-current-protection;
+					regulator-oc-protection-microamp = <410000>;
 					regulator-enable-ramp-delay = <1000>;
 				};
 			};
