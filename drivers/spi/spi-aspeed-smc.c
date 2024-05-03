@@ -14,6 +14,15 @@
 #include <linux/spi/spi.h>
 #include <linux/spi/spi-mem.h>
 
+#include <linux/bits.h>
+#include <linux/delay.h>
+#include <linux/io.h>
+#include <linux/kernel.h>
+#include <linux/mfd/syscon.h>
+#include <linux/of.h>
+#include <linux/regmap.h>
+#include <linux/watchdog.h>
+
 #define DEVICE_NAME "spi-aspeed-smc"
 
 /* Type setting Register */
@@ -47,8 +56,32 @@
 /* CEx Address Decoding Range Register */
 #define CE0_SEGMENT_ADDR_REG		0x30
 
+#define WDT_RATE_10HZ		10
+#define WDT_MAX_TIMEOUT_MS	409500
+#define WDT_DEFAULT_TIMEOUT	22
+
+#define SCU_AST2600_HW_STRAP2	0x510
+#define SCU_AST2600_HW_STRAP2_ABR	BIT(11)
+
+#define WDT_CTRL		0x64
+#define   WDT_CTRL_CLEAR_COUNTER	(0xea << 24)
+#define   WDT_CTRL_ACTIVE_EVENT_COUNT	(0xff << 8)
+#define   WDT_CTRL_OTP_BOOT_MODE	BIT(6)
+#define   WDT_CTRL_SINGLE_CHIP_SOURCE	BIT(5)
+#define   WDT_CTRL_BOOT_INDICATOR	BIT(4)
+#define   WDT_CTRL_ENABLE		BIT(0)
+#define WDT_RELOAD_VALUE	0x68
+#define WDT_RESTART		0x6c
+#define   WDT_RESTART_MAGIC		0x4755
+
 /* CEx Read timing compensation register */
 #define CE0_TIMING_COMPENSATION_REG	0x94
+
+struct aspeed_wdt {
+	struct watchdog_device	wdd;
+	void __iomem		*base;
+	u32			ctrl;
+};
 
 enum aspeed_spi_ctl_reg_value {
 	ASPEED_SPI_BASE,
@@ -101,6 +134,7 @@ struct aspeed_spi {
 	u32			 clk_freq;
 
 	struct aspeed_spi_chip	 chips[ASPEED_SPI_MAX_NUM_CS];
+	bool                     fixed_windows;
 };
 
 static u32 aspeed_spi_get_io_mode(const struct spi_mem_op *op)
@@ -383,6 +417,7 @@ static const char *aspeed_spi_get_name(struct spi_mem *mem)
 
 struct aspeed_spi_window {
 	u32 cs;
+	u32 reg;
 	u32 offset;
 	u32 size;
 };
@@ -397,6 +432,7 @@ static void aspeed_spi_get_windows(struct aspeed_spi *aspi,
 	for (cs = 0; cs < aspi->data->max_cs; cs++) {
 		reg_val = readl(aspi->regs + CE0_SEGMENT_ADDR_REG + cs * 4);
 		windows[cs].cs = cs;
+		windows[cs].reg = reg_val;
 		windows[cs].size = data->segment_end(aspi, reg_val) -
 			data->segment_start(aspi, reg_val);
 		windows[cs].offset = data->segment_start(aspi, reg_val) - aspi->ahb_base_phy;
@@ -573,7 +609,8 @@ static int aspeed_spi_dirmap_create(struct spi_mem_dirmap_desc *desc)
 	if (op->data.dir != SPI_MEM_DATA_IN)
 		return -EOPNOTSUPP;
 
-	aspeed_spi_chip_adjust_window(chip, desc->info.offset, desc->info.length);
+	if (!aspi->fixed_windows)
+		aspeed_spi_chip_adjust_window(chip, desc->info.offset, desc->info.length);
 
 	if (desc->info.length > chip->ahb_window_size)
 		dev_warn(aspi->dev, "CE%d window (%dMB) too small for mapping",
@@ -713,6 +750,287 @@ static void aspeed_spi_enable(struct aspeed_spi *aspi, bool enable)
 		aspeed_spi_chip_enable(aspi, cs, enable);
 }
 
+static int windows_show(struct device *dev, struct device_attribute *attr, char *buf)
+{
+	struct aspeed_spi *aspi = dev_get_drvdata(dev);
+	struct aspeed_spi_window windows[ASPEED_SPI_MAX_NUM_CS] = { 0 };
+	u32 cs;
+	int len = 0;
+
+	if (aspi->data == &ast2400_spi_data)
+		return 0;
+
+	aspeed_spi_get_windows(aspi, windows);
+
+	len += sysfs_emit_at(buf, len, "     offset     size       register\n");
+	for (cs = 0; cs < aspi->data->max_cs; cs++) {
+		if (!windows[cs].reg)
+			len += sysfs_emit_at(buf, len, "CE%d: disabled\n", cs);
+		else
+			len += sysfs_emit_at(buf, len, "CE%d: 0x%.8x 0x%.8x 0x%x\n", cs,
+					     windows[cs].offset, windows[cs].size,
+					     windows[cs].reg);
+	}
+	return len;
+}
+
+static DEVICE_ATTR_RO(windows);
+
+static struct attribute *aspeed_spi_attributes[] = {
+	&dev_attr_windows.attr,
+	NULL,
+};
+
+static const struct attribute_group aspeed_spi_attribute_group = {
+	.attrs = aspeed_spi_attributes
+};
+
+static int aspeed_spi_chip_read_ranges(struct device_node *node, struct aspeed_spi *aspi)
+{
+	const char *range_prop = "ranges";
+	struct property *prop;
+	struct aspeed_spi_window ranges[ASPEED_SPI_MAX_NUM_CS];
+	int prop_size;
+	int count;
+	int ret;
+	int i;
+
+	prop = of_find_property(node, range_prop, &prop_size);
+	if (!prop)
+		return 0;
+
+	count = prop_size / sizeof(*ranges);
+	if (count > aspi->data->max_cs) {
+		dev_err(aspi->dev, "invalid '%s' property %d\n", range_prop, count);
+		return -EINVAL;
+	}
+
+	if (count < aspi->data->max_cs)
+		dev_dbg(aspi->dev, "'%s' property does not cover all CE\n",
+			range_prop);
+
+	ret = of_property_read_u32_array(node, range_prop, (u32 *)ranges, count * 4);
+	if (ret)
+		return ret;
+
+	dev_info(aspi->dev, "Using preset decoding ranges\n");
+	for (i = 0; i < count; i++) {
+		struct aspeed_spi_window *win = &ranges[i];
+
+		if (win->cs > aspi->data->max_cs) {
+			dev_err(aspi->dev, "CE%d range is invalid", win->cs);
+			return -EINVAL;
+		}
+
+		/* Trim top bit of the address to keep offset */
+		win->offset &= aspi->ahb_window_size - 1;
+
+		/* Minimal check */
+		if (win->offset + win->size > aspi->ahb_window_size) {
+			dev_warn(aspi->dev, "CE%d range is too large", win->cs);
+				return -EINVAL;
+		}
+
+		ret = aspeed_spi_set_window(aspi, win);
+		if (ret)
+			return ret;
+	}
+
+	aspi->fixed_windows = true;
+	return 0;
+}
+
+
+static struct aspeed_wdt *to_aspeed_wdt(struct watchdog_device *wdd)
+{
+	return container_of(wdd, struct aspeed_wdt, wdd);
+}
+
+static void aspeed_wdt_enable(struct aspeed_wdt *wdt, int count)
+{
+	wdt->ctrl |= WDT_CTRL_ENABLE;
+
+	writel(0, wdt->base + WDT_CTRL);
+	writel(count, wdt->base + WDT_RELOAD_VALUE);
+	writel(WDT_RESTART_MAGIC, wdt->base + WDT_RESTART);
+	writel(wdt->ctrl, wdt->base + WDT_CTRL);
+}
+
+static int aspeed_wdt_start(struct watchdog_device *wdd)
+{
+	struct aspeed_wdt *wdt = to_aspeed_wdt(wdd);
+
+	aspeed_wdt_enable(wdt, wdd->timeout * WDT_RATE_10HZ);
+
+	return 0;
+}
+
+static int aspeed_wdt_stop(struct watchdog_device *wdd)
+{
+	struct aspeed_wdt *wdt = to_aspeed_wdt(wdd);
+
+	wdt->ctrl &= ~WDT_CTRL_ENABLE;
+	writel(wdt->ctrl, wdt->base + WDT_CTRL);
+
+	return 0;
+}
+
+static int aspeed_wdt_ping(struct watchdog_device *wdd)
+{
+	struct aspeed_wdt *wdt = to_aspeed_wdt(wdd);
+
+	writel(WDT_RESTART_MAGIC, wdt->base + WDT_RESTART);
+
+	return 0;
+}
+
+static int aspeed_wdt_set_timeout(struct watchdog_device *wdd,
+				  unsigned int timeout)
+{
+	struct aspeed_wdt *wdt = to_aspeed_wdt(wdd);
+
+	wdd->timeout = timeout;
+
+	writel(timeout * WDT_RATE_10HZ, wdt->base + WDT_RELOAD_VALUE);
+	writel(WDT_RESTART_MAGIC, wdt->base + WDT_RESTART);
+
+	return 0;
+}
+
+static int aspeed_wdt_restart(struct watchdog_device *wdd,
+			      unsigned long action, void *data)
+{
+	struct aspeed_wdt *wdt = to_aspeed_wdt(wdd);
+
+	aspeed_wdt_enable(wdt, 1);
+
+	mdelay(1000);
+
+	return 0;
+}
+
+/* access_cs0 shows if cs0 is accessible, hence the reverted bit */
+static ssize_t access_cs0_show(struct device *dev,
+			       struct device_attribute *attr, char *buf)
+{
+	struct aspeed_wdt *wdt = dev_get_drvdata(dev);
+	u32 status = readl(wdt->base + WDT_CTRL);
+
+	return sysfs_emit(buf, "%u\n",
+			  !(status & WDT_CTRL_BOOT_INDICATOR));
+}
+
+static ssize_t access_cs0_store(struct device *dev,
+				struct device_attribute *attr, const char *buf,
+				size_t size)
+{
+	struct aspeed_wdt *wdt = dev_get_drvdata(dev);
+	unsigned long val;
+
+	if (kstrtoul(buf, 10, &val))
+		return -EINVAL;
+
+	if (val)
+		writel(WDT_CTRL_CLEAR_COUNTER | wdt->ctrl, wdt->base + WDT_CTRL);
+
+	return size;
+}
+
+/*
+ * This attribute exists only if the system has booted from the alternate
+ * flash with 'alt-boot' option.
+ *
+ * At alternate flash the 'access_cs0' sysfs node provides:
+ *   ast2600: a way to restore the normal address mapping from
+ *            (CS0->CS1, CS1->CS0) to (CS0->CS0, CS1->CS1).
+ *
+ * Clearing the boot code selection and timeout counter also resets to the
+ * initial state the chip select line mapping. When the SoC is in normal
+ * mapping state (i.e. booted from CS0), clearing those bits does nothing for
+ * both versions of the SoC. For alternate boot mode (booted from CS1 due to
+ * wdt2 expiration) the behavior differs as described above.
+ *
+ * This option can be used with fmc_wdt2 only.
+ */
+static DEVICE_ATTR_RW(access_cs0);
+
+static struct attribute *bswitch_attrs[] = {
+	&dev_attr_access_cs0.attr,
+	NULL
+};
+ATTRIBUTE_GROUPS(bswitch);
+
+static const struct watchdog_ops aspeed_wdt_ops = {
+	.start		= aspeed_wdt_start,
+	.stop		= aspeed_wdt_stop,
+	.ping		= aspeed_wdt_ping,
+	.set_timeout	= aspeed_wdt_set_timeout,
+	.restart	= aspeed_wdt_restart,
+	.owner		= THIS_MODULE,
+};
+
+static const struct watchdog_info aspeed_wdt_info = {
+	.options	= WDIOF_KEEPALIVEPING
+			| WDIOF_MAGICCLOSE
+			| WDIOF_SETTIMEOUT,
+	.identity	= KBUILD_MODNAME,
+};
+
+static int aspeed_fmc_wdt_probe(struct platform_device *pdev, void __iomem *base)
+{
+	struct device *dev = &pdev->dev;
+	struct aspeed_wdt *wdt;
+	u32 status;
+
+	wdt = devm_kzalloc(dev, sizeof(*wdt), GFP_KERNEL);
+	if (!wdt)
+		return -ENOMEM;
+
+	wdt->base = base;
+	wdt->wdd.info = &aspeed_wdt_info;
+
+	wdt->wdd.ops = &aspeed_wdt_ops;
+	wdt->wdd.max_hw_heartbeat_ms = WDT_MAX_TIMEOUT_MS;
+	wdt->wdd.parent = dev;
+
+	wdt->wdd.timeout = WDT_DEFAULT_TIMEOUT;
+	watchdog_init_timeout(&wdt->wdd, 0, dev);
+
+	if (readl(wdt->base + WDT_CTRL) & WDT_CTRL_ENABLE)  {
+		/*
+		 * The watchdog is running, but invoke aspeed_wdt_start() to
+		 * write wdt->ctrl to WDT_CTRL to ensure the watchdog's
+		 * configuration conforms to the driver's expectations.
+		 * Primarily, ensure we're using the 1MHz clock source.
+		 */
+		aspeed_wdt_start(&wdt->wdd);
+		set_bit(WDOG_HW_RUNNING, &wdt->wdd.status);
+	}
+
+	if (of_property_read_bool(dev->of_node, "aspeed,alt-boot")) {
+		status = readl(wdt->base + WDT_CTRL);
+
+		if (status & WDT_CTRL_BOOT_INDICATOR) {
+			wdt->wdd.bootstatus = WDIOF_CARDRESET;
+			wdt->wdd.groups = bswitch_groups;
+		}
+
+		struct regmap *scu = syscon_regmap_lookup_by_phandle(dev->of_node, "syscon");
+		if (!IS_ERR(scu)) {
+			regmap_update_bits(scu, SCU_AST2600_HW_STRAP2,
+					   SCU_AST2600_HW_STRAP2_ABR,
+					   SCU_AST2600_HW_STRAP2_ABR);
+		} else {
+			dev_warn(dev, "Unable to enable ABR boot: %ld; continuing.\n",
+				PTR_ERR(scu));
+		}
+	}
+
+	dev_set_drvdata(dev, wdt);
+
+	return devm_watchdog_register_device(dev, &wdt->wdd);
+}
+
 static int aspeed_spi_probe(struct platform_device *pdev)
 {
 	struct device *dev = &pdev->dev;
@@ -766,6 +1084,10 @@ static int aspeed_spi_probe(struct platform_device *pdev)
 		return ret;
 	}
 
+	ret = aspeed_spi_chip_read_ranges(dev->of_node, aspi);
+	if (ret)
+		return ret;
+
 	/* IRQ is for DMA, which the driver doesn't support yet */
 
 	ctlr->mode_bits = SPI_RX_DUAL | SPI_TX_DUAL | data->mode_bits;
@@ -781,6 +1103,22 @@ static int aspeed_spi_probe(struct platform_device *pdev)
 		dev_err(&pdev->dev, "spi_register_controller failed\n");
 		goto disable_clk;
 	}
+
+	ret = devm_device_add_group(&pdev->dev, &aspeed_spi_attribute_group);
+	if (ret) {
+		dev_err(&pdev->dev, "cannot create attribute group\n");
+		goto disable_clk;
+	}
+
+	if (of_device_is_compatible(dev->of_node, "aspeed,ast2600-fmc")) {
+		ret = aspeed_fmc_wdt_probe(pdev, aspi->regs);
+		if (ret) {
+			dev_err(&pdev->dev, "cannot create watchdog\n");
+			goto disable_clk;
+		}
+	}
+
+
 	return 0;
 
 disable_clk:
