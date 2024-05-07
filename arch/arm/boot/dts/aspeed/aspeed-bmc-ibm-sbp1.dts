@@ -1810,6 +1810,17 @@
 	/* Z0 - Z7 */	"FM_CPU_ERR0_LVT3_N", "FM_CPU_ERR1_LVT3_N", "BMC_MUX_VR_PCH_CPU_RST_INT_N", "JTAG_MUX_LSP_SEL1", "", "JTAG_MUX_LSP_SEL4", "JTAG_MUX_LSP_SEL2", "";
 
 	gpio-reserved-ranges = <0 10>, <16 27>, <45 3>, <55 1>, <59 5>, <69 1>, <72 20>, <94 2>, <102 2>, <105 1>, <117 1>, <128 1>, <146 2>, <150 18>, <176 16>, <196 4>, <204 1>, <207 1>;
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_gpio0_unbiased_default>;
+};
+
+&pinctrl {
+	pinctrl_gpio0_unbiased_default: gpio_default {
+		pins = "AB15", "AD14", "R23", "A18", "AD24", "AD15", "AE14",
+		       "AC15", "U25", "AA24", "V24", "W26", "AA23", "V26",
+		       "U24", "V25", "AE15", "C15", "F15";
+		bias-disable;
+	};
 };
 
 // SDA2 BMC_MUX_NIC
