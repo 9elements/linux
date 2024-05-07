@@ -24,11 +24,16 @@ struct userspace_consumer_data {
 	const char *name;
 
 	struct mutex lock;
-	bool enabled;
 	bool no_autoswitch;
 
 	int num_supplies;
 	struct regulator_bulk_data *supplies;
+	bool *enabled;
+};
+
+struct userspace_consumer_nb {
+	struct notifier_block nb;
+	bool *enabled;
 };
 
 static ssize_t name_show(struct device *dev,
@@ -43,8 +48,18 @@ static ssize_t state_show(struct device *dev,
 			  struct device_attribute *attr, char *buf)
 {
 	struct userspace_consumer_data *data = dev_get_drvdata(dev);
+	bool enabled = true, disabled = true;
 
-	if (data->enabled)
+	for (int i = 0; i < data->num_supplies; i++) {
+		if (data->enabled[i])
+			disabled = false;
+		else
+			enabled = false;
+	}
+
+	if (!enabled && !disabled)
+		return sprintf(buf, "mixed\n");
+	else if (enabled)
 		return sprintf(buf, "enabled\n");
 
 	return sprintf(buf, "disabled\n");
@@ -71,18 +86,18 @@ static ssize_t state_store(struct device *dev, struct device_attribute *attr,
 	}
 
 	mutex_lock(&data->lock);
-	if (enabled != data->enabled) {
-		if (enabled)
-			ret = regulator_bulk_enable(data->num_supplies,
-						    data->supplies);
-		else
-			ret = regulator_bulk_disable(data->num_supplies,
-						     data->supplies);
+	for (int i = 0; i < data->num_supplies; i++) {
+		if (enabled != data->enabled[i]) {
+			if (enabled)
+				ret = regulator_enable(data->supplies[i].consumer);
+			else
+				ret = regulator_disable(data->supplies[i].consumer);
 
-		if (ret == 0)
-			data->enabled = enabled;
-		else
-			dev_err(dev, "Failed to configure state: %d\n", ret);
+			if (ret != 0) {
+				dev_err(dev, "Failed to configure state: %d\n", ret);
+				break;
+			}
+		}
 	}
 	mutex_unlock(&data->lock);
 
@@ -115,11 +130,27 @@ static const struct attribute_group attr_group = {
 	.is_visible =  attr_visible,
 };
 
+static int userspace_consumer_event(struct notifier_block *nb,
+				    unsigned long event, void *data)
+{
+	struct userspace_consumer_nb *userspace_consumer =
+		container_of(nb, struct userspace_consumer_nb, nb);
+
+	if (event & REGULATOR_EVENT_DISABLE) {
+		*userspace_consumer->enabled = false;
+	} else if (event & REGULATOR_EVENT_ENABLE) {
+		*userspace_consumer->enabled = true;
+	}
+
+	return 0;
+}
+
 static int regulator_userspace_consumer_probe(struct platform_device *pdev)
 {
 	struct regulator_userspace_consumer_data tmpdata;
 	struct regulator_userspace_consumer_data *pdata;
 	struct userspace_consumer_data *drvdata;
+	struct userspace_consumer_nb *regulator_nb;
 	int ret;
 
 	pdata = dev_get_platdata(&pdev->dev);
@@ -153,6 +184,11 @@ static int regulator_userspace_consumer_probe(struct platform_device *pdev)
 	drvdata->num_supplies = pdata->num_supplies;
 	drvdata->supplies = pdata->supplies;
 	drvdata->no_autoswitch = pdata->no_autoswitch;
+	drvdata->enabled = devm_kzalloc(&pdev->dev,
+					sizeof(bool) * drvdata->num_supplies,
+					GFP_KERNEL);
+	if (drvdata->enabled == NULL)
+		return -ENOMEM;
 
 	mutex_init(&drvdata->lock);
 
@@ -169,22 +205,42 @@ static int regulator_userspace_consumer_probe(struct platform_device *pdev)
 	if (ret != 0)
 		return ret;
 
-	if (pdata->init_on && !pdata->no_autoswitch) {
-		ret = regulator_bulk_enable(drvdata->num_supplies,
-					    drvdata->supplies);
-		if (ret) {
-			dev_err(&pdev->dev,
-				"Failed to set initial state: %d\n", ret);
+	for (int i = 0; i < drvdata->num_supplies; i++) {
+		ret = regulator_is_enabled(pdata->supplies[i].consumer);
+		if (ret < 0) {
+			dev_err(&pdev->dev, "Failed to get regulator status: %d\n", ret);
+			goto err_enable;
+		}
+		drvdata->enabled[i] = !!ret;
+
+		if ((pdata->init_on && !pdata->no_autoswitch) || drvdata->enabled[i]) {
+			ret = regulator_enable(pdata->supplies[i].consumer);
+			if (ret) {
+				dev_err(&pdev->dev,
+					"Failed to set initial state: %d\n", ret);
+				goto err_enable;
+			}
+			drvdata->enabled[i] = true;
+		}
+
+		regulator_nb = devm_kzalloc(&pdev->dev,
+					    sizeof(struct userspace_consumer_nb),
+					    GFP_KERNEL);
+		if (regulator_nb == NULL) {
+			ret = -ENOMEM;
+			goto err_enable;
+		}
+
+		regulator_nb->nb.notifier_call = userspace_consumer_event;
+		regulator_nb->enabled = &drvdata->enabled[i];
+
+		ret = devm_regulator_register_notifier(pdata->supplies[i].consumer,
+						       &regulator_nb->nb);
+		if (ret < 0) {
+			dev_err(&pdev->dev, "Failed to get register notifier: %d\n", ret);
 			goto err_enable;
 		}
 	}
-
-	ret = regulator_is_enabled(pdata->supplies[0].consumer);
-	if (ret < 0) {
-		dev_err(&pdev->dev, "Failed to get regulator status\n");
-		goto err_enable;
-	}
-	drvdata->enabled = !!ret;
 
 	return 0;
 
