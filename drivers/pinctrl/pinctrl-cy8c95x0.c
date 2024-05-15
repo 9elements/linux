@@ -471,7 +471,7 @@ static const struct regmap_config cy8c95x0_i2c_regmap = {
 	.volatile_reg = cy8c95x0_volatile_register,
 	.precious_reg = cy8c95x0_precious_register,
 
-	.cache_type = REGCACHE_FLAT,
+	.cache_type = REGCACHE_MAPLE,
 	.max_register = CY8C95X0_VIRTUAL + MAX_BANK * MUXED_STRIDE,
 	.num_reg_defaults_raw = CY8C95X0_VIRTUAL + MAX_BANK * MUXED_STRIDE,
 	.disable_locking = true,
