@@ -32,6 +32,7 @@
 
 #include "dummy.h"
 #include "internal.h"
+#include "regnl.h"
 
 static DEFINE_WW_CLASS(regulator_ww_class);
 static DEFINE_MUTEX(regulator_nesting_mutex);
@@ -2854,13 +2855,16 @@ static int _regulator_handle_consumer_disable(struct regulator *regulator)
 	struct regulator_dev *rdev = regulator->rdev;
 
 	lockdep_assert_held_once(&rdev->mutex.base);
+	if (!regulator->enable_count && regulator_is_enabled(regulator))
+		rdev_err(rdev, "%s is enabled but enable count is zero\n", rdev_get_name(rdev));
 
-	if (!regulator->enable_count) {
+	if (!regulator->enable_count && !regulator_is_enabled(regulator)) {
 		rdev_err(rdev, "Underflow of regulator enable count\n");
 		return -EINVAL;
 	}
+	if (regulator->enable_count > 0)
+		regulator->enable_count--;
 
-	regulator->enable_count--;
 	if (regulator->uA_load && regulator->enable_count == 0)
 		return drms_uA_update(rdev);
 
@@ -4849,7 +4853,23 @@ static int _notifier_call_chain(struct regulator_dev *rdev,
 				  unsigned long event, void *data)
 {
 	/* call rdev chain first */
-	return blocking_notifier_call_chain(&rdev->notifier, event, data);
+	int ret = blocking_notifier_call_chain(&rdev->notifier, event, data);
+
+	if (IS_REACHABLE(CONFIG_REGULATOR_NETLINK_EVENTS)) {
+		struct device *parent = rdev->dev.parent;
+		const char *rname = rdev_get_name(rdev);
+		char name[32];
+
+		/* Avoid duplicate debugfs directory names */
+		if (parent && rname == rdev->desc->name) {
+			snprintf(name, sizeof(name), "%s-%s", dev_name(parent),
+				 rname);
+			rname = name;
+		}
+		reg_generate_netlink_event(rname, event);
+	}
+
+	return ret;
 }
 
 int _regulator_bulk_get(struct device *dev, int num_consumers,
