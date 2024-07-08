@@ -4,44 +4,7 @@
 		#address-cells = <1>;
 		#size-cells = <0>;
 		reg = <0>;
-		ssb_rssd19: regulator@3a {
-			reg = <0x3a>;
-			compatible = "maxim,max5970";
-			interrupt-parent = <&smb_svc_pex_rssd17_32>;
-			interrupts = <46 IRQ_TYPE_LEVEL_LOW>; // SSB_RSSD19_ALERT_N
-			vss1-supply = <&p3v3_aux>;
-			vss2-supply = <&p12v_a>;
-			leds {
-				#address-cells = <1>;
-				#size-cells = <0>;
-				led@0 {
-					label = "rssd19:green:power";
-					reg = <0>;
-					default-state = "off";
-				};
-			};
-			regulators {
-				sw1_ssb_rssd19: sw0 {
-					vss2-supply = <&p12v_a>;
-					regulator-compatible = "SW0";
-					regulator-name = "rssd19_12v";
-					shunt-resistor-micro-ohms = <9000>;
-					regulator-over-current-protection;
-					regulator-oc-protection-microamp = <4500000>;
-					regulator-enable-ramp-delay = <1000>;
-				};
-				sw0_ssb_rssd19: sw1 {
-					vss1-supply = <&p3v3_aux>;
-					regulator-compatible = "SW1";
-					regulator-name = "rssd19_3v3";
-					shunt-resistor-micro-ohms = <100000>;
-					regulator-over-current-protection;
-					regulator-oc-protection-microamp = <410000>;
-					regulator-enable-ramp-delay = <1000>;
-				};
-			};
-		};
-	};
+		
 	i2c@1 { // MUX_SSB_RSSD18
 		#address-cells = <1>;
 		#size-cells = <0>;
