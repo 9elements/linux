@@ -887,12 +887,6 @@
 		vout-supply = <&p12v_c>;
 	};
 
-	p12v_d_consumer {
-		status = "okay";
-		compatible = "regulator-output";
-		vout-supply = <&p12v_d>;
-	};
-
 	pvccinfaon_cpu0_consumer {
 		status = "okay";
 		compatible = "regulator-output";
