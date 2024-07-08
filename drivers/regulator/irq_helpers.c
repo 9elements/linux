@@ -165,6 +165,7 @@ static irqreturn_t regulator_notifier_isr(int irq, void *data)
 	d = &h->desc;
 	rid = &h->rdata;
 	num_rdevs = rid->num_states;
+	printk(KERN_ERR "%s:%d: regulator_notifier_isr entry\n", __FILE__, __LINE__);
 
 	if (d->fatal_cnt)
 		h->retry_cnt++;

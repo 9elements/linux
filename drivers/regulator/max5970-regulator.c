@@ -484,6 +484,8 @@ static int max597x_irq_handler(int irq, struct regulator_irq_data *rid,
 			regulator_disable_regmap(stat->rdev);
 		}
 	}
+	printk(KERN_ERR "%s:%d: max597x_irq_handler done\n", __FILE__, __LINE__);
+
 	return 0;
 }
 
