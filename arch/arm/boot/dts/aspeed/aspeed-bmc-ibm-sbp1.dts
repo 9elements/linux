@@ -4804,6 +4804,7 @@
 		#address-cells = <1>;
 		#size-cells = <0>;
 		reg = <0>;
+	};
 
 	i2c@1 { // MUX_SSB_RSSD18
 		#address-cells = <1>;
