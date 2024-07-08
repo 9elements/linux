@@ -875,12 +875,6 @@
 		regulator-boot-on;
 	};
 
-	p12v_b_consumer {
-		status = "okay";
-		compatible = "regulator-output";
-		vout-supply = <&p12v_b>;
-	};
-
 	p12v_c_consumer {
 		status = "okay";
 		compatible = "regulator-output";
