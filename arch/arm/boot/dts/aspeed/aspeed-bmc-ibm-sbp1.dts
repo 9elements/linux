@@ -986,7 +986,6 @@
 		regulator-name = "p1v2_bmc_aux";
 		regulator-min-microvolt = <1200000>;
 		regulator-max-microvolt = <1200000>;
-		vin-supply = <&p5v_aux>;
 		regulator-always-on;
 		regulator-boot-on;
 	};
@@ -1948,7 +1947,6 @@
 						regulator-name = "p3v3_nic";
 						regulator-enable-ramp-delay = <2000>;
 						vin-supply = <&p12v_a>;
-						vbus-supply = <&p3v3_aux>;
 					};
 				};
 			};
@@ -1967,7 +1965,6 @@
 						regulator-name = "p1v2_nic";
 						regulator-enable-ramp-delay = <2000>;
 						vin-supply = <&p12v_a>;
-						vbus-supply = <&p3v3_aux>;
 					};
 				};
 			};
@@ -1986,7 +1983,6 @@
 						regulator-name = "p1v8_nic";
 						regulator-enable-ramp-delay = <2000>;
 						vin-supply = <&p12v_a>;
-						vbus-supply = <&p3v3_aux>;
 					};
 				};
 			};

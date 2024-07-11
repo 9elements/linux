@@ -126,7 +126,6 @@
 						regulator-name = "p3v3_nic";
 						regulator-enable-ramp-delay = <2000>;
 						vin-supply = <&p12v_a>;
-						vbus-supply = <&p3v3_aux>;
 					};
 				};
 			};
@@ -145,7 +144,6 @@
 						regulator-name = "p1v2_nic";
 						regulator-enable-ramp-delay = <2000>;
 						vin-supply = <&p12v_a>;
-						vbus-supply = <&p3v3_aux>;
 					};
 				};
 			};
@@ -164,7 +162,6 @@
 						regulator-name = "p1v8_nic";
 						regulator-enable-ramp-delay = <2000>;
 						vin-supply = <&p12v_a>;
-						vbus-supply = <&p3v3_aux>;
 					};
 				};
 			};
