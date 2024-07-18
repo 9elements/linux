@@ -171,6 +171,9 @@ static struct mcfg_fixup mcfg_quirks[] = {
 	ALTRA_ECAM_QUIRK(1, 13),
 	ALTRA_ECAM_QUIRK(1, 14),
 	ALTRA_ECAM_QUIRK(1, 15),
+
+	{ "bc2711", "", 0, 0, MCFG_BUS_ANY, &bcm2711_pcie_ops,
+	  DEFINE_RES_MEM(0xFD500000, 0xA000) },
 #endif /* ARM64 */
 
 #ifdef CONFIG_LOONGARCH
