@@ -963,6 +963,15 @@
 		#thermal-sensor-cells = <0>;
 	};
 
+	p12v: fixedregulator-p12v {
+		compatible = "regulator-fixed";
+		regulator-name = "p12v";
+		regulator-min-microvolt = <12000000>;
+		regulator-max-microvolt = <12000000>;
+		regulator-always-on;
+		regulator-boot-on;
+	};
+
 	p3v3_bmc_aux: fixedregulator-p3v3_bmc_aux {
 		/* FIXME: use correct driver */
 		compatible = "regulator-fixed";
@@ -988,6 +997,12 @@
 		regulator-max-microvolt = <1200000>;
 		regulator-always-on;
 		regulator-boot-on;
+	};
+
+	p12v_a_consumer {
+		status = "okay";
+		compatible = "regulator-output";
+		vout-supply = <&p12v_a>;
 	};
 
 	p12v_b_consumer {
@@ -1904,7 +1919,7 @@
 					pvcore_nic2: vout {
 						regulator-name = "pvcore_nic2";
 						regulator-enable-ramp-delay = <2000>;
-						vin-supply = <&p12v_a>;
+						vin-supply = <&p12v>;
 					};
 				};
 			};
@@ -1922,7 +1937,7 @@
 					pvcore_nic1: vout {
 						regulator-name = "pvcore_nic1";
 						regulator-enable-ramp-delay = <2000>;
-						vin-supply = <&p12v_a>;
+						vin-supply = <&p12v>;
 					};
 				};
 			};
@@ -1946,7 +1961,7 @@
 					p3v3_nic: vout {
 						regulator-name = "p3v3_nic";
 						regulator-enable-ramp-delay = <2000>;
-						vin-supply = <&p12v_a>;
+						vin-supply = <&p12v>;
 					};
 				};
 			};
@@ -1964,7 +1979,7 @@
 					p1v2_nic: vout {
 						regulator-name = "p1v2_nic";
 						regulator-enable-ramp-delay = <2000>;
-						vin-supply = <&p12v_a>;
+						vin-supply = <&p12v>;
 					};
 				};
 			};
@@ -1982,7 +1997,7 @@
 					p1v8_nic: vout {
 						regulator-name = "p1v8_nic";
 						regulator-enable-ramp-delay = <2000>;
-						vin-supply = <&p12v_a>;
+						vin-supply = <&p12v>;
 					};
 				};
 			};
@@ -2158,7 +2173,7 @@
 					p1v05_pch_aux: vout {
 						regulator-name = "p1v05_pch_aux";
 						regulator-enable-ramp-delay = <2000>;
-						vin-supply = <&p12v_a>;
+						vin-supply = <&p12v>;
 					};
 				};
 			};
@@ -2181,7 +2196,7 @@
 					p1v8_pch_aux: vout {
 						regulator-name = "p1v8_pch_aux";
 						regulator-enable-ramp-delay = <2000>;
-						vin-supply = <&p12v_a>;
+						vin-supply = <&p12v>;
 					};
 				};
 			};
@@ -4145,7 +4160,7 @@
 							p5v_aux: vout {
 								regulator-name = "p5v_aux";
 								regulator-enable-ramp-delay = <2000>;
-								vin-supply = <&p12v_a>;
+								vin-supply = <&p12v>;
 								vbus-supply = <&p3v3_bmc_aux>;
 								// Supplies the BMC
 								regulator-always-on;
@@ -4165,7 +4180,7 @@
 
 						regulators {
 							p3v3_aux: vout {
-								vin-supply = <&p12v_a>;
+								vin-supply = <&p12v>;
 								regulator-name = "p3v3_aux";
 								// 2msec for regulator + 18msec for board capacitance
 								// Note: Every IC has a PTC which slowly charges the bypass cap.
@@ -4218,7 +4233,6 @@
 						regulators {
 							p12v_a: vout2 {
 								regulator-name = "bcm0";
-								regulator-always-on;
 								regulator-boot-on;
 							};
 						};
@@ -4307,7 +4321,7 @@
 		fan10_ssb: regulator@3a {
 			reg = <0x3a>;
 			compatible = "maxim,max5978";
-			vss1-supply = <&p12v_a>;
+			vss1-supply = <&p12v>;
 			interrupt-parent = <&smb_svc_pex_fan_alert>;
 			interrupts = <9 IRQ_TYPE_LEVEL_LOW>; // FAN10_SSB_ALERT_N
 
@@ -4330,7 +4344,7 @@
 		fan12_ssb: regulator@3a {
 			reg = <0x3a>;
 			compatible = "maxim,max5978";
-			vss1-supply = <&p12v_a>;
+			vss1-supply = <&p12v>;
 			interrupt-parent = <&smb_svc_pex_fan_alert>;
 			interrupts = <11 IRQ_TYPE_LEVEL_LOW>; // FAN12_SSB_ALERT_N
 
@@ -4353,7 +4367,7 @@
 		fan14_ssb: regulator@3a {
 			reg = <0x3a>;
 			compatible = "maxim,max5978";
-			vss1-supply = <&p12v_a>;
+			vss1-supply = <&p12v>;
 			interrupt-parent = <&smb_svc_pex_fan_alert>;
 			interrupts = <13 IRQ_TYPE_LEVEL_LOW>; // FAN14_SSB_ALERT_N
 
@@ -4375,7 +4389,7 @@
 		fan16_ssb: regulator@3a {
 			reg = <0x3a>;
 			compatible = "maxim,max5978";
-			vss1-supply = <&p12v_a>;
+			vss1-supply = <&p12v>;
 			interrupt-parent = <&smb_svc_pex_fan_alert>;
 			interrupts = <15 IRQ_TYPE_LEVEL_LOW>; // FAN16_SSB_ALERT_N
 
@@ -4397,7 +4411,7 @@
 		fan18_ssb: regulator@3a {
 			reg = <0x3a>;
 			compatible = "maxim,max5978";
-			vss1-supply = <&p12v_a>;
+			vss1-supply = <&p12v>;
 			interrupt-parent = <&smb_svc_pex_fan_alert>;
 			interrupts = <17 IRQ_TYPE_LEVEL_LOW>; // FAN18_SSB_ALERT_N
 
@@ -4419,7 +4433,7 @@
 		fan20_ssb: regulator@3a {
 			reg = <0x3a>;
 			compatible = "maxim,max5978";
-			vss1-supply = <&p12v_a>;
+			vss1-supply = <&p12v>;
 			interrupt-parent = <&smb_svc_pex_fan_alert>;
 			interrupts = <19 IRQ_TYPE_LEVEL_LOW>; // FAN20_SSB_ALERT_N
 
@@ -4441,7 +4455,7 @@
 		fan22_ssb: regulator@3a {
 			reg = <0x3a>;
 			compatible = "maxim,max5978";
-			vss1-supply = <&p12v_a>;
+			vss1-supply = <&p12v>;
 			interrupt-parent = <&smb_svc_pex_fan_alert>;
 			interrupts = <21 IRQ_TYPE_LEVEL_LOW>; // FAN22_SSB_ALERT_N
 
@@ -4463,7 +4477,7 @@
 		fan24_ssb: regulator@3a {
 			reg = <0x3a>;
 			compatible = "maxim,max5978";
-			vss1-supply = <&p12v_a>;
+			vss1-supply = <&p12v>;
 			interrupt-parent = <&smb_svc_pex_fan_alert>;
 			interrupts = <23 IRQ_TYPE_LEVEL_LOW>; // FAN24_SSB_ALERT_N
 
@@ -4488,7 +4502,7 @@
 		fan17_ssb: regulator@3a {
 			reg = <0x3a>;
 			compatible = "maxim,max5978";
-			vss1-supply = <&p12v_a>;
+			vss1-supply = <&p12v>;
 			interrupt-parent = <&smb_svc_pex_fan_alert>;
 			interrupts = <16 IRQ_TYPE_LEVEL_LOW>; // FAN17_SSB_ALERT_N
 
@@ -4510,7 +4524,7 @@
 		fan19_ssb: regulator@3a {
 			reg = <0x3a>;
 			compatible = "maxim,max5978";
-			vss1-supply = <&p12v_a>;
+			vss1-supply = <&p12v>;
 			interrupt-parent = <&smb_svc_pex_fan_alert>;
 			interrupts = <18 IRQ_TYPE_LEVEL_LOW>; // FAN19_SSB_ALERT_N
 
@@ -4532,7 +4546,7 @@
 		fan21_ssb: regulator@3a {
 			reg = <0x3a>;
 			compatible = "maxim,max5978";
-			vss1-supply = <&p12v_a>;
+			vss1-supply = <&p12v>;
 			interrupt-parent = <&smb_svc_pex_fan_alert>;
 			interrupts = <20 IRQ_TYPE_LEVEL_LOW>; // FAN21_SSB_ALERT_N
 
@@ -4554,7 +4568,7 @@
 		fan23_ssb: regulator@3a {
 			reg = <0x3a>;
 			compatible = "maxim,max5978";
-			vss1-supply = <&p12v_a>;
+			vss1-supply = <&p12v>;
 			interrupt-parent = <&smb_svc_pex_fan_alert>;
 			interrupts = <22 IRQ_TYPE_LEVEL_LOW>; // FAN23_SSB_ALERT_N
 
@@ -4576,7 +4590,7 @@
 		fan02_ssb: regulator@3a {
 			reg = <0x3a>;
 			compatible = "maxim,max5978";
-			vss1-supply = <&p12v_a>;
+			vss1-supply = <&p12v>;
 			interrupt-parent = <&smb_svc_pex_fan_alert>;
 			interrupts = <1 IRQ_TYPE_LEVEL_LOW>; // FAN02_SSB_ALERT_N
 
@@ -4598,7 +4612,7 @@
 		fan04_ssb: regulator@3a {
 			reg = <0x3a>;
 			compatible = "maxim,max5978";
-			vss1-supply = <&p12v_a>;
+			vss1-supply = <&p12v>;
 			interrupt-parent = <&smb_svc_pex_fan_alert>;
 			interrupts = <3 IRQ_TYPE_LEVEL_LOW>; // FAN04_SSB_ALERT_N
 
@@ -4620,7 +4634,7 @@
 		fan06_ssb: regulator@3a {
 			reg = <0x3a>;
 			compatible = "maxim,max5978";
-			vss1-supply = <&p12v_a>;
+			vss1-supply = <&p12v>;
 			interrupt-parent = <&smb_svc_pex_fan_alert>;
 			interrupts = <5 IRQ_TYPE_LEVEL_LOW>; // FAN06_SSB_ALERT_N
 
@@ -4642,7 +4656,7 @@
 		fan08_ssb: regulator@3a {
 			reg = <0x3a>;
 			compatible = "maxim,max5978";
-			vss1-supply = <&p12v_a>;
+			vss1-supply = <&p12v>;
 			interrupt-parent = <&smb_svc_pex_fan_alert>;
 			interrupts = <7 IRQ_TYPE_LEVEL_LOW>; // FAN08_SSB_ALERT_N
 
@@ -4667,7 +4681,7 @@
 		fan01_ssb: regulator@3a {
 			reg = <0x3a>;
 			compatible = "maxim,max5978";
-			vss1-supply = <&p12v_a>;
+			vss1-supply = <&p12v>;
 			interrupt-parent = <&smb_svc_pex_fan_alert>;
 			interrupts = <0 IRQ_TYPE_LEVEL_LOW>; // FAN01_SSB_ALERT_N
 
@@ -4689,7 +4703,7 @@
 		fan03_ssb: regulator@3a {
 			reg = <0x3a>;
 			compatible = "maxim,max5978";
-			vss1-supply = <&p12v_a>;
+			vss1-supply = <&p12v>;
 			interrupt-parent = <&smb_svc_pex_fan_alert>;
 			interrupts = <2 IRQ_TYPE_LEVEL_LOW>; // FAN03_SSB_ALERT_N
 
@@ -4712,7 +4726,7 @@
 		fan05_ssb: regulator@3a {
 			reg = <0x3a>;
 			compatible = "maxim,max5978";
-			vss1-supply = <&p12v_a>;
+			vss1-supply = <&p12v>;
 			interrupt-parent = <&smb_svc_pex_fan_alert>;
 			interrupts = <4 IRQ_TYPE_LEVEL_LOW>; // FAN05_SSB_ALERT_N
 
@@ -4734,7 +4748,7 @@
 		fan07_ssb: regulator@3a {
 			reg = <0x3a>;
 			compatible = "maxim,max5978";
-			vss1-supply = <&p12v_a>;
+			vss1-supply = <&p12v>;
 			interrupt-parent = <&smb_svc_pex_fan_alert>;
 			interrupts = <6 IRQ_TYPE_LEVEL_LOW>; // FAN07_SSB_ALERT_N
 
@@ -4756,7 +4770,7 @@
 		fan09_ssb: regulator@3a {
 			reg = <0x3a>;
 			compatible = "maxim,max5978";
-			vss1-supply = <&p12v_a>;
+			vss1-supply = <&p12v>;
 			interrupt-parent = <&smb_svc_pex_fan_alert>;
 			interrupts = <8 IRQ_TYPE_LEVEL_LOW>; // FAN09_SSB_ALERT_N
 
@@ -4778,7 +4792,7 @@
 		fan11_ssb: regulator@3a {
 			reg = <0x3a>;
 			compatible = "maxim,max5978";
-			vss1-supply = <&p12v_a>;
+			vss1-supply = <&p12v>;
 			interrupt-parent = <&smb_svc_pex_fan_alert>;
 			interrupts = <10 IRQ_TYPE_LEVEL_LOW>; // FAN11_SSB_ALERT_N
 
@@ -4800,7 +4814,7 @@
 		fan13_ssb: regulator@3a {
 			reg = <0x3a>;
 			compatible = "maxim,max5978";
-			vss1-supply = <&p12v_a>;
+			vss1-supply = <&p12v>;
 			interrupt-parent = <&smb_svc_pex_fan_alert>;
 			interrupts = <12 IRQ_TYPE_LEVEL_LOW>; // FAN13_SSB_ALERT_N
 
@@ -4822,7 +4836,7 @@
 		fan15_ssb: regulator@3a {
 			reg = <0x3a>;
 			compatible = "maxim,max5978";
-			vss1-supply = <&p12v_a>;
+			vss1-supply = <&p12v>;
 			interrupt-parent = <&smb_svc_pex_fan_alert>;
 			interrupts = <14 IRQ_TYPE_LEVEL_LOW>; // FAN15_SSB_ALERT_N
 
@@ -4854,7 +4868,7 @@
 			interrupts = <46 IRQ_TYPE_LEVEL_LOW>; // SSB_RSSD19_ALERT_N
 
 			vss1-supply = <&p3v3_aux>;
-			vss2-supply = <&p12v_a>;
+			vss2-supply = <&p12v>;
 
 			leds {
 				#address-cells = <1>;
@@ -4897,7 +4911,7 @@
 			interrupts = <45 IRQ_TYPE_LEVEL_LOW>; // SSB_RSSD18_ALERT_N
 
 			vss1-supply = <&p3v3_aux>;
-			vss2-supply = <&p12v_a>;
+			vss2-supply = <&p12v>;
 
 			leds {
 				#address-cells = <1>;
@@ -4940,7 +4954,7 @@
 			interrupts = <44 IRQ_TYPE_LEVEL_LOW>; // SSB_RSSD17_ALERT_N
 
 			vss1-supply = <&p3v3_aux>;
-			vss2-supply = <&p12v_a>;
+			vss2-supply = <&p12v>;
 
 			leds {
 				#address-cells = <1>;
@@ -4983,7 +4997,7 @@
 			interrupts = <47 IRQ_TYPE_LEVEL_LOW>; // SSB_RSSD20_ALERT_N
 
 			vss1-supply = <&p3v3_aux>;
-			vss2-supply = <&p12v_a>;
+			vss2-supply = <&p12v>;
 
 			leds {
 				#address-cells = <1>;
@@ -5026,7 +5040,7 @@
 			interrupts = <48 IRQ_TYPE_LEVEL_LOW>; // SSB_RSSD21_ALERT_N
 
 			vss1-supply = <&p3v3_aux>;
-			vss2-supply = <&p12v_a>;
+			vss2-supply = <&p12v>;
 
 			leds {
 				#address-cells = <1>;
@@ -5069,7 +5083,7 @@
 			interrupts = <49 IRQ_TYPE_LEVEL_LOW>; // SSB_RSSD22_ALERT_N
 
 			vss1-supply = <&p3v3_aux>;
-			vss2-supply = <&p12v_a>;
+			vss2-supply = <&p12v>;
 
 			leds {
 				#address-cells = <1>;
@@ -5112,7 +5126,7 @@
 			interrupts = <51 IRQ_TYPE_LEVEL_LOW>; // SSB_RSSD24_ALERT_N
 
 			vss1-supply = <&p3v3_aux>;
-			vss2-supply = <&p12v_a>;
+			vss2-supply = <&p12v>;
 
 			leds {
 				#address-cells = <1>;
@@ -5155,7 +5169,7 @@
 			interrupts = <50 IRQ_TYPE_LEVEL_LOW>; // SSB_RSSD23_ALERT_N
 
 			vss1-supply = <&p3v3_aux>;
-			vss2-supply = <&p12v_a>;
+			vss2-supply = <&p12v>;
 
 			leds {
 				#address-cells = <1>;
@@ -5201,7 +5215,7 @@
 			interrupts = <52 IRQ_TYPE_LEVEL_LOW>; // SSB_RSSD25_ALERT_N
 
 			vss1-supply = <&p3v3_aux>;
-			vss2-supply = <&p12v_a>;
+			vss2-supply = <&p12v>;
 
 			leds {
 				#address-cells = <1>;
@@ -5244,7 +5258,7 @@
 			interrupts = <53 IRQ_TYPE_LEVEL_LOW>; // SSB_RSSD26_ALERT_N
 
 			vss1-supply = <&p3v3_aux>;
-			vss2-supply = <&p12v_a>;
+			vss2-supply = <&p12v>;
 
 			leds {
 				#address-cells = <1>;
@@ -5287,7 +5301,7 @@
 			interrupts = <54 IRQ_TYPE_LEVEL_LOW>; // SSB_RSSD27_ALERT_N
 
 			vss1-supply = <&p3v3_aux>;
-			vss2-supply = <&p12v_a>;
+			vss2-supply = <&p12v>;
 
 			leds {
 				#address-cells = <1>;
@@ -5330,7 +5344,7 @@
 			interrupts = <59 IRQ_TYPE_LEVEL_LOW>; // SSB_RSSD32_ALERT_N
 
 			vss1-supply = <&p3v3_aux>;
-			vss2-supply = <&p12v_a>;
+			vss2-supply = <&p12v>;
 
 			leds {
 				#address-cells = <1>;
@@ -5373,7 +5387,7 @@
 			interrupts = <58 IRQ_TYPE_LEVEL_LOW>; // SSB_RSSD31_ALERT_N
 
 			vss1-supply = <&p3v3_aux>;
-			vss2-supply = <&p12v_a>;
+			vss2-supply = <&p12v>;
 
 			leds {
 				#address-cells = <1>;
@@ -5416,7 +5430,7 @@
 			interrupts = <57 IRQ_TYPE_LEVEL_LOW>; // SSB_RSSD30_ALERT_N
 
 			vss1-supply = <&p3v3_aux>;
-			vss2-supply = <&p12v_a>;
+			vss2-supply = <&p12v>;
 
 			leds {
 				#address-cells = <1>;
@@ -5459,7 +5473,7 @@
 			interrupts = <56 IRQ_TYPE_LEVEL_LOW>; // SSB_RSSD29_ALERT_N
 
 			vss1-supply = <&p3v3_aux>;
-			vss2-supply = <&p12v_a>;
+			vss2-supply = <&p12v>;
 
 			leds {
 				#address-cells = <1>;
@@ -5502,7 +5516,7 @@
 			interrupts = <55 IRQ_TYPE_LEVEL_LOW>; // SSB_RSSD28_ALERT_N
 
 			vss1-supply = <&p3v3_aux>;
-			vss2-supply = <&p12v_a>;
+			vss2-supply = <&p12v>;
 
 			leds {
 				#address-cells = <1>;
@@ -5548,7 +5562,7 @@
 			interrupts = <46 IRQ_TYPE_LEVEL_LOW>; // SSB_RSSD03_ALERT_N
 
 			vss1-supply = <&p3v3_aux>;
-			vss2-supply = <&p12v_a>;
+			vss2-supply = <&p12v>;
 
 			leds {
 				#address-cells = <1>;
@@ -5591,7 +5605,7 @@
 			interrupts = <45 IRQ_TYPE_LEVEL_LOW>; // SSB_RSSD02_ALERT_N
 
 			vss1-supply = <&p3v3_aux>;
-			vss2-supply = <&p12v_a>;
+			vss2-supply = <&p12v>;
 
 			leds {
 				#address-cells = <1>;
@@ -5634,7 +5648,7 @@
 			interrupts = <44 IRQ_TYPE_LEVEL_LOW>; // SSB_RSSD01_ALERT_N
 
 			vss1-supply = <&p3v3_aux>;
-			vss2-supply = <&p12v_a>;
+			vss2-supply = <&p12v>;
 
 			leds {
 				#address-cells = <1>;
@@ -5677,7 +5691,7 @@
 			interrupts = <47 IRQ_TYPE_LEVEL_LOW>; // SSB_RSSD04_ALERT_N
 
 			vss1-supply = <&p3v3_aux>;
-			vss2-supply = <&p12v_a>;
+			vss2-supply = <&p12v>;
 
 			leds {
 				#address-cells = <1>;
@@ -5720,7 +5734,7 @@
 			interrupts = <48 IRQ_TYPE_LEVEL_LOW>; // SSB_RSSD05_ALERT_N
 
 			vss1-supply = <&p3v3_aux>;
-			vss2-supply = <&p12v_a>;
+			vss2-supply = <&p12v>;
 
 			leds {
 				#address-cells = <1>;
@@ -5763,7 +5777,7 @@
 			interrupts = <51 IRQ_TYPE_LEVEL_LOW>; // SSB_RSSD08_ALERT_N
 
 			vss1-supply = <&p3v3_aux>;
-			vss2-supply = <&p12v_a>;
+			vss2-supply = <&p12v>;
 
 			leds {
 				#address-cells = <1>;
@@ -5806,7 +5820,7 @@
 			interrupts = <50 IRQ_TYPE_LEVEL_LOW>; // SSB_RSSD07_ALERT_N
 
 			vss1-supply = <&p3v3_aux>;
-			vss2-supply = <&p12v_a>;
+			vss2-supply = <&p12v>;
 
 			leds {
 				#address-cells = <1>;
@@ -5849,7 +5863,7 @@
 			interrupts = <49 IRQ_TYPE_LEVEL_LOW>; // SSB_RSSD06_ALERT_N
 
 			vss1-supply = <&p3v3_aux>;
-			vss2-supply = <&p12v_a>;
+			vss2-supply = <&p12v>;
 
 			leds {
 				#address-cells = <1>;
@@ -5895,7 +5909,7 @@
 			interrupts = <57 IRQ_TYPE_LEVEL_LOW>; // SSB_RSSD14_ALERT_N
 
 			vss1-supply = <&p3v3_aux>;
-			vss2-supply = <&p12v_a>;
+			vss2-supply = <&p12v>;
 
 			leds {
 				#address-cells = <1>;
@@ -5938,7 +5952,7 @@
 			interrupts = <56 IRQ_TYPE_LEVEL_LOW>; // SSB_RSSD13_ALERT_N
 
 			vss1-supply = <&p3v3_aux>;
-			vss2-supply = <&p12v_a>;
+			vss2-supply = <&p12v>;
 
 			leds {
 				#address-cells = <1>;
@@ -5981,7 +5995,7 @@
 			interrupts = <55 IRQ_TYPE_LEVEL_LOW>; // SSB_RSSD12_ALERT_N
 
 			vss1-supply = <&p3v3_aux>;
-			vss2-supply = <&p12v_a>;
+			vss2-supply = <&p12v>;
 
 			leds {
 				#address-cells = <1>;
@@ -6024,7 +6038,7 @@
 			interrupts = <54 IRQ_TYPE_LEVEL_LOW>; // SSB_RSSD11_ALERT_N
 
 			vss1-supply = <&p3v3_aux>;
-			vss2-supply = <&p12v_a>;
+			vss2-supply = <&p12v>;
 
 			leds {
 				#address-cells = <1>;
@@ -6067,7 +6081,7 @@
 			interrupts = <53 IRQ_TYPE_LEVEL_LOW>; // SSB_RSSD10_ALERT_N
 
 			vss1-supply = <&p3v3_aux>;
-			vss2-supply = <&p12v_a>;
+			vss2-supply = <&p12v>;
 
 			leds {
 				#address-cells = <1>;
@@ -6110,7 +6124,7 @@
 			interrupts = <52 IRQ_TYPE_LEVEL_LOW>; // SSB_RSSD09_ALERT_N
 
 			vss1-supply = <&p3v3_aux>;
-			vss2-supply = <&p12v_a>;
+			vss2-supply = <&p12v>;
 
 			leds {
 				#address-cells = <1>;
@@ -6153,7 +6167,7 @@
 			interrupts = <58 IRQ_TYPE_LEVEL_LOW>; // SSB_RSSD15_ALERT_N
 
 			vss1-supply = <&p3v3_aux>;
-			vss2-supply = <&p12v_a>;
+			vss2-supply = <&p12v>;
 
 			leds {
 				#address-cells = <1>;
@@ -6196,7 +6210,7 @@
 			interrupts = <59 IRQ_TYPE_LEVEL_LOW>; // SSB_RSSD16_ALERT_N
 
 			vss1-supply = <&p3v3_aux>;
-			vss2-supply = <&p12v_a>;
+			vss2-supply = <&p12v>;
 
 			leds {
 				#address-cells = <1>;
