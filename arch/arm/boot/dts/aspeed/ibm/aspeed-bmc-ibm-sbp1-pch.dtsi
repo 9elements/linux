@@ -28,7 +28,7 @@
 						regulator-compatible = "vout0";
 						regulator-name = "p1v05_pch_aux";
 						regulator-enable-ramp-delay = <2000>;
-						vin-supply = <&p12v_a>;
+						vin-supply = <&p12v>;
 					};
 				};
 			};
@@ -49,7 +49,7 @@
 						regulator-compatible = "vout0";
 						regulator-name = "p1v8_pch_aux";
 						regulator-enable-ramp-delay = <2000>;
-						vin-supply = <&p12v_a>;
+						vin-supply = <&p12v>;
 					};
 				};
 			};

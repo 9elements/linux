@@ -847,6 +847,15 @@
 		#thermal-sensor-cells = <0>;
 	};
 
+	p12v: fixedregulator-p12v {
+		compatible = "regulator-fixed";
+		regulator-name = "p12v";
+		regulator-min-microvolt = <12000000>;
+		regulator-max-microvolt = <12000000>;
+		regulator-always-on;
+		regulator-boot-on;
+	};
+
 	p3v3_bmc_aux: fixedregulator-p3v3_bmc_aux {
 		/* FIXME: use correct driver */
 		compatible = "regulator-fixed";
@@ -873,6 +882,12 @@
 		vin-supply = <&p5v_aux>;
 		regulator-always-on;
 		regulator-boot-on;
+	};
+
+	p12v_a_consumer {
+		status = "okay";
+		compatible = "regulator-output";
+		vout-supply = <&p12v_a>;
 	};
 
 	p12v_b_consumer {

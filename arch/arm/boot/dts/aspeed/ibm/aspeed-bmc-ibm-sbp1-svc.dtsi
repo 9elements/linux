@@ -640,7 +640,7 @@
 								regulator-compatible = "vout0";
 								regulator-name = "p5v_aux";
 								regulator-enable-ramp-delay = <2000>;
-								vin-supply = <&p12v_a>;
+								vin-supply = <&p12v>;
 								vbus-supply = <&p3v3_bmc_aux>;
 								// Supplies the BMC
 								regulator-always-on;
@@ -660,7 +660,7 @@
 						regulators {
 							p3v3_aux: vout0 {
 								regulator-compatible = "vout0";
-								vin-supply = <&p12v_a>;
+								vin-supply = <&p12v>;
 								regulator-name = "p3v3_aux";
 								// 2msec for regulator + 18msec for board capacitance
 								// Note: Every IC has a PTC which slowly charges the bypass cap.
@@ -718,7 +718,6 @@
 							p12v_a: vout2 {
 								regulator-compatible = "vout2";
 								regulator-name = "bcm0";
-								regulator-always-on;
 								regulator-boot-on;
 							};
 						};

@@ -7,13 +7,13 @@
 		fan10_ssb: regulator@3a {
 			reg = <0x3a>;
 			compatible = "maxim,max5978";
-			vss1-supply = <&p12v_a>;
+			vss1-supply = <&p12v>;
 			interrupt-parent = <&smb_svc_pex_fan_alert>;
 			interrupts = <9 IRQ_TYPE_LEVEL_LOW>; // FAN10_SSB_ALERT_N
 
 			regulators {
 				sw0_fan10_ssb: sw0 {
-					vss1-supply = <&p12v_a>;
+					vss1-supply = <&p12v>;
 					regulator-compatible = "SW0";
 					regulator-name = "fan10_supply";
 					shunt-resistor-micro-ohms = <10000>;
@@ -32,13 +32,13 @@
 		fan12_ssb: regulator@3a {
 			reg = <0x3a>;
 			compatible = "maxim,max5978";
-			vss1-supply = <&p12v_a>;
+			vss1-supply = <&p12v>;
 			interrupt-parent = <&smb_svc_pex_fan_alert>;
 			interrupts = <11 IRQ_TYPE_LEVEL_LOW>; // FAN12_SSB_ALERT_N
 
 			regulators {
 				sw0_fan12_ssb: sw0 {
-					vss1-supply = <&p12v_a>;
+					vss1-supply = <&p12v>;
 					regulator-compatible = "SW0";
 					regulator-name = "fan12_supply";
 					shunt-resistor-micro-ohms = <10000>;
@@ -57,13 +57,13 @@
 		fan14_ssb: regulator@3a {
 			reg = <0x3a>;
 			compatible = "maxim,max5978";
-			vss1-supply = <&p12v_a>;
+			vss1-supply = <&p12v>;
 			interrupt-parent = <&smb_svc_pex_fan_alert>;
 			interrupts = <13 IRQ_TYPE_LEVEL_LOW>; // FAN14_SSB_ALERT_N
 
 			regulators {
 				sw0_fan14_ssb: sw0 {
-					vss1-supply = <&p12v_a>;
+					vss1-supply = <&p12v>;
 					regulator-compatible = "SW0";
 					regulator-name = "fan14_supply";
 					shunt-resistor-micro-ohms = <10000>;
@@ -81,13 +81,13 @@
 		fan16_ssb: regulator@3a {
 			reg = <0x3a>;
 			compatible = "maxim,max5978";
-			vss1-supply = <&p12v_a>;
+			vss1-supply = <&p12v>;
 			interrupt-parent = <&smb_svc_pex_fan_alert>;
 			interrupts = <15 IRQ_TYPE_LEVEL_LOW>; // FAN16_SSB_ALERT_N
 
 			regulators {
 				sw0_fan16_ssb: sw0 {
-					vss1-supply = <&p12v_a>;
+					vss1-supply = <&p12v>;
 					regulator-compatible = "SW0";
 					regulator-name = "fan16_supply";
 					shunt-resistor-micro-ohms = <10000>;
@@ -105,13 +105,13 @@
 		fan18_ssb: regulator@3a {
 			reg = <0x3a>;
 			compatible = "maxim,max5978";
-			vss1-supply = <&p12v_a>;
+			vss1-supply = <&p12v>;
 			interrupt-parent = <&smb_svc_pex_fan_alert>;
 			interrupts = <17 IRQ_TYPE_LEVEL_LOW>; // FAN18_SSB_ALERT_N
 
 			regulators {
 				sw0_fan18_ssb: sw0 {
-					vss1-supply = <&p12v_a>;
+					vss1-supply = <&p12v>;
 					regulator-compatible = "SW0";
 					regulator-name = "fan18_supply";
 					shunt-resistor-micro-ohms = <10000>;
@@ -129,13 +129,13 @@
 		fan20_ssb: regulator@3a {
 			reg = <0x3a>;
 			compatible = "maxim,max5978";
-			vss1-supply = <&p12v_a>;
+			vss1-supply = <&p12v>;
 			interrupt-parent = <&smb_svc_pex_fan_alert>;
 			interrupts = <19 IRQ_TYPE_LEVEL_LOW>; // FAN20_SSB_ALERT_N
 
 			regulators {
 				sw0_fan20_ssb: sw0 {
-					vss1-supply = <&p12v_a>;
+					vss1-supply = <&p12v>;
 					regulator-compatible = "SW0";
 					regulator-name = "fan20_supply";
 					shunt-resistor-micro-ohms = <10000>;
@@ -153,13 +153,13 @@
 		fan22_ssb: regulator@3a {
 			reg = <0x3a>;
 			compatible = "maxim,max5978";
-			vss1-supply = <&p12v_a>;
+			vss1-supply = <&p12v>;
 			interrupt-parent = <&smb_svc_pex_fan_alert>;
 			interrupts = <21 IRQ_TYPE_LEVEL_LOW>; // FAN22_SSB_ALERT_N
 
 			regulators {
 				sw0_fan22_ssb: sw0 {
-					vss1-supply = <&p12v_a>;
+					vss1-supply = <&p12v>;
 					regulator-compatible = "SW0";
 					regulator-name = "fan22_supply";
 					shunt-resistor-micro-ohms = <10000>;
@@ -177,13 +177,13 @@
 		fan24_ssb: regulator@3a {
 			reg = <0x3a>;
 			compatible = "maxim,max5978";
-			vss1-supply = <&p12v_a>;
+			vss1-supply = <&p12v>;
 			interrupt-parent = <&smb_svc_pex_fan_alert>;
 			interrupts = <23 IRQ_TYPE_LEVEL_LOW>; // FAN24_SSB_ALERT_N
 
 			regulators {
 				sw0_fan24_ssb: sw0 {
-					vss1-supply = <&p12v_a>;
+					vss1-supply = <&p12v>;
 					regulator-compatible = "SW0";
 					regulator-name = "fan24_supply";
 					shunt-resistor-micro-ohms = <10000>;
@@ -933,13 +933,13 @@
 		fan17_ssb: regulator@3a {
 			reg = <0x3a>;
 			compatible = "maxim,max5978";
-			vss1-supply = <&p12v_a>;
+			vss1-supply = <&p12v>;
 			interrupt-parent = <&smb_svc_pex_fan_alert>;
 			interrupts = <16 IRQ_TYPE_LEVEL_LOW>; // FAN17_SSB_ALERT_N
 
 			regulators {
 				sw0_fan17_ssb: sw0 {
-					vss1-supply = <&p12v_a>;
+					vss1-supply = <&p12v>;
 					regulator-compatible = "SW0";
 					regulator-name = "fan17_supply";
 					shunt-resistor-micro-ohms = <10000>;
@@ -957,13 +957,13 @@
 		fan19_ssb: regulator@3a {
 			reg = <0x3a>;
 			compatible = "maxim,max5978";
-			vss1-supply = <&p12v_a>;
+			vss1-supply = <&p12v>;
 			interrupt-parent = <&smb_svc_pex_fan_alert>;
 			interrupts = <18 IRQ_TYPE_LEVEL_LOW>; // FAN19_SSB_ALERT_N
 
 			regulators {
 				sw0_fan19_ssb: sw0 {
-					vss1-supply = <&p12v_a>;
+					vss1-supply = <&p12v>;
 					regulator-compatible = "SW0";
 					regulator-name = "fan19_supply";
 					shunt-resistor-micro-ohms = <10000>;
@@ -981,13 +981,13 @@
 		fan21_ssb: regulator@3a {
 			reg = <0x3a>;
 			compatible = "maxim,max5978";
-			vss1-supply = <&p12v_a>;
+			vss1-supply = <&p12v>;
 			interrupt-parent = <&smb_svc_pex_fan_alert>;
 			interrupts = <20 IRQ_TYPE_LEVEL_LOW>; // FAN21_SSB_ALERT_N
 
 			regulators {
 				sw0_fan21_ssb: sw0 {
-					vss1-supply = <&p12v_a>;
+					vss1-supply = <&p12v>;
 					regulator-compatible = "SW0";
 					regulator-name = "fan21_supply";
 					shunt-resistor-micro-ohms = <10000>;
@@ -1005,13 +1005,13 @@
 		fan23_ssb: regulator@3a {
 			reg = <0x3a>;
 			compatible = "maxim,max5978";
-			vss1-supply = <&p12v_a>;
+			vss1-supply = <&p12v>;
 			interrupt-parent = <&smb_svc_pex_fan_alert>;
 			interrupts = <22 IRQ_TYPE_LEVEL_LOW>; // FAN23_SSB_ALERT_N
 
 			regulators {
 				sw0_fan23_ssb: sw0 {
-					vss1-supply = <&p12v_a>;
+					vss1-supply = <&p12v>;
 					regulator-compatible = "SW0";
 					regulator-name = "fan23_supply";
 					shunt-resistor-micro-ohms = <10000>;
@@ -1029,13 +1029,13 @@
 		fan02_ssb: regulator@3a {
 			reg = <0x3a>;
 			compatible = "maxim,max5978";
-			vss1-supply = <&p12v_a>;
+			vss1-supply = <&p12v>;
 			interrupt-parent = <&smb_svc_pex_fan_alert>;
 			interrupts = <1 IRQ_TYPE_LEVEL_LOW>; // FAN02_SSB_ALERT_N
 
 			regulators {
 				sw0_fan02_ssb: sw0 {
-					vss1-supply = <&p12v_a>;
+					vss1-supply = <&p12v>;
 					regulator-compatible = "SW0";
 					regulator-name = "fan02_supply";
 					shunt-resistor-micro-ohms = <10000>;
@@ -1053,13 +1053,13 @@
 		fan04_ssb: regulator@3a {
 			reg = <0x3a>;
 			compatible = "maxim,max5978";
-			vss1-supply = <&p12v_a>;
+			vss1-supply = <&p12v>;
 			interrupt-parent = <&smb_svc_pex_fan_alert>;
 			interrupts = <3 IRQ_TYPE_LEVEL_LOW>; // FAN04_SSB_ALERT_N
 
 			regulators {
 				sw0_fan04_ssb: sw0 {
-					vss1-supply = <&p12v_a>;
+					vss1-supply = <&p12v>;
 					regulator-compatible = "SW0";
 					regulator-name = "fan04_supply";
 					shunt-resistor-micro-ohms = <10000>;
@@ -1077,13 +1077,13 @@
 		fan06_ssb: regulator@3a {
 			reg = <0x3a>;
 			compatible = "maxim,max5978";
-			vss1-supply = <&p12v_a>;
+			vss1-supply = <&p12v>;
 			interrupt-parent = <&smb_svc_pex_fan_alert>;
 			interrupts = <5 IRQ_TYPE_LEVEL_LOW>; // FAN06_SSB_ALERT_N
 
 			regulators {
 				sw0_fan06_ssb: sw0 {
-					vss1-supply = <&p12v_a>;
+					vss1-supply = <&p12v>;
 					regulator-compatible = "SW0";
 					regulator-name = "fan06_supply";
 					shunt-resistor-micro-ohms = <10000>;
@@ -1101,13 +1101,13 @@
 		fan08_ssb: regulator@3a {
 			reg = <0x3a>;
 			compatible = "maxim,max5978";
-			vss1-supply = <&p12v_a>;
+			vss1-supply = <&p12v>;
 			interrupt-parent = <&smb_svc_pex_fan_alert>;
 			interrupts = <7 IRQ_TYPE_LEVEL_LOW>; // FAN08_SSB_ALERT_N
 
 			regulators {
 				sw0_fan08_ssb: sw0 {
-					vss1-supply = <&p12v_a>;
+					vss1-supply = <&p12v>;
 					regulator-compatible = "SW0";
 					regulator-name = "fan08_supply";
 					shunt-resistor-micro-ohms = <10000>;
@@ -1129,13 +1129,13 @@
 		fan01_ssb: regulator@3a {
 			reg = <0x3a>;
 			compatible = "maxim,max5978";
-			vss1-supply = <&p12v_a>;
+			vss1-supply = <&p12v>;
 			interrupt-parent = <&smb_svc_pex_fan_alert>;
 			interrupts = <0 IRQ_TYPE_LEVEL_LOW>; // FAN01_SSB_ALERT_N
 
 			regulators {
 				sw0_fan01_ssb: sw0 {
-					vss1-supply = <&p12v_a>;
+					vss1-supply = <&p12v>;
 					regulator-compatible = "SW0";
 					regulator-name = "fan01_supply";
 					shunt-resistor-micro-ohms = <10000>;
@@ -1153,13 +1153,13 @@
 		fan03_ssb: regulator@3a {
 			reg = <0x3a>;
 			compatible = "maxim,max5978";
-			vss1-supply = <&p12v_a>;
+			vss1-supply = <&p12v>;
 			interrupt-parent = <&smb_svc_pex_fan_alert>;
 			interrupts = <2 IRQ_TYPE_LEVEL_LOW>; // FAN03_SSB_ALERT_N
 
 			regulators {
 				sw0_fan03_ssb: sw0 {
-					vss1-supply = <&p12v_a>;
+					vss1-supply = <&p12v>;
 					regulator-name = "fan03_supply";
 					regulator-compatible = "SW0";
 					shunt-resistor-micro-ohms = <10000>;
@@ -1177,13 +1177,13 @@
 		fan05_ssb: regulator@3a {
 			reg = <0x3a>;
 			compatible = "maxim,max5978";
-			vss1-supply = <&p12v_a>;
+			vss1-supply = <&p12v>;
 			interrupt-parent = <&smb_svc_pex_fan_alert>;
 			interrupts = <4 IRQ_TYPE_LEVEL_LOW>; // FAN05_SSB_ALERT_N
 
 			regulators {
 				sw0_fan05_ssb: sw0 {
-					vss1-supply = <&p12v_a>;
+					vss1-supply = <&p12v>;
 					regulator-compatible = "SW0";
 					regulator-name = "fan05_supply";
 					shunt-resistor-micro-ohms = <10000>;
@@ -1201,13 +1201,13 @@
 		fan07_ssb: regulator@3a {
 			reg = <0x3a>;
 			compatible = "maxim,max5978";
-			vss1-supply = <&p12v_a>;
+			vss1-supply = <&p12v>;
 			interrupt-parent = <&smb_svc_pex_fan_alert>;
 			interrupts = <6 IRQ_TYPE_LEVEL_LOW>; // FAN07_SSB_ALERT_N
 
 			regulators {
 				sw0_fan07_ssb: sw0 {
-					vss1-supply = <&p12v_a>;
+					vss1-supply = <&p12v>;
 					regulator-compatible = "SW0";
 					regulator-name = "fan07_supply";
 					shunt-resistor-micro-ohms = <10000>;
@@ -1225,13 +1225,13 @@
 		fan09_ssb: regulator@3a {
 			reg = <0x3a>;
 			compatible = "maxim,max5978";
-			vss1-supply = <&p12v_a>;
+			vss1-supply = <&p12v>;
 			interrupt-parent = <&smb_svc_pex_fan_alert>;
 			interrupts = <8 IRQ_TYPE_LEVEL_LOW>; // FAN09_SSB_ALERT_N
 
 			regulators {
 				sw0_fan09_ssb: sw0 {
-					vss1-supply = <&p12v_a>;
+					vss1-supply = <&p12v>;
 					regulator-compatible = "SW0";
 					regulator-name = "fan09_supply";
 					shunt-resistor-micro-ohms = <10000>;
@@ -1249,13 +1249,13 @@
 		fan11_ssb: regulator@3a {
 			reg = <0x3a>;
 			compatible = "maxim,max5978";
-			vss1-supply = <&p12v_a>;
+			vss1-supply = <&p12v>;
 			interrupt-parent = <&smb_svc_pex_fan_alert>;
 			interrupts = <10 IRQ_TYPE_LEVEL_LOW>; // FAN11_SSB_ALERT_N
 
 			regulators {
 				sw0_fan11_ssb: sw0 {
-					vss1-supply = <&p12v_a>;
+					vss1-supply = <&p12v>;
 					regulator-compatible = "SW0";
 					regulator-name = "fan11_supply";
 					shunt-resistor-micro-ohms = <10000>;
@@ -1273,13 +1273,13 @@
 		fan13_ssb: regulator@3a {
 			reg = <0x3a>;
 			compatible = "maxim,max5978";
-			vss1-supply = <&p12v_a>;
+			vss1-supply = <&p12v>;
 			interrupt-parent = <&smb_svc_pex_fan_alert>;
 			interrupts = <12 IRQ_TYPE_LEVEL_LOW>; // FAN13_SSB_ALERT_N
 
 			regulators {
 				sw0_fan13_ssb: sw0 {
-					vss1-supply = <&p12v_a>;
+					vss1-supply = <&p12v>;
 					regulator-compatible = "SW0";
 					regulator-name = "fan13_supply";
 					shunt-resistor-micro-ohms = <10000>;
@@ -1297,13 +1297,13 @@
 		fan15_ssb: regulator@3a {
 			reg = <0x3a>;
 			compatible = "maxim,max5978";
-			vss1-supply = <&p12v_a>;
+			vss1-supply = <&p12v>;
 			interrupt-parent = <&smb_svc_pex_fan_alert>;
 			interrupts = <14 IRQ_TYPE_LEVEL_LOW>; // FAN15_SSB_ALERT_N
 
 			regulators {
 				sw0_fan15_ssb: sw0 {
-					vss1-supply = <&p12v_a>;
+					vss1-supply = <&p12v>;
 					regulator-compatible = "SW0";
 					regulator-name = "fan15_supply";
 					shunt-resistor-micro-ohms = <10000>;
