@@ -3585,8 +3585,6 @@
 				// reset is PEX_VR_CTRL_RST
 				reset-gpios = <&gpio0 ASPEED_GPIO(Q, 2) GPIO_ACTIVE_HIGH>;
 
-				gpio-reserved-ranges = <21 1>;
-
 				gpio-line-names =
 				/* GPORT0 */
 					"BCM0_INPUT_DISABLE_N", "SMB_VR_P3V3_AUX_ALERT_N",
