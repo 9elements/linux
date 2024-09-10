@@ -3616,7 +3616,7 @@
 				pinctrl-0 = <&U62120_input &U62120_input_pullup>;
 				pinctrl-names = "default";
 				U62120_input: input-pins {
-					pins = "gp04", "gp05", "gp06", "gp07", "gp10";
+					pins = "gp10";
 					function = "gpio";
 					input-enable;
 					bias-disable;
