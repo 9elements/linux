@@ -1839,6 +1839,7 @@
 
 // SDA2 BMC_MUX_NIC
 &i2c1 { // BMC_MUX_NIC
+	multi-master;
 	status = "okay";
 	// Bus frequency limited to 100KHz by cy8c9540
 
@@ -2006,10 +2007,12 @@
 };
 
 &i2c2 { // SMB_VR_P3V3_BMC_AUX, MAX77813
+	multi-master;
 	status = "okay";
 };
 
 &i2c3 { // BMC_MUX_M2
+	multi-master;
 	status = "okay";
 
 	// Bus frequency limited to 100KHz by M.2 slot
@@ -2145,6 +2148,7 @@
 
 // SDA6 BMC_MUX_VR_PCH_CPU
 &i2c5 { // BMC_MUX_VR_PCH_CPU
+	multi-master;
 	status = "okay";
 
 	i2cmux2: mux@77 {
@@ -2230,6 +2234,7 @@
 
 // SDA11 BMC_MUX_CPU0
 &i2c14 { // BMC_MUX_CPU0
+	multi-master;
 	status = "okay";
 	// Bus frequency limited to 100KHz by cy8c9540
 
@@ -2427,6 +2432,7 @@
 
 // SDA8 BMC_MUX_CPU1
 &i2c7 { // BMC_MUX_CPU1
+	multi-master;
 	status = "okay";
 	// Bus frequency limited to 100KHz by cy8c9540
 
@@ -2624,6 +2630,7 @@
 
 // SDA7 BMC_MUX_CPU2
 &i2c6 { // BMC_MUX_CPU2
+	multi-master;
 	status = "okay";
 	// Bus frequency limited to 100KHz by cy8c9540
 
@@ -2822,6 +2829,7 @@
 
 // SDA13 BMC_MUX_CPU3
 &i2c12 { // BMC_MUX_CPU3
+	multi-master;
 	status = "okay";
 	// Bus frequency limited to 100KHz by cy8c9540
 
@@ -3019,6 +3027,7 @@
 
 // SDA12 BMC_MUX_FANSSB_RSSD01_16
 &i2c15 { // BMC_MUX_FANPWM_RSSD01_16
+	multi-master;
 	status = "okay";
 	// Bus frequency limited to 100KHz by cy8c9560
 
@@ -3286,6 +3295,7 @@
 
 // SDA9 BMC_MUX_FANSSB_RSSD17_32
 &i2c8 { // BMC_MUX_FANSSB_RSSD17_32
+	multi-master;
 	status = "okay";
 	// Bus frequency limited to 100KHz by cy8c9560
 
@@ -3552,6 +3562,7 @@
 
 // SDA14 BMC_MUX_SVC_EXP
 &i2c13 { // BMC_MUX_SVC_EXP
+	multi-master;
 	status = "okay";
 
 	// Bus frequency limited to 100KHz by cy8c9540
@@ -4294,6 +4305,7 @@
 
 // SDA10
 &i2c9 { // SMB_VR_P1V2_BMC_AUX
+	multi-master;
 	status = "okay";
 
 	/* Debug interface for p1v2_bmc_aux */
