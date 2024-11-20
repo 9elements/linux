@@ -289,6 +289,30 @@ mp2975_read_phases(struct i2c_client *client, struct mp2975_data *data,
 	return ret;
 }
 
+static int mp2973_read_byte_data(struct i2c_client *client, int page, int reg)
+{
+	int ret, retries = 10;
+
+	do {
+		ret = pmbus_read_byte_data(client, page, reg);
+
+		/* MP2973 responds with a 0xff when I2C clock was low for too long,
+		* but still within the datasheet advertised limits.
+		* On the Aspeed SoC the I2C clock is natually low for longer times and
+		* there's no way of detecting such clock stretching.
+		*
+		* Retry the read instruction when 0xff is seen.
+		*/
+		if (ret >= 0 && ret != 0xff)
+			break;
+	} while (retries--);
+
+	if (ret > 0 && retries != 10) {
+		dev_err(&client->dev, "Failed to read reg 0x%02x, retried %d times\n", reg, 10 - retries);
+	}
+	return ret;
+}
+
 static int mp2973_read_word_data(struct i2c_client *client, int page,
 				 int phase, int reg)
 {
@@ -946,6 +970,7 @@ static struct pmbus_driver_info mp2973_info = {
 		PMBUS_HAVE_IIN | PMBUS_HAVE_IOUT | PMBUS_HAVE_STATUS_IOUT |
 		PMBUS_HAVE_TEMP | PMBUS_HAVE_STATUS_TEMP | PMBUS_HAVE_POUT |
 		PMBUS_HAVE_PIN | PMBUS_HAVE_STATUS_INPUT,
+	.read_byte_data = mp2973_read_byte_data,
 	.read_word_data = mp2973_read_word_data,
 	.write_word_data = mp2973_write_word_data,
 #if IS_ENABLED(CONFIG_SENSORS_MP2975_REGULATOR)
