@@ -307,7 +307,7 @@ static int mp2973_read_byte_data(struct i2c_client *client, int page, int reg)
 			break;
 	} while (retries--);
 
-	if (ret > 0 && retries != 10) {
+	if (ret >= 0 && retries != 10) {
 		dev_err(&client->dev, "Failed to read reg 0x%02x, retried %d times\n", reg, 10 - retries);
 	}
 	return ret;
