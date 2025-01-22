@@ -1111,10 +1111,12 @@ static int aspeed_spi_probe(struct platform_device *pdev)
 	}
 
 	if (of_device_is_compatible(dev->of_node, "aspeed,ast2600-fmc")) {
-		ret = aspeed_fmc_wdt_probe(pdev, aspi->regs);
-		if (ret) {
-			dev_err(&pdev->dev, "cannot create watchdog\n");
-			goto disable_clk;
+		if (0) { // On latest OpenBMC this WDT is started on shutdown and flashing fails as the WDT times out and reboots the platform....
+			ret = aspeed_fmc_wdt_probe(pdev, aspi->regs);
+			if (ret) {
+				dev_err(&pdev->dev, "cannot create watchdog\n");
+				goto disable_clk;
+			}
 		}
 	}
 
