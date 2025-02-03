@@ -175,7 +175,7 @@ static int aspeed_espi_ctrl_probe(struct platform_device *pdev)
 	return 0;
 }
 
-static int aspeed_espi_ctrl_remove(struct platform_device *pdev)
+void aspeed_espi_ctrl_remove(struct platform_device *pdev)
 {
 	struct device *dev = &pdev->dev;
 	struct aspeed_espi_ctrl *espi_ctrl = dev_get_drvdata(dev);
@@ -184,8 +184,6 @@ static int aspeed_espi_ctrl_remove(struct platform_device *pdev)
 	aspeed_espi_vw_free(dev, espi_ctrl->vw);
 	aspeed_espi_oob_free(dev, espi_ctrl->oob);
 	aspeed_espi_flash_free(dev, espi_ctrl->flash);
-
-	return 0;
 }
 
 static const struct aspeed_espi_model ast2500_model = {
