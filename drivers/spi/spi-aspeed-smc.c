@@ -1102,7 +1102,7 @@ static int aspeed_spi_probe(struct platform_device *pdev)
 	if (ret)
 		dev_err(&pdev->dev, "cannot create attribute group\n");
 
-	if (of_device_is_compatible(dev->of_node, "aspeed,ast2600-fmc")) {
+	if (of_device_is_compatible(dev->of_node, "aspeed,ast2600-fmc") && 0) {
 		ret = aspeed_fmc_wdt_probe(pdev, aspi->regs);
 		if (ret)
 			dev_err(&pdev->dev, "cannot create watchdog\n");
