@@ -18,21 +18,17 @@
 			interrupt-parent = <&smb_svc_pex_fan_alert>;
 			interrupts = <27 IRQ_TYPE_LEVEL_LOW>; // FAN01_PWM_ALERT_N
 			fan-supply = <&sw0_fan01_ssb>;
-			channel@0 {
+			fan@0 {
 				reg = <0>;
 				pwm-polarity = <1>;
 				pulses-per-revolution = <1>;
-				rpm-range = <16000>;
-				pwm-init = <90>;
-				maxim,disable-therm-full-speed;
+				max-rpm = <16000>;
 			};
-			channel@1 {
+			fan@1 {
 				reg = <1>;
 				pwm-polarity = <1>;
 				pulses-per-revolution = <1>;
-				rpm-range = <16000>;
-				pwm-init = <90>;
-				maxim,disable-therm-full-speed;
+				max-rpm = <16000>;
 			};
 		};
 	};
@@ -48,21 +44,17 @@
 			interrupt-parent = <&smb_svc_pex_fan_alert>;
 			interrupts = <29 IRQ_TYPE_LEVEL_LOW>; // FAN03_PWM_ALERT_N
 			fan-supply = <&sw0_fan03_ssb>;
-			channel@0 {
+			fan@0 {
 				reg = <0>;
 				pwm-polarity = <1>;
 				pulses-per-revolution = <1>;
-				rpm-range = <16000>;
-				pwm-init = <90>;
-				maxim,disable-therm-full-speed;
+				max-rpm = <16000>;
 			};
-			channel@1 {
+			fan@1 {
 				reg = <1>;
 				pwm-polarity = <1>;
 				pulses-per-revolution = <1>;
-				rpm-range = <16000>;
-				pwm-init = <90>;
-				maxim,disable-therm-full-speed;
+				max-rpm = <16000>;
 			};
 		};
 	};
@@ -78,21 +70,17 @@
 			interrupt-parent = <&smb_svc_pex_fan_alert>;
 			interrupts = <31 IRQ_TYPE_LEVEL_LOW>; // FAN05_PWM_ALERT_N
 			fan-supply = <&sw0_fan05_ssb>;
-			channel@0 {
+			fan@0 {
 				reg = <0>;
 				pwm-polarity = <1>;
 				pulses-per-revolution = <1>;
-				rpm-range = <16000>;
-				pwm-init = <90>;
-				maxim,disable-therm-full-speed;
+				max-rpm = <16000>;
 			};
-			channel@1 {
+			fan@1 {
 				reg = <1>;
 				pwm-polarity = <1>;
 				pulses-per-revolution = <1>;
-				rpm-range = <16000>;
-				pwm-init = <90>;
-				maxim,disable-therm-full-speed;
+				max-rpm = <16000>;
 			};
 		};
 	};
@@ -108,21 +96,17 @@
 			interrupt-parent = <&smb_svc_pex_fan_alert>;
 			interrupts = <33 IRQ_TYPE_LEVEL_LOW>; // FAN07_PWM_ALERT_N
 			fan-supply = <&sw0_fan07_ssb>;
-			channel@0 {
+			fan@0 {
 				reg = <0>;
 				pwm-polarity = <1>;
 				pulses-per-revolution = <1>;
-				rpm-range = <16000>;
-				pwm-init = <90>;
-				maxim,disable-therm-full-speed;
+				max-rpm = <16000>;
 			};
-			channel@1 {
+			fan@1 {
 				reg = <1>;
 				pwm-polarity = <1>;
 				pulses-per-revolution = <1>;
-				rpm-range = <16000>;
-				pwm-init = <90>;
-				maxim,disable-therm-full-speed;
+				max-rpm = <16000>;
 			};
 		};
 	};
@@ -138,21 +122,17 @@
 			interrupt-parent = <&smb_svc_pex_fan_alert>;
 			interrupts = <35 IRQ_TYPE_LEVEL_LOW>; // FAN09_PWM_ALERT_N
 			fan-supply = <&sw0_fan09_ssb>;
-			channel@0 {
+			fan@0 {
 				reg = <0>;
 				pwm-polarity = <1>;
 				pulses-per-revolution = <1>;
-				rpm-range = <16000>;
-				pwm-init = <90>;
-				maxim,disable-therm-full-speed;
+				max-rpm = <16000>;
 			};
-			channel@1 {
+			fan@1 {
 				reg = <1>;
 				pwm-polarity = <1>;
 				pulses-per-revolution = <1>;
-				rpm-range = <16000>;
-				pwm-init = <90>;
-				maxim,disable-therm-full-speed;
+				max-rpm = <16000>;
 			};
 		};
 	};
@@ -168,21 +148,17 @@
 			interrupt-parent = <&smb_svc_pex_fan_alert>;
 			interrupts = <37 IRQ_TYPE_LEVEL_LOW>; // FAN11_PWM_ALERT_N
 			fan-supply = <&sw0_fan11_ssb>;
-			channel@0 {
+			fan@0 {
 				reg = <0>;
 				pwm-polarity = <1>;
 				pulses-per-revolution = <1>;
-				rpm-range = <16000>;
-				pwm-init = <90>;
-				maxim,disable-therm-full-speed;
+				max-rpm = <16000>;
 			};
-			channel@1 {
+			fan@1 {
 				reg = <1>;
 				pwm-polarity = <1>;
 				pulses-per-revolution = <1>;
-				rpm-range = <16000>;
-				pwm-init = <90>;
-				maxim,disable-therm-full-speed;
+				max-rpm = <16000>;
 			};
 		};
 	};
@@ -198,21 +174,17 @@
 			interrupt-parent = <&smb_svc_pex_fan_alert>;
 			interrupts = <39 IRQ_TYPE_LEVEL_LOW>; // FAN13_PWM_ALERT_N
 			fan-supply = <&sw0_fan13_ssb>;
-			channel@0 {
+			fan@0 {
 				reg = <0>;
 				pwm-polarity = <1>;
 				pulses-per-revolution = <1>;
-				rpm-range = <16000>;
-				pwm-init = <90>;
-				maxim,disable-therm-full-speed;
+				max-rpm = <16000>;
 			};
-			channel@1 {
+			fan@1 {
 				reg = <1>;
 				pwm-polarity = <1>;
 				pulses-per-revolution = <1>;
-				rpm-range = <16000>;
-				pwm-init = <90>;
-				maxim,disable-therm-full-speed;
+				max-rpm = <16000>;
 			};
 		};
 	};
@@ -228,21 +200,17 @@
 			interrupt-parent = <&smb_svc_pex_fan_alert>;
 			interrupts = <41 IRQ_TYPE_LEVEL_LOW>; // FAN15_PWM_ALERT_N
 			fan-supply = <&sw0_fan15_ssb>;
-			channel@0 {
+			fan@0 {
 				reg = <0>;
 				pwm-polarity = <1>;
 				pulses-per-revolution = <1>;
-				rpm-range = <16000>;
-				pwm-init = <90>;
-				maxim,disable-therm-full-speed;
+				max-rpm = <16000>;
 			};
-			channel@1 {
+			fan@1 {
 				reg = <1>;
 				pwm-polarity = <1>;
 				pulses-per-revolution = <1>;
-				rpm-range = <16000>;
-				pwm-init = <90>;
-				maxim,disable-therm-full-speed;
+				max-rpm = <16000>;
 			};
 		};
 	};
@@ -261,21 +229,17 @@
 			interrupt-parent = <&smb_svc_pex_fan_alert>;
 			interrupts = <43 IRQ_TYPE_LEVEL_LOW>; // FAN17_PWM_ALERT_N
 			fan-supply = <&sw0_fan17_ssb>;
-			channel@0 {
+			fan@0 {
 				reg = <0>;
 				pwm-polarity = <1>;
 				pulses-per-revolution = <1>;
-				rpm-range = <16000>;
-				pwm-init = <90>;
-				maxim,disable-therm-full-speed;
+				max-rpm = <16000>;
 			};
-			channel@1 {
+			fan@1 {
 				reg = <1>;
 				pwm-polarity = <1>;
 				pulses-per-revolution = <1>;
-				rpm-range = <16000>;
-				pwm-init = <90>;
-				maxim,disable-therm-full-speed;
+				max-rpm = <16000>;
 			};
 		};
 	};
@@ -291,21 +255,17 @@
 			interrupt-parent = <&smb_svc_pex_fan_alert>;
 			interrupts = <45 IRQ_TYPE_LEVEL_LOW>; // FAN19_PWM_ALERT_N
 			fan-supply = <&sw0_fan19_ssb>;
-			channel@0 {
+			fan@0 {
 				reg = <0>;
 				pwm-polarity = <1>;
 				pulses-per-revolution = <1>;
-				rpm-range = <16000>;
-				pwm-init = <90>;
-				maxim,disable-therm-full-speed;
+				max-rpm = <16000>;
 			};
-			channel@1 {
+			fan@1 {
 				reg = <1>;
 				pwm-polarity = <1>;
 				pulses-per-revolution = <1>;
-				rpm-range = <16000>;
-				pwm-init = <90>;
-				maxim,disable-therm-full-speed;
+				max-rpm = <16000>;
 			};
 		};
 	};
@@ -321,21 +281,17 @@
 			interrupt-parent = <&smb_svc_pex_fan_alert>;
 			interrupts = <47 IRQ_TYPE_LEVEL_LOW>; // FAN21_PWM_ALERT_N
 			fan-supply = <&sw0_fan21_ssb>;
-			channel@0 {
+			fan@0 {
 				reg = <0>;
 				pwm-polarity = <1>;
 				pulses-per-revolution = <1>;
-				rpm-range = <16000>;
-				pwm-init = <90>;
-				maxim,disable-therm-full-speed;
+				max-rpm = <16000>;
 			};
-			channel@1 {
+			fan@1 {
 				reg = <1>;
 				pwm-polarity = <1>;
 				pulses-per-revolution = <1>;
-				rpm-range = <16000>;
-				pwm-init = <90>;
-				maxim,disable-therm-full-speed;
+				max-rpm = <16000>;
 			};
 		};
 	};
@@ -351,21 +307,17 @@
 			interrupt-parent = <&smb_svc_pex_fan_alert>;
 			interrupts = <49 IRQ_TYPE_LEVEL_LOW>; // FAN23_PWM_ALERT_N
 			fan-supply = <&sw0_fan23_ssb>;
-			channel@0 {
+			fan@0 {
 				reg = <0>;
 				pwm-polarity = <1>;
 				pulses-per-revolution = <1>;
-				rpm-range = <16000>;
-				pwm-init = <90>;
-				maxim,disable-therm-full-speed;
+				max-rpm = <16000>;
 			};
-			channel@1 {
+			fan@1 {
 				reg = <1>;
 				pwm-polarity = <1>;
 				pulses-per-revolution = <1>;
-				rpm-range = <16000>;
-				pwm-init = <90>;
-				maxim,disable-therm-full-speed;
+				max-rpm = <16000>;
 			};
 		};
 	};
@@ -381,21 +333,17 @@
 			interrupt-parent = <&smb_svc_pex_fan_alert>;
 			interrupts = <28 IRQ_TYPE_LEVEL_LOW>; // FAN02_PWM_ALERT_N
 			fan-supply = <&sw0_fan02_ssb>;
-			channel@0 {
+			fan@0 {
 				reg = <0>;
 				pwm-polarity = <1>;
 				pulses-per-revolution = <1>;
-				rpm-range = <16000>;
-				pwm-init = <90>;
-				maxim,disable-therm-full-speed;
+				max-rpm = <16000>;
 			};
-			channel@1 {
+			fan@1 {
 				reg = <1>;
 				pwm-polarity = <1>;
 				pulses-per-revolution = <1>;
-				rpm-range = <16000>;
-				pwm-init = <90>;
-				maxim,disable-therm-full-speed;
+				max-rpm = <16000>;
 			};
 		};
 	};
@@ -411,21 +359,17 @@
 			interrupt-parent = <&smb_svc_pex_fan_alert>;
 			interrupts = <30 IRQ_TYPE_LEVEL_LOW>; // FAN04_PWM_ALERT_N
 			fan-supply = <&sw0_fan04_ssb>;
-			channel@0 {
+			fan@0 {
 				reg = <0>;
 				pwm-polarity = <1>;
 				pulses-per-revolution = <1>;
-				rpm-range = <16000>;
-				pwm-init = <90>;
-				maxim,disable-therm-full-speed;
+				max-rpm = <16000>;
 			};
-			channel@1 {
+			fan@1 {
 				reg = <1>;
 				pwm-polarity = <1>;
 				pulses-per-revolution = <1>;
-				rpm-range = <16000>;
-				pwm-init = <90>;
-				maxim,disable-therm-full-speed;
+				max-rpm = <16000>;
 			};
 		};
 	};
@@ -441,21 +385,17 @@
 			interrupt-parent = <&smb_svc_pex_fan_alert>;
 			interrupts = <32 IRQ_TYPE_LEVEL_LOW>; // FAN06_PWM_ALERT_N
 			fan-supply = <&sw0_fan06_ssb>;
-			channel@0 {
+			fan@0 {
 				reg = <0>;
 				pwm-polarity = <1>;
 				pulses-per-revolution = <1>;
-				rpm-range = <16000>;
-				pwm-init = <90>;
-				maxim,disable-therm-full-speed;
+				max-rpm = <16000>;
 			};
-			channel@1 {
+			fan@1 {
 				reg = <1>;
 				pwm-polarity = <1>;
 				pulses-per-revolution = <1>;
-				rpm-range = <16000>;
-				pwm-init = <90>;
-				maxim,disable-therm-full-speed;
+				max-rpm = <16000>;
 			};
 		};
 	};
@@ -471,21 +411,17 @@
 			interrupt-parent = <&smb_svc_pex_fan_alert>;
 			interrupts = <34 IRQ_TYPE_LEVEL_LOW>; // FAN08_PWM_ALERT_N
 			fan-supply = <&sw0_fan08_ssb>;
-			channel@0 {
+			fan@0 {
 				reg = <0>;
 				pwm-polarity = <1>;
 				pulses-per-revolution = <1>;
-				rpm-range = <16000>;
-				pwm-init = <90>;
-				maxim,disable-therm-full-speed;
+				max-rpm = <16000>;
 			};
-			channel@1 {
+			fan@1 {
 				reg = <1>;
 				pwm-polarity = <1>;
 				pulses-per-revolution = <1>;
-				rpm-range = <16000>;
-				pwm-init = <90>;
-				maxim,disable-therm-full-speed;
+				max-rpm = <16000>;
 			};
 		};
 	};
@@ -504,21 +440,17 @@
 			interrupt-parent = <&smb_svc_pex_fan_alert>;
 			interrupts = <36 IRQ_TYPE_LEVEL_LOW>; // FAN10_PWM_ALERT_N
 			fan-supply = <&sw0_fan10_ssb>;
-			channel@0 {
+			fan@0 {
 				reg = <0x00>;
 				pwm-polarity = <1>;
 				pulses-per-revolution = <1>;
-				rpm-range = <16000>;
-				pwm-init = <90>;
-				maxim,disable-therm-full-speed;
+				max-rpm = <16000>;
 			};
-			channel@1 {
+			fan@1 {
 				reg = <1>;
 				pwm-polarity = <1>;
 				pulses-per-revolution = <1>;
-				rpm-range = <16000>;
-				pwm-init = <90>;
-				maxim,disable-therm-full-speed;
+				max-rpm = <16000>;
 			};
 		};
 	};
@@ -534,21 +466,17 @@
 			interrupt-parent = <&smb_svc_pex_fan_alert>;
 			interrupts = <38 IRQ_TYPE_LEVEL_LOW>; // FAN12_PWM_ALERT_N
 			fan-supply = <&sw0_fan12_ssb>;
-			channel@0 {
+			fan@0 {
 				reg = <0>;
 				pwm-polarity = <1>;
 				pulses-per-revolution = <1>;
-				rpm-range = <16000>;
-				pwm-init = <90>;
-				maxim,disable-therm-full-speed;
+				max-rpm = <16000>;
 			};
-			channel@1 {
+			fan@1 {
 				reg = <1>;
 				pwm-polarity = <1>;
 				pulses-per-revolution = <1>;
-				rpm-range = <16000>;
-				pwm-init = <90>;
-				maxim,disable-therm-full-speed;
+				max-rpm = <16000>;
 			};
 		};
 	};
@@ -564,21 +492,17 @@
 			interrupt-parent = <&smb_svc_pex_fan_alert>;
 			interrupts = <40 IRQ_TYPE_LEVEL_LOW>; // FAN14_PWM_ALERT_N
 			fan-supply = <&sw0_fan14_ssb>;
-			channel@0 {
+			fan@0 {
 				reg = <0>;
 				pwm-polarity = <1>;
 				pulses-per-revolution = <1>;
-				rpm-range = <16000>;
-				pwm-init = <90>;
-				maxim,disable-therm-full-speed;
+				max-rpm = <16000>;
 			};
-			channel@1 {
+			fan@1 {
 				reg = <1>;
 				pwm-polarity = <1>;
 				pulses-per-revolution = <1>;
-				rpm-range = <16000>;
-				pwm-init = <90>;
-				maxim,disable-therm-full-speed;
+				max-rpm = <16000>;
 			};
 		};
 	};
@@ -594,21 +518,17 @@
 			interrupt-parent = <&smb_svc_pex_fan_alert>;
 			interrupts = <42 IRQ_TYPE_LEVEL_LOW>; // FAN16_PWM_ALERT_N
 			fan-supply = <&sw0_fan16_ssb>;
-			channel@0 {
+			fan@0 {
 				reg = <0>;
 				pwm-polarity = <1>;
 				pulses-per-revolution = <1>;
-				rpm-range = <16000>;
-				pwm-init = <90>;
-				maxim,disable-therm-full-speed;
+				max-rpm = <16000>;
 			};
-			channel@1 {
+			fan@1 {
 				reg = <1>;
 				pwm-polarity = <1>;
 				pulses-per-revolution = <1>;
-				rpm-range = <16000>;
-				pwm-init = <90>;
-				maxim,disable-therm-full-speed;
+				max-rpm = <16000>;
 			};
 		};
 	};
@@ -624,21 +544,17 @@
 			interrupt-parent = <&smb_svc_pex_fan_alert>;
 			interrupts = <44 IRQ_TYPE_LEVEL_LOW>; // FAN18_PWM_ALERT_N
 			fan-supply = <&sw0_fan18_ssb>;
-			channel@0 {
+			fan@0 {
 				reg = <0>;
 				pwm-polarity = <1>;
 				pulses-per-revolution = <1>;
-				rpm-range = <16000>;
-				pwm-init = <90>;
-				maxim,disable-therm-full-speed;
+				max-rpm = <16000>;
 			};
-			channel@1 {
+			fan@1 {
 				reg = <1>;
 				pwm-polarity = <1>;
 				pulses-per-revolution = <1>;
-				rpm-range = <16000>;
-				pwm-init = <90>;
-				maxim,disable-therm-full-speed;
+				max-rpm = <16000>;
 			};
 		};
 	};
@@ -654,21 +570,17 @@
 			interrupt-parent = <&smb_svc_pex_fan_alert>;
 			interrupts = <46 IRQ_TYPE_LEVEL_LOW>; // FAN20_PWM_ALERT_N
 			fan-supply = <&sw0_fan20_ssb>;
-			channel@0 {
+			fan@0 {
 				reg = <0>;
 				pwm-polarity = <1>;
 				pulses-per-revolution = <1>;
-				rpm-range = <16000>;
-				pwm-init = <90>;
-				maxim,disable-therm-full-speed;
+				max-rpm = <16000>;
 			};
-			channel@1 {
+			fan@1 {
 				reg = <1>;
 				pwm-polarity = <1>;
 				pulses-per-revolution = <1>;
-				rpm-range = <16000>;
-				pwm-init = <90>;
-				maxim,disable-therm-full-speed;
+				max-rpm = <16000>;
 			};
 		};
 	};
@@ -684,21 +596,17 @@
 			interrupt-parent = <&smb_svc_pex_fan_alert>;
 			interrupts = <48 IRQ_TYPE_LEVEL_LOW>; // FAN22_PWM_ALERT_N
 			fan-supply = <&sw0_fan22_ssb>;
-			channel@0 {
+			fan@0 {
 				reg = <0>;
 				pwm-polarity = <1>;
 				pulses-per-revolution = <1>;
-				rpm-range = <16000>;
-				pwm-init = <90>;
-				maxim,disable-therm-full-speed;
+				max-rpm = <16000>;
 			};
-			channel@1 {
+			fan@1 {
 				reg = <1>;
 				pwm-polarity = <1>;
 				pulses-per-revolution = <1>;
-				rpm-range = <16000>;
-				pwm-init = <90>;
-				maxim,disable-therm-full-speed;
+				max-rpm = <16000>;
 			};
 		};
 	};
@@ -714,21 +622,17 @@
 			interrupt-parent = <&smb_svc_pex_fan_alert>;
 			interrupts = <50 IRQ_TYPE_LEVEL_LOW>; // FAN24_PWM_ALERT_N
 			fan-supply = <&sw0_fan24_ssb>;
-			channel@0 {
+			fan@0 {
 				reg = <0>;
 				pwm-polarity = <1>;
 				pulses-per-revolution = <1>;
-				rpm-range = <16000>;
-				pwm-init = <90>;
-				maxim,disable-therm-full-speed;
+				max-rpm = <16000>;
 			};
-			channel@1 {
+			fan@1 {
 				reg = <1>;
 				pwm-polarity = <1>;
 				pulses-per-revolution = <1>;
-				rpm-range = <16000>;
-				pwm-init = <90>;
-				maxim,disable-therm-full-speed;
+				max-rpm = <16000>;
 			};
 		};
 	};
