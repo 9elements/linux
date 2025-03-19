@@ -2,6 +2,7 @@
 &espi_ctrl {
 	status = "okay";
 	flash,size = <0x4000000>;
+	aspeed,espi-mafs-size  = <0x4000000>;
 };
 
 

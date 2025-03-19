@@ -513,20 +513,17 @@
 			#size-cells = <1>;
 			ranges;
 
-			espi: espi@1e6ee000 {
-				compatible = "aspeed,ast2600-espi", "simple-mfd", "syscon";
+			espi_ctrl: espi@1e6ee000 {
+				compatible = "aspeed,ast2600-espi-ctrl", "syscon";
 				reg = <0x1e6ee000 0x1000>;
+				interrupts = <GIC_SPI 42 IRQ_TYPE_LEVEL_HIGH>;
+				clocks = <&syscon ASPEED_CLK_GATE_ESPICLK>;
+				status = "disabled";
 
-				#address-cells = <1>;
-				#size-cells = <1>;
-				ranges = <0x0 0x1e6ee000 0x1000>;
-
-				espi_ctrl: espi-ctrl@0 {
-					compatible = "aspeed,ast2600-espi-ctrl";
-					reg = <0x0 0x800>;
-					interrupts = <GIC_SPI 42 IRQ_TYPE_LEVEL_HIGH>;
-					clocks = <&syscon ASPEED_CLK_GATE_ESPICLK>;
-					status = "disabled";
+				mafs {
+					compatible = "aspeed,ast2600-espi-mafs";
+					aspeed,espi-mafs-size  = <0x4000000>;
+					status = "okay";
 				};
 			};
 
