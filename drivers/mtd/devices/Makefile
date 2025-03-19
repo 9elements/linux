@@ -3,6 +3,7 @@
 # linux/drivers/mtd/devices/Makefile
 #
 
+obj-$(CONFIG_MTD_ASPEED_ESPI_MAFS)	+= aspeed_espi_mafs.o
 obj-$(CONFIG_MTD_DOCG3)		+= docg3.o
 obj-$(CONFIG_MTD_SLRAM)		+= slram.o
 obj-$(CONFIG_MTD_PHRAM)		+= phram.o

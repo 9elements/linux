@@ -3,6 +3,16 @@ menu "Self-contained MTD device drivers"
 	depends on MTD!=n
 	depends on HAS_IOMEM
 
+config MTD_ASPEED_ESPI_MAFS
+	tristate "Aspeed eSPI MAFS support"
+	depends on MFD_ASPEED_ESPI_CTRL
+	help
+	  This provides a MTD device driver to access the SPI flash on the
+	  other side of the eSPI flash channel. The eSPI protocol abstracts
+	  the SPI NOR interface and provides support for reading, writing and
+	  erasing certain areas of the flash chip. It's vendor defined which
+	  regions are accessible or writeable.
+
 config MTD_PMC551
 	tristate "Ramix PMC551 PCI Mezzanine RAM card support"
 	depends on PCI
