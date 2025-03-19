@@ -35,6 +35,8 @@ obj-$(CONFIG_MFD_TQMX86)	+= tqmx86.o
 
 obj-$(CONFIG_MFD_LOCHNAGAR)	+= lochnagar-i2c.o
 
+obj-$(CONFIG_MFD_ASPEED_ESPI_CTRL) += aspeed-espi.o
+
 arizona-objs			:= arizona-core.o arizona-irq.o
 obj-$(CONFIG_MFD_ARIZONA)	+= arizona.o
 obj-$(CONFIG_MFD_ARIZONA_I2C)	+= arizona-i2c.o

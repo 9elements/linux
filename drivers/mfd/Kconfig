@@ -114,6 +114,16 @@ config MFD_AS3722
 	  controllers, 11 LDOs, RTC, automatic battery, temperature and
 	  over current monitoring, GPIOs, ADC and a watchdog.
 
+config MFD_ASPEED_ESPI_CTRL
+	bool "Aspeed SoC eSPI controller"
+	select MFD_CORE
+	select REGMAP_MMIO
+	help
+	  Support for the Aspeed eSPI controller found on AST2500/AST2600.
+	  This driver provides common support for accessing the device,
+	  additional drivers must be enabled in order to use the
+	  functionality of the device.
+
 config PMIC_ADP5520
 	bool "Analog Devices ADP5520/01 MFD PMIC Core Support"
 	depends on I2C=y
