@@ -7,30 +7,30 @@
 
 #include <linux/bits.h>
 
-enum aspeed_espi_version {
-	ESPI_AST2500,
-	ESPI_AST2600,
-};
-
-struct aspeed_espi_model {
-	uint32_t version;
-};
-
-struct aspeed_espi_ctrl {
-	struct device *dev;
-
-	struct regmap *map;
-	struct clk *clk;
-
-	int irq;
-
-	struct aspeed_espi_perif *perif;
-	struct aspeed_espi_vw *vw;
-	struct aspeed_espi_oob *oob;
-	struct aspeed_espi_flash *flash;
-
-	const struct aspeed_espi_model *model;
-};
+#define   ESPI_IRQ_HW_RST_DEASSERT	23
+#define   ESPI_IRQ_OOB_RX_TMOUT		22
+#define   ESPI_IRQ_VW_SYSEVT1		21
+#define   ESPI_IRQ_FLASH_TX_ERR		20
+#define   ESPI_IRQ_OOB_TX_ERR		19
+#define   ESPI_IRQ_FLASH_TX_ABT		18
+#define   ESPI_IRQ_OOB_TX_ABT		17
+#define   ESPI_IRQ_PERIF_NP_TX_ABT	16
+#define   ESPI_IRQ_PERIF_PC_TX_ABT	15
+#define   ESPI_IRQ_FLASH_RX_ABT		14
+#define   ESPI_IRQ_OOB_RX_ABT		13
+#define   ESPI_IRQ_PERIF_NP_RX_ABT	12
+#define   ESPI_IRQ_PERIF_PC_RX_ABT	11
+#define   ESPI_IRQ_PERIF_NP_TX_ERR	10
+#define   ESPI_IRQ_PERIF_PC_TX_ERR	9
+#define   ESPI_IRQ_VW_GPIOEVT		8
+#define   ESPI_IRQ_VW_SYSEVT		7
+#define   ESPI_IRQ_FLASH_TX_CMPLT	6
+#define   ESPI_IRQ_FLASH_RX_CMPLT	5
+#define   ESPI_IRQ_OOB_TX_CMPLT		4
+#define   ESPI_IRQ_OOB_RX_CMPLT		3
+#define   ESPI_IRQ_PERIF_NP_TX_CMPLT	2
+#define   ESPI_IRQ_PERIF_PC_TX_CMPLT	1
+#define   ESPI_IRQ_PERIF_PC_RX_CMPLT	0
 
 /* eSPI register offset */
 #define ESPI_CTRL		0x000
@@ -45,14 +45,17 @@ struct aspeed_espi_ctrl {
 #define   ESPI_CTRL_FLASH_SW_MODE_MASK		GENMASK(11, 10)
 #define   ESPI_CTRL_FLASH_SW_MODE_SHIFT		10
 #define   ESPI_CTRL_PERIF_PC_RX_DMA_EN		BIT(16)
+#define   ESPI_CTRL_RESET_LVL			BIT(12)
 #define   ESPI_CTRL_FLASH_SW_RDY		BIT(7)
+#define   ESPI_CTRL_FLASH_CHAN_RDY		BIT(6)
 #define   ESPI_CTRL_OOB_SW_RDY			BIT(4)
 #define   ESPI_CTRL_VW_SW_RDY			BIT(3)
+#define   ESPI_CTRL_VW_RDY			BIT(2)
 #define   ESPI_CTRL_PERIF_SW_RDY		BIT(1)
 #define ESPI_STS		0x004
-#define   ESPI_CTRL_FLASH_CHAN_RDY		BIT(6)
-#define   ESPI_CTRL_VW_CHAN_RDY			BIT(5)
-#define   ESPI_CTRL_RDY				BIT(0)
+#define   ESPI_CTRL_FLASH_CHAN_ENABLE		BIT(7)
+#define   ESPI_CTRL_VW_CHAN_ENABLE		BIT(5)
+#define   ESPI_CTRL_ENABLED			BIT(0)
 
 #define ESPI_INT_STS		0x008
 #define   ESPI_INT_STS_HW_RST_DEASSERT		BIT(31)
@@ -177,6 +180,9 @@ struct aspeed_espi_ctrl {
 #define ESPI_CTRL2		0x080
 #define   ESPI_CTRL2_MEMCYC_RD_DIS		BIT(6)
 #define   ESPI_CTRL2_MEMCYC_WR_DIS		BIT(4)
+#define   ESPI_CTRL2_AUTO_ACK_HOST_RST_WARN	BIT(2)
+#define   ESPI_CTRL2_AUTO_ACK_OOB_RST_WARN	BIT(1)
+#define   ESPI_CTRL2_AUTO_ACK_SUS_WARN		BIT(0)
 #define ESPI_PERIF_PC_RX_SADDR	0x084
 #define ESPI_PERIF_PC_RX_TADDR	0x088
 #define ESPI_PERIF_PC_RX_MASK	0x08c
@@ -185,10 +191,10 @@ struct aspeed_espi_ctrl {
 #define ESPI_SYSEVT		0x098
 #define   ESPI_SYSEVT_HOST_RST_ACK		BIT(27)
 #define   ESPI_SYSEVT_RST_CPU_INIT		BIT(26)
-#define   ESPI_SYSEVT_SLV_BOOT_STS		BIT(23)
+#define   ESPI_SYSEVT_TARGET_BOOT_STS		BIT(23)
 #define   ESPI_SYSEVT_NON_FATAL_ERR		BIT(22)
 #define   ESPI_SYSEVT_FATAL_ERR			BIT(21)
-#define   ESPI_SYSEVT_SLV_BOOT_DONE		BIT(20)
+#define   ESPI_SYSEVT_TARGET_BOOT_DONE		BIT(20)
 #define   ESPI_SYSEVT_OOB_RST_ACK		BIT(16)
 #define   ESPI_SYSEVT_NMI_OUT			BIT(10)
 #define   ESPI_SYSEVT_SMI_OUT			BIT(9)
@@ -202,9 +208,23 @@ struct aspeed_espi_ctrl {
 #define ESPI_VW_GPIO_VAL	0x09c
 #define ESPI_GEN_CAP_N_CONF	0x0a0
 #define ESPI_CH0_CAP_N_CONF	0x0a4
+#define   ESPI_CH0_CAP_N_READY		BIT(1)
+#define   ESPI_CH0_CAP_N_ENABLED	BIT(0)
 #define ESPI_CH1_CAP_N_CONF	0x0a8
+#define   ESPI_CH1_CAP_N_READY		BIT(1)
+#define   ESPI_CH1_CAP_N_ENABLED	BIT(0)
 #define ESPI_CH2_CAP_N_CONF	0x0ac
+#define   ESPI_CH2_CAP_N_READY		BIT(1)
+#define   ESPI_CH2_CAP_N_ENABLED	BIT(0)
 #define ESPI_CH3_CAP_N_CONF	0x0b0
+#define   ESPI_CH3_CAP_N_CONF_MAFS	BIT(11)
+#define   ESPI_CH3_CAP_N_READY		BIT(1)
+#define   ESPI_CH3_CAP_N_ENABLED	BIT(0)
+#define   ESPI_CH3_CAP_N_CONF_PAYLOAD_MASK		GENMASK(10, 8)
+#define   ESPI_CH3_CAP_N_CONF_PAYLOAD_SHIFT		8
+#define   ESPI_CH3_CAP_N_CONF_PAYLOAD_SIZE_64		1
+#define   ESPI_CH3_CAP_N_CONF_PAYLOAD_SIZE_128		2
+#define   ESPI_CH3_CAP_N_CONF_PAYLOAD_SIZE_256		3
 #define   ESPI_CH3_CAP_N_CONF_ERASE_MASK		GENMASK(4, 2)
 #define   ESPI_CH3_CAP_N_CONF_ERASE_SHIFT		2
 #define   ESPI_CH3_CAP_N_CONF_ERASE_SIZE_4KB		1
@@ -213,6 +233,7 @@ struct aspeed_espi_ctrl {
 #define   ESPI_CH3_CAP_N_CONF_ERASE_SIZE_128KB		4
 #define   ESPI_CH3_CAP_N_CONF_ERASE_SIZE_256KB		5
 #define ESPI_CH3_CAP_N_CONF2	0x0b4
+#define ESPI_INT_EN_CLR		0x0fc
 #define ESPI_SYSEVT1_INT_EN	0x100
 #define ESPI_SYSEVT1		0x104
 #define   ESPI_SYSEVT1_SUSPEND_ACK		BIT(20)
