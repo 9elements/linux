@@ -518,11 +518,20 @@
 				reg = <0x1e6ee000 0x1000>;
 				interrupts = <GIC_SPI 42 IRQ_TYPE_LEVEL_HIGH>;
 				clocks = <&syscon ASPEED_CLK_GATE_ESPICLK>;
+				pinctrl-names = "default";
+				pinctrl-0 = <&pinctrl_espi_default>;
 				status = "disabled";
 
 				mafs {
-					compatible = "aspeed,ast2600-espi-mafs";
+					compatible = "aspeed,espi-mafs";
 					aspeed,espi-mafs-size  = <0x4000000>;
+					status = "okay";
+				};
+
+				vw {
+					compatible = "aspeed,espi-vw";
+					gpio-reserved-ranges = <3 1>, <7 1>, <11 5>, <17 3>, <24 2>, <28 4>, <34 1>, <38 10>, <49 3>, <53 3>;
+					aspeed,auto-ack-target-boot;
 					status = "okay";
 				};
 			};
