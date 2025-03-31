@@ -327,6 +327,7 @@ static int aspeed_espi_sysevt_gpio_probe(struct platform_device *pdev)
 	struct gpio_chip *gc;
 	int ret, irq;
 
+	dev_err(dev, "entering...\n");
 	espi_gpio = devm_kzalloc(dev, sizeof(struct aspeed_espi_vw_sysevt), GFP_KERNEL);
 	if (!espi_gpio)
 		return -ENOMEM;

@@ -588,6 +588,8 @@ static int aspeed_espi_mafs_probe(struct platform_device *pdev)
 	int ret;
 	u32 reg;
 
+	dev_err(dev, "entering...\n");
+
 	/*
 	 * The eSPI specification doesn't specify a way to retrieve the remote flash size.
 	 * It must be provided in the device-tree.

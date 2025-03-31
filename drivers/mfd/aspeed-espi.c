@@ -111,13 +111,20 @@ static inline bool aspeed_espi_ctrl_in_reset(struct regmap *regmap)
 static irqreturn_t aspeed_espi_ctrl_reset_irq(int irq, void *data)
 {
 	struct aspeed_espi_ctrl *espi_ctrl = data;
+	u32 val;
+	regmap_read(espi_ctrl->regmap, ESPI_STS, &val);
+
+	dev_err(espi_ctrl->dev, "IRQ %d ESPI_STS=%x\n", irq, val);
 
 	mfd_remove_devices(espi_ctrl->dev);
 
-	if (!aspeed_espi_ctrl_in_reset(espi_ctrl->regmap))
+	if (!aspeed_espi_ctrl_in_reset(espi_ctrl->regmap)) {
+		dev_err(espi_ctrl->dev, "starting MTD devices...\n");
+
 		WARN_ON(devm_mfd_add_devices(espi_ctrl->dev, PLATFORM_DEVID_NONE,
 			cells, ARRAY_SIZE(cells), NULL, 0,
 			regmap_irq_get_domain(espi_ctrl->irq_data)));
+	}
 
 	return IRQ_HANDLED;
 }
