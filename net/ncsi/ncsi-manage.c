@@ -1371,12 +1371,12 @@ static void ncsi_probe_channel(struct ncsi_dev_priv *ndp)
 		nd->state = ncsi_dev_state_probe_deselect;
 		fallthrough;
 	case ncsi_dev_state_probe_deselect:
-		ndp->pending_req_num = 8;
+		ndp->pending_req_num = ndp->max_package;
 
 		/* Deselect all possible packages */
 		nca.type = NCSI_PKT_CMD_DP;
 		nca.channel = NCSI_RESERVED_CHANNEL;
-		for (index = 0; index < 8; index++) {
+		for (index = 0; index < ndp->max_package; index++) {
 			nca.package = index;
 			ret = ncsi_xmit_cmd(&nca);
 			if (ret)
@@ -1386,7 +1386,7 @@ static void ncsi_probe_channel(struct ncsi_dev_priv *ndp)
 		nd->state = ncsi_dev_state_probe_package;
 		break;
 	case ncsi_dev_state_probe_package:
-		if (ndp->package_probe_id >= 8) {
+		if (ndp->package_probe_id >= ndp->max_package) {
 			/* Last package probed, finishing */
 			ndp->flags |= NCSI_DEV_PROBED;
 			break;
@@ -1760,7 +1760,7 @@ struct ncsi_dev *ncsi_register_dev(struct net_device *dev,
 	struct platform_device *pdev;
 	struct device_node *np;
 	unsigned long flags;
-	int i;
+	int i, ret;
 
 	/* Check if the device has been registered or not */
 	nd = ncsi_find_dev(dev);
@@ -1816,6 +1816,14 @@ struct ncsi_dev *ncsi_register_dev(struct net_device *dev,
 
 		if (np && of_get_property(np, "ncsi-ctrl,start-redo-probe", NULL))
 			ndp->ctrl_flags |= NCSI_CTRL_FLAG_START_REDO_PROBE;
+
+		if (np) {
+			ret = of_property_read_u32(np, "ncsi-package",
+						   &ndp->max_package);
+			if (ret || !ndp->max_package ||
+			    ndp->max_package > NCSI_MAX_PACKAGE)
+				ndp->max_package = NCSI_MAX_PACKAGE;
+		}
 	}
 
 	return nd;
