@@ -861,7 +861,7 @@ static const struct file_operations ast2600_espi_vw_fops = {
 static void ast2600_espi_vw_isr(struct aspeed_espi *espi)
 {
 	struct aspeed_espi_vw *vw;
-	u32 sts;
+	u32 sts, sysevt_sts, reg;
 
 	vw = &espi->vw;
 
@@ -870,11 +870,24 @@ static void ast2600_espi_vw_isr(struct aspeed_espi *espi)
 	if (sts & ESPI_INT_STS_VW_GPIO) {
 		vw->gpio.val0 = readl(espi->regs + ESPI_VW_GPIO_VAL);
 		writel(ESPI_INT_STS_VW_GPIO, espi->regs + ESPI_INT_STS);
-	} else if (sts & ESPI_INT_STS_VW_SYSEVT) {
-		/* Handle system event */
+	}
+
+	if (sts & ESPI_INT_STS_VW_SYSEVT) {
+		sysevt_sts = readl(espi->regs + ESPI_VW_SYSEVT_INT_STS);
+		writel(sysevt_sts, espi->regs + ESPI_VW_SYSEVT_INT_STS);
 		writel(ESPI_INT_STS_VW_SYSEVT, espi->regs + ESPI_INT_STS);
-	} else if (sts & (ESPI_INT_STS_VW_SYSEVT1)) {
-		/* Handle system event1 */
+	}
+
+	if (sts & ESPI_INT_STS_VW_SYSEVT1) {
+		sysevt_sts = readl(espi->regs + ESPI_VW_SYSEVT1_INT_STS);
+
+		if (sysevt_sts & ESPI_VW_SYSEVT1_SUSPEND_WARN) {
+			reg = readl(espi->regs + ESPI_VW_SYSEVT1);
+			reg |= ESPI_VW_SYSEVT1_SUSPEND_ACK;
+			writel(reg, espi->regs + ESPI_VW_SYSEVT1);
+		}
+
+		writel(sysevt_sts, espi->regs + ESPI_VW_SYSEVT1_INT_STS);
 		writel(ESPI_INT_STS_VW_SYSEVT1, espi->regs + ESPI_INT_STS);
 	}
 }
@@ -1877,6 +1890,8 @@ irqreturn_t ast2600_espi_isr(int irq, void *arg)
 		ast2600_espi_flash_isr(espi);
 
 	if (sts & ESPI_INT_STS_RST_DEASSERT) {
+		u32 reg;
+
 		/* this will clear all interrupt enable and status */
 		reset_control_assert(espi->rst);
 		reset_control_deassert(espi->rst);
@@ -1886,6 +1901,15 @@ irqreturn_t ast2600_espi_isr(int irq, void *arg)
 		ast2600_espi_vw_reset(espi);
 		ast2600_espi_oob_reset(espi);
 		ast2600_espi_flash_reset(espi);
+
+		/*
+		 * Signal to the host that the slave has completed its boot
+		 * sequence and is ready. Without this, the platform will not
+		 * proceed past eSPI enumeration.
+		 */
+		reg = readl(espi->regs + ESPI_VW_SYSEVT);
+		reg |= ESPI_VW_SYSEVT_SLV_BOOT_STS | ESPI_VW_SYSEVT_SLV_BOOT_DONE;
+		writel(reg, espi->regs + ESPI_VW_SYSEVT);
 
 		/* re-enable eSPI_RESET# interrupt */
 		writel(ESPI_INT_EN_RST_DEASSERT, espi->regs + ESPI_INT_EN);
