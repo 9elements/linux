@@ -8,6 +8,17 @@ config ASPEED_ESPI
           the eSPI interface. The four eSPI channels, namely peripheral,
           virtual wire, out-of-band, and flash are supported.
 
+config ASPEED_ESPI_LEGACY
+        bool "Use legacy eSPI reset behavior"
+        depends on ASPEED_ESPI
+        help
+          Skip the hardware reset of the eSPI controller during the
+          HW_RST_DEASSERT interrupt handler on AST2600. On some platforms
+          the aggressive SCU reset disrupts the eSPI link and prevents the
+          host from completing PCIe bus initialization. Enable this option
+          to use the gentler channel re-enable approach from older Aspeed
+          eSPI drivers.
+
 config AST2700_RTC_OVER_ESPI
         tristate "ASPEED AST2700 RTC over eSPI drvier"
         depends on HAS_IOMEM

@@ -1892,11 +1892,13 @@ irqreturn_t ast2600_espi_isr(int irq, void *arg)
 	if (sts & ESPI_INT_STS_RST_DEASSERT) {
 		u32 reg;
 
+#ifndef CONFIG_ASPEED_ESPI_LEGACY
 		/* this will clear all interrupt enable and status */
 		reset_control_assert(espi->rst);
 		reset_control_deassert(espi->rst);
 
 		ast2600_espi_perif_sw_reset(espi);
+#endif
 		ast2600_espi_perif_reset(espi);
 		ast2600_espi_vw_reset(espi);
 		ast2600_espi_oob_reset(espi);
@@ -1913,6 +1915,16 @@ irqreturn_t ast2600_espi_isr(int irq, void *arg)
 
 		/* re-enable eSPI_RESET# interrupt */
 		writel(ESPI_INT_EN_RST_DEASSERT, espi->regs + ESPI_INT_EN);
+#ifdef CONFIG_ASPEED_ESPI_LEGACY
+		/*
+		 * Without the SCU hardware reset above, the RST_DEASSERT
+		 * status bit must be cleared explicitly to prevent an
+		 * infinite interrupt loop.  This matches the approach used
+		 * by the AST2500/AST2700 handlers and the older Aspeed 5.10
+		 * eSPI driver.
+		 */
+		writel(ESPI_INT_STS_RST_DEASSERT, espi->regs + ESPI_INT_STS);
+#endif
 	}
 
 	return IRQ_HANDLED;
