@@ -229,9 +229,10 @@ int ncsi_aen_handler(struct ncsi_dev_priv *ndp, struct sk_buff *skb)
 
 	ret = ncsi_validate_aen_pkt(h, nah->payload);
 	if (ret) {
-		netdev_warn(ndp->ndev.dev,
-			    "NCSI: 'bad' packet ignored for AEN type 0x%x\n",
-			    h->type);
+		if (net_ratelimit())
+			netdev_warn(ndp->ndev.dev,
+				    "NCSI: 'bad' packet ignored for AEN type 0x%x\n",
+				    h->type);
 		goto out;
 	}
 
