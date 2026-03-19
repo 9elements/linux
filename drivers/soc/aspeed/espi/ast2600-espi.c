@@ -909,9 +909,13 @@ static void ast2600_espi_vw_reset(struct aspeed_espi *espi)
 
 	writel(ESPI_INT_EN_VW_GPIO, espi->regs + ESPI_INT_EN);
 
-	reg = readl(espi->regs + ESPI_CTRL)
-	      | ((vw->gpio.hw_mode) ? 0 : ESPI_CTRL_VW_GPIO_SW)
-	      | ESPI_CTRL_VW_SW_RDY;
+	reg = readl(espi->regs + ESPI_CTRL) | ESPI_CTRL_VW_SW_RDY;
+#ifndef CONFIG_ASPEED_ESPI_LEGACY
+	/* software-controlled VW GPIO values; suppressed in legacy mode to
+	 * match the older 5.10-era driver which left this bit clear */
+	if (!vw->gpio.hw_mode)
+		reg |= ESPI_CTRL_VW_GPIO_SW;
+#endif
 	writel(reg, espi->regs + ESPI_CTRL);
 
 	writel(0x0, espi->regs + ESPI_VW_SYSEVT_INT_T0);
@@ -1745,7 +1749,11 @@ static void ast2600_espi_flash_reset(struct aspeed_espi *espi)
 	writel(reg, espi->regs + ESPI_CTRL);
 
 	reg = readl(espi->regs + ESPI_CTRL) & ~ESPI_CTRL_FLASH_EDAF_MODE;
+#ifndef CONFIG_ASPEED_ESPI_LEGACY
+	/* program the DT-configured EDAF mode; legacy mode leaves the field
+	 * at zero (EDAF_MODE_MIX) to match the older 5.10-era driver default */
 	reg |= FIELD_PREP(ESPI_CTRL_FLASH_EDAF_MODE, flash->edaf.mode);
+#endif
 	writel(reg, espi->regs + ESPI_CTRL);
 
 	if (flash->edaf.mode == EDAF_MODE_MIX) {
@@ -1865,6 +1873,36 @@ int ast2600_espi_flash_remove(struct aspeed_espi *espi)
 	return 0;
 }
 
+#ifdef CONFIG_ASPEED_ESPI_LEGACY
+/*
+ * Legacy RST_DEASSERT handler: reprogram all four channels and signal boot
+ * completion to the host without performing an SCU hardware reset.  Shared
+ * between the ISR and the missed-edge check in post_init.
+ */
+static void ast2600_espi_legacy_rst_deassert(struct aspeed_espi *espi)
+{
+	u32 reg;
+
+	ast2600_espi_perif_reset(espi);
+	ast2600_espi_vw_reset(espi);
+	ast2600_espi_oob_reset(espi);
+	ast2600_espi_flash_reset(espi);
+
+	/*
+	 * Signal to the host that the slave has completed its boot
+	 * sequence and is ready. Without this, the platform will not
+	 * proceed past eSPI enumeration.
+	 */
+	reg = readl(espi->regs + ESPI_VW_SYSEVT);
+	reg |= ESPI_VW_SYSEVT_SLV_BOOT_STS | ESPI_VW_SYSEVT_SLV_BOOT_DONE;
+	writel(reg, espi->regs + ESPI_VW_SYSEVT);
+
+	/* re-enable eSPI_RESET# interrupt and clear the status bit */
+	writel(ESPI_INT_EN_RST_DEASSERT, espi->regs + ESPI_INT_EN);
+	writel(ESPI_INT_STS_RST_DEASSERT, espi->regs + ESPI_INT_STS);
+}
+#endif
+
 /* global control */
 irqreturn_t ast2600_espi_isr(int irq, void *arg)
 {
@@ -1889,16 +1927,18 @@ irqreturn_t ast2600_espi_isr(int irq, void *arg)
 	if (sts & ESPI_INT_STS_FLASH)
 		ast2600_espi_flash_isr(espi);
 
+#ifdef CONFIG_ASPEED_ESPI_LEGACY
+	if (sts & ESPI_INT_STS_RST_DEASSERT)
+		ast2600_espi_legacy_rst_deassert(espi);
+#else
 	if (sts & ESPI_INT_STS_RST_DEASSERT) {
 		u32 reg;
 
-#ifndef CONFIG_ASPEED_ESPI_LEGACY
 		/* this will clear all interrupt enable and status */
 		reset_control_assert(espi->rst);
 		reset_control_deassert(espi->rst);
 
 		ast2600_espi_perif_sw_reset(espi);
-#endif
 		ast2600_espi_perif_reset(espi);
 		ast2600_espi_vw_reset(espi);
 		ast2600_espi_oob_reset(espi);
@@ -1915,17 +1955,8 @@ irqreturn_t ast2600_espi_isr(int irq, void *arg)
 
 		/* re-enable eSPI_RESET# interrupt */
 		writel(ESPI_INT_EN_RST_DEASSERT, espi->regs + ESPI_INT_EN);
-#ifdef CONFIG_ASPEED_ESPI_LEGACY
-		/*
-		 * Without the SCU hardware reset above, the RST_DEASSERT
-		 * status bit must be cleared explicitly to prevent an
-		 * infinite interrupt loop.  This matches the approach used
-		 * by the AST2500/AST2700 handlers and the older Aspeed 5.10
-		 * eSPI driver.
-		 */
-		writel(ESPI_INT_STS_RST_DEASSERT, espi->regs + ESPI_INT_STS);
-#endif
 	}
+#endif
 
 	return IRQ_HANDLED;
 }
@@ -1938,6 +1969,17 @@ void ast2600_espi_pre_init(struct aspeed_espi *espi)
 void ast2600_espi_post_init(struct aspeed_espi *espi)
 {
 	writel(ESPI_INT_EN_RST_DEASSERT, espi->regs + ESPI_INT_EN);
+#ifdef CONFIG_ASPEED_ESPI_LEGACY
+	/*
+	 * If eSPI_RESET# was already deasserted before the driver probed,
+	 * the RST_DEASSERT edge was missed and the ISR will never fire.
+	 * Check the status bit now and run the full handshake sequence to
+	 * ensure SLV_BOOT_STS/DONE are signalled to the host regardless of
+	 * boot ordering.
+	 */
+	if (readl(espi->regs + ESPI_INT_STS) & ESPI_INT_STS_RST_DEASSERT)
+		ast2600_espi_legacy_rst_deassert(espi);
+#endif
 }
 
 void ast2600_espi_deinit(struct aspeed_espi *espi)
