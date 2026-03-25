@@ -1897,6 +1897,19 @@ static void ast2600_espi_legacy_rst_deassert(struct aspeed_espi *espi)
 	reg |= ESPI_VW_SYSEVT_SLV_BOOT_STS | ESPI_VW_SYSEVT_SLV_BOOT_DONE;
 	writel(reg, espi->regs + ESPI_VW_SYSEVT);
 
+	/*
+	 * Enable hardware auto-acknowledge of SLV_BOOT_STS/DONE in
+	 * ESPI080 (Engine Control 2).  When set, the eSPI slave hardware
+	 * automatically reports boot status to the host on every VW
+	 * system event read — even if BMC software hasn't written
+	 * ESPI098 yet or if a subsequent IN_BAND_RESET cleared the
+	 * software-written values.  This ensures the host proceeds with
+	 * PCIe link training regardless of BMC boot timing.
+	 */
+	reg = readl(espi->regs + ESPI_CTRL2);
+	reg |= ESPI_CTRL2_AUTO_SLV_BOOT_STS | ESPI_CTRL2_AUTO_SLV_BOOT_DONE;
+	writel(reg, espi->regs + ESPI_CTRL2);
+
 	/* re-enable eSPI_RESET# interrupt and clear the status bit */
 	writel(ESPI_INT_EN_RST_DEASSERT, espi->regs + ESPI_INT_EN);
 	writel(ESPI_INT_STS_RST_DEASSERT, espi->regs + ESPI_INT_STS);
@@ -1970,15 +1983,41 @@ void ast2600_espi_post_init(struct aspeed_espi *espi)
 {
 	writel(ESPI_INT_EN_RST_DEASSERT, espi->regs + ESPI_INT_EN);
 #ifdef CONFIG_ASPEED_ESPI_LEGACY
-	/*
-	 * If eSPI_RESET# was already deasserted before the driver probed,
-	 * the RST_DEASSERT edge was missed and the ISR will never fire.
-	 * Check the status bit now and run the full handshake sequence to
-	 * ensure SLV_BOOT_STS/DONE are signalled to the host regardless of
-	 * boot ordering.
-	 */
-	if (readl(espi->regs + ESPI_INT_STS) & ESPI_INT_STS_RST_DEASSERT)
-		ast2600_espi_legacy_rst_deassert(espi);
+	{
+		u32 reg;
+
+		/*
+		 * Enable hardware auto-acknowledge of SLV_BOOT_STS/DONE
+		 * as early as possible.  This must happen before the host
+		 * firmware's eSPI channel negotiation timeout expires,
+		 * since it determines whether the host proceeds with BMC
+		 * PCIe link training.  Set it unconditionally at probe
+		 * time — the ISR handler also sets it after any reset.
+		 */
+		reg = readl(espi->regs + ESPI_CTRL2);
+		reg |= ESPI_CTRL2_AUTO_SLV_BOOT_STS
+		     | ESPI_CTRL2_AUTO_SLV_BOOT_DONE;
+		writel(reg, espi->regs + ESPI_CTRL2);
+
+		/*
+		 * Also set the software SLV_BOOT bits explicitly for
+		 * hosts that read ESPI098 instead of relying on the
+		 * auto-acknowledge mechanism.
+		 */
+		reg = readl(espi->regs + ESPI_VW_SYSEVT);
+		reg |= ESPI_VW_SYSEVT_SLV_BOOT_STS
+		     | ESPI_VW_SYSEVT_SLV_BOOT_DONE;
+		writel(reg, espi->regs + ESPI_VW_SYSEVT);
+
+		/*
+		 * If eSPI_RESET# was already deasserted before the
+		 * driver probed, the RST_DEASSERT edge was missed.
+		 * Run the full handshake now.
+		 */
+		if (readl(espi->regs + ESPI_INT_STS) &
+		    ESPI_INT_STS_RST_DEASSERT)
+			ast2600_espi_legacy_rst_deassert(espi);
+	}
 #endif
 }
 
