@@ -786,6 +786,8 @@ static int aspeed_video_start_frame(struct aspeed_video *video)
 	if (!(seq_ctrl & VE_SEQ_CTRL_COMP_BUSY) ||
 	    !(seq_ctrl & VE_SEQ_CTRL_CAP_BUSY)) {
 		v4l2_dbg(1, debug, &video->v4l2_dev, "Engine busy; don't start frame\n");
+		pr_info("aspeed-video: Frame %d: ENGINE BUSY (seq_ctrl=0x%08x)\n",
+			video->frame_cnt, seq_ctrl);
 		return -EBUSY;
 	}
 
@@ -805,6 +807,7 @@ static int aspeed_video_start_frame(struct aspeed_video *video)
 	if (!buf) {
 		spin_unlock_irqrestore(&video->lock, flags);
 		v4l2_dbg(1, debug, &video->v4l2_dev, "No buffers; don't start frame\n");
+		pr_info("aspeed_video: Frame %d: NO BUFFERS\n", video->frame_cnt);
 		return -EPROTO;
 	}
 
@@ -818,6 +821,11 @@ static int aspeed_video_start_frame(struct aspeed_video *video)
 
 	aspeed_video_update(video, VE_INTERRUPT_CTRL, 0,
 			    VE_INTERRUPT_COMP_COMPLETE);
+
+	pr_info("aspeed_video: Frame %d: START capture\n", video->frame_cnt);
+	pr_info("  src_addr=0x%08x, dst_addr=0x%08x\n",
+		video->input == VIDEO_INPUT_GFX ?
+		aspeed_video_read(video, VE_TGS_0) : 0, _make_addr(addr));
 
 	if (video->format == VIDEO_FMT_PARTIAL) {
 		aspeed_video_partial_jpeg_update_regs(video);
@@ -857,6 +865,8 @@ static void aspeed_video_off(struct aspeed_video *video)
 	if (!test_bit(VIDEO_CLOCKS_ON, &video->flags))
 		return;
 
+	pr_info("aspeed-video: OFF: clocks disabled, reset asserted\n");
+
 	/* Disable interrupts */
 	aspeed_video_write(video, VE_INTERRUPT_CTRL, 0);
 	aspeed_video_write(video, VE_INTERRUPT_STATUS, 0xffffffff);
@@ -876,6 +886,8 @@ static void aspeed_video_on(struct aspeed_video *video)
 	if (test_bit(VIDEO_CLOCKS_ON, &video->flags))
 		return;
 
+	pr_info("aspeed-video: ON: enabling clocks and deasserting reset\n");
+
 	/* Turn on the relevant clocks */
 	clk_enable(video->vclk);
 	clk_enable(video->eclk);
@@ -884,6 +896,7 @@ static void aspeed_video_on(struct aspeed_video *video)
 	reset_control_deassert(video->reset);
 
 	set_bit(VIDEO_CLOCKS_ON, &video->flags);
+	pr_info("aspeed-video: ON: clocks enabled, reset deasserted\n");
 
 	if (video->version >= 7)
 		queue_work(video->rst_wq, &video->rst_work);
@@ -1203,6 +1216,10 @@ static irqreturn_t aspeed_video_irq(int irq, void *arg)
 
 	if (sts & VE_INTERRUPT_COMP_COMPLETE) {
 		bool frame_done = false;
+
+		pr_info("aspeed_video: Frame %d: COMPLETE\n", video->frame_cnt);
+		pr_info("  VE_COMP_SIZE_READ_BACK=0x%08x\n",
+			aspeed_video_read(video, video->comp_size_read));
 
 		if (video->format != VIDEO_FMT_PARTIAL)
 			frame_done = true;
@@ -2784,6 +2801,31 @@ static int aspeed_video_init(struct aspeed_video *video)
 
 	video->scu = aspeed_regmap_lookup(dev->of_node, "aspeed,scu");
 	video->gfx = aspeed_regmap_lookup(dev->of_node, "aspeed,gfx");
+
+	/* Initial register dump for debugging */
+	pr_info("aspeed-video: === Initial State Dump (id=%d) ===\n", video->id);
+	pr_info("  VE_MODE_DETECT_STATUS(0x098) = 0x%08x\n", aspeed_video_read(video, 0x098));
+	pr_info("  VE_SRC_LR_EDGE_DET(0x090)    = 0x%08x\n", aspeed_video_read(video, 0x090));
+	pr_info("  VE_SRC_TB_EDGE_DET(0x094)    = 0x%08x\n", aspeed_video_read(video, 0x094));
+	pr_info("  VE_SEQ_CTRL(0x004)           = 0x%08x\n", aspeed_video_read(video, 0x004));
+	pr_info("  VE_CTRL(0x008)               = 0x%08x\n", aspeed_video_read(video, 0x008));
+	pr_info("  VE_INTERRUPT_STATUS(0x308)   = 0x%08x\n", aspeed_video_read(video, 0x308));
+	if (!IS_ERR(video->scu)) {
+		u32 val;
+		regmap_read(video->scu, 0xC0, &val);
+		pr_info("  SCU_MISC_CTRL(0xC0)          = 0x%08x\n", val);
+		regmap_read(video->scu, 0x288, &val);
+		pr_info("  SCU_CLK_SEL(0x288)           = 0x%08x\n", val);
+	}
+	if (!IS_ERR(video->gfx)) {
+		u32 val;
+		regmap_read(video->gfx, 0x60, &val);
+		pr_info("  GFX_CTRL(0x60)               = 0x%08x\n", val);
+		regmap_read(video->gfx, 0x70, &val);
+		pr_info("  GFX_H_DISPLAY(0x70)          = 0x%08x\n", val);
+		regmap_read(video->gfx, 0x78, &val);
+		pr_info("  GFX_V_DISPLAY(0x78)          = 0x%08x\n", val);
+	}
 
 	irq = irq_of_parse_and_map(dev->of_node, 0);
 	if (!irq) {
