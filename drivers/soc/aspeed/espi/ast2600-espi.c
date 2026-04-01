@@ -1883,6 +1883,12 @@ static void ast2600_espi_legacy_rst_deassert(struct aspeed_espi *espi)
 {
 	u32 reg;
 
+	pr_info("aspeed-espi: === HW_RST_DEASSERT Event (Legacy) ===\n");
+
+	reg = readl(espi->regs + ESPI_VW_SYSEVT);
+	pr_info("  ESPI_SYSEVT before=0x%08x (SLV_BOOT_STS=%d, DONE=%d)\n",
+		reg, (reg >> 23) & 1, (reg >> 20) & 1);
+
 	ast2600_espi_perif_reset(espi);
 	ast2600_espi_vw_reset(espi);
 	ast2600_espi_oob_reset(espi);
@@ -1896,6 +1902,7 @@ static void ast2600_espi_legacy_rst_deassert(struct aspeed_espi *espi)
 	reg = readl(espi->regs + ESPI_VW_SYSEVT);
 	reg |= ESPI_VW_SYSEVT_SLV_BOOT_STS | ESPI_VW_SYSEVT_SLV_BOOT_DONE;
 	writel(reg, espi->regs + ESPI_VW_SYSEVT);
+	pr_info("  ESPI_SYSEVT after=0x%08x (SLV_BOOT_STS/DONE set)\n", reg);
 
 	/*
 	 * Enable hardware auto-acknowledge of SLV_BOOT_STS/DONE in
@@ -1907,8 +1914,20 @@ static void ast2600_espi_legacy_rst_deassert(struct aspeed_espi *espi)
 	 * PCIe link training regardless of BMC boot timing.
 	 */
 	reg = readl(espi->regs + ESPI_CTRL2);
+	pr_info("  ESPI_CTRL2 before=0x%08x (AUTO_STS=%d, AUTO_DONE=%d)\n",
+		reg, (reg >> 8) & 1, (reg >> 9) & 1);
 	reg |= ESPI_CTRL2_AUTO_SLV_BOOT_STS | ESPI_CTRL2_AUTO_SLV_BOOT_DONE;
 	writel(reg, espi->regs + ESPI_CTRL2);
+	pr_info("  ESPI_CTRL2 after=0x%08x (AUTO_BOOT_ACK enabled)\n", reg);
+
+	/* Log channel capabilities */
+	pr_info("  Capabilities: GEN=0x%08x\n",
+		readl(espi->regs + ESPI_GEN_CAP_N_CONF));
+	pr_info("  CH0=0x%03x CH1=0x%03x CH2=0x%03x CH3=0x%05x\n",
+		readl(espi->regs + ESPI_CH0_CAP_N_CONF),
+		readl(espi->regs + ESPI_CH1_CAP_N_CONF),
+		readl(espi->regs + ESPI_CH2_CAP_N_CONF),
+		readl(espi->regs + ESPI_CH3_CAP_N_CONF));
 
 	/* re-enable eSPI_RESET# interrupt and clear the status bit */
 	writel(ESPI_INT_EN_RST_DEASSERT, espi->regs + ESPI_INT_EN);
@@ -1927,6 +1946,8 @@ irqreturn_t ast2600_espi_isr(int irq, void *arg)
 	sts = readl(espi->regs + ESPI_INT_STS);
 	if (!sts)
 		return IRQ_NONE;
+
+	pr_info("aspeed-espi: ISR entry: INT_STS=0x%08x\n", sts);
 
 	if (sts & ESPI_INT_STS_PERIF)
 		ast2600_espi_perif_isr(espi);
@@ -1947,6 +1968,8 @@ irqreturn_t ast2600_espi_isr(int irq, void *arg)
 	if (sts & ESPI_INT_STS_RST_DEASSERT) {
 		u32 reg;
 
+		pr_info("aspeed-espi: HW_RST_DEASSERT event (non-legacy mode)\n");
+
 		/* this will clear all interrupt enable and status */
 		reset_control_assert(espi->rst);
 		reset_control_deassert(espi->rst);
@@ -1965,6 +1988,7 @@ irqreturn_t ast2600_espi_isr(int irq, void *arg)
 		reg = readl(espi->regs + ESPI_VW_SYSEVT);
 		reg |= ESPI_VW_SYSEVT_SLV_BOOT_STS | ESPI_VW_SYSEVT_SLV_BOOT_DONE;
 		writel(reg, espi->regs + ESPI_VW_SYSEVT);
+		pr_info("aspeed-espi: ESPI_SYSEVT=0x%08x (SLV_BOOT_STS/DONE set)\n", reg);
 
 		/* re-enable eSPI_RESET# interrupt */
 		writel(ESPI_INT_EN_RST_DEASSERT, espi->regs + ESPI_INT_EN);
@@ -1981,11 +2005,38 @@ void ast2600_espi_pre_init(struct aspeed_espi *espi)
 
 void ast2600_espi_post_init(struct aspeed_espi *espi)
 {
+	u32 reg;
+
+	/* Initial state dump for debugging */
+	pr_info("aspeed-espi: === Initial State Dump ===\n");
+	reg = readl(espi->regs + ESPI_VW_SYSEVT);
+	pr_info("  ESPI_SYSEVT(0x098)      = 0x%08x (SLV_BOOT_STS=%d, SLV_BOOT_DONE=%d)\n",
+		reg, (reg >> 23) & 1, (reg >> 20) & 1);
+	reg = readl(espi->regs + ESPI_CTRL2);
+	pr_info("  ESPI_CTRL2(0x080)       = 0x%08x (AUTO_BOOT_ACK=%d/%d)\n",
+		reg, (reg >> 8) & 1, (reg >> 9) & 1);
+	pr_info("  ESPI_GEN_CAP(0x0a0)     = 0x%08x\n",
+		readl(espi->regs + ESPI_GEN_CAP_N_CONF));
+	pr_info("  ESPI_CH0_CAP(0x0a4)     = 0x%08x (RDY=%d)\n",
+		readl(espi->regs + ESPI_CH0_CAP_N_CONF),
+		(readl(espi->regs + ESPI_CH0_CAP_N_CONF) >> 4) & 1);
+	pr_info("  ESPI_CH1_CAP(0x0a8)     = 0x%08x (RDY=%d)\n",
+		readl(espi->regs + ESPI_CH1_CAP_N_CONF),
+		(readl(espi->regs + ESPI_CH1_CAP_N_CONF) >> 4) & 1);
+	pr_info("  ESPI_CH2_CAP(0x0ac)     = 0x%08x (RDY=%d)\n",
+		readl(espi->regs + ESPI_CH2_CAP_N_CONF),
+		(readl(espi->regs + ESPI_CH2_CAP_N_CONF) >> 4) & 1);
+	pr_info("  ESPI_CH3_CAP(0x0b0)     = 0x%08x (RDY=%d)\n",
+		readl(espi->regs + ESPI_CH3_CAP_N_CONF),
+		(readl(espi->regs + ESPI_CH3_CAP_N_CONF) >> 4) & 1);
+	pr_info("  ESPI_INT_STS(0x008)     = 0x%08x\n",
+		readl(espi->regs + ESPI_INT_STS));
+	pr_info("  ESPI_INT_EN(0x00c)      = 0x%08x\n",
+		readl(espi->regs + ESPI_INT_EN));
+
 	writel(ESPI_INT_EN_RST_DEASSERT, espi->regs + ESPI_INT_EN);
 #ifdef CONFIG_ASPEED_ESPI_LEGACY
 	{
-		u32 reg;
-
 		/*
 		 * Enable hardware auto-acknowledge of SLV_BOOT_STS/DONE
 		 * as early as possible.  This must happen before the host
@@ -1998,6 +2049,8 @@ void ast2600_espi_post_init(struct aspeed_espi *espi)
 		reg |= ESPI_CTRL2_AUTO_SLV_BOOT_STS
 		     | ESPI_CTRL2_AUTO_SLV_BOOT_DONE;
 		writel(reg, espi->regs + ESPI_CTRL2);
+		pr_info("aspeed-espi: Legacy mode: ESPI_CTRL2=0x%08x (AUTO_BOOT_ACK enabled)\n",
+			reg);
 
 		/*
 		 * Also set the software SLV_BOOT bits explicitly for
@@ -2008,6 +2061,8 @@ void ast2600_espi_post_init(struct aspeed_espi *espi)
 		reg |= ESPI_VW_SYSEVT_SLV_BOOT_STS
 		     | ESPI_VW_SYSEVT_SLV_BOOT_DONE;
 		writel(reg, espi->regs + ESPI_VW_SYSEVT);
+		pr_info("aspeed-espi: Legacy mode: ESPI_SYSEVT=0x%08x (SLV_BOOT_STS/DONE set)\n",
+			reg);
 
 		/*
 		 * If eSPI_RESET# was already deasserted before the
@@ -2015,10 +2070,13 @@ void ast2600_espi_post_init(struct aspeed_espi *espi)
 		 * Run the full handshake now.
 		 */
 		if (readl(espi->regs + ESPI_INT_STS) &
-		    ESPI_INT_STS_RST_DEASSERT)
+		    ESPI_INT_STS_RST_DEASSERT) {
+			pr_info("aspeed-espi: RST_DEASSERT already pending at probe, running handshake\n");
 			ast2600_espi_legacy_rst_deassert(espi);
+		}
 	}
 #endif
+	pr_info("aspeed-espi: === Post-init complete ===\n");
 }
 
 void ast2600_espi_deinit(struct aspeed_espi *espi)

@@ -112,6 +112,10 @@ static int aspeed_espi_probe(struct platform_device *pdev)
 		return -ENODEV;
 	espi->ops = match->data;
 
+	pr_info("aspeed-espi: === Probe ===\n");
+	pr_info("  compatible: %s\n", dev->of_node->name);
+	pr_info("  platform_id: %d\n", espi->ops->platform_id);
+
 	espi->pdev = pdev;
 
 	rc = dma_set_mask_and_coherent(dev, DMA_BIT_MASK(64));
@@ -203,7 +207,7 @@ static int aspeed_espi_probe(struct platform_device *pdev)
 
 	platform_set_drvdata(pdev, espi);
 
-	dev_info(dev, "module loaded\n");
+	dev_info(dev, "module loaded (platform=%d)\n", espi->ops->platform_id);
 
 	return 0;
 
