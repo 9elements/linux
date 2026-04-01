@@ -213,6 +213,7 @@ static int aspeed_clk_enable(struct clk_hw *hw)
 	u32 clk = BIT(gate->clock_idx);
 	u32 rst = BIT(gate->reset_idx);
 	u32 enval;
+	bool is_critical = !!(gate->flags & CLK_IS_CRITICAL);
 
 	spin_lock_irqsave(gate->lock, flags);
 
@@ -220,6 +221,10 @@ static int aspeed_clk_enable(struct clk_hw *hw)
 		spin_unlock_irqrestore(gate->lock, flags);
 		return 0;
 	}
+
+	if (is_critical)
+		pr_info("clk-aspeed: %s: ENABLING (gate=%d, reset=%d, critical=%d)\n",
+			clk_hw_get_name(hw), gate->clock_idx, gate->reset_idx, is_critical);
 
 	if (gate->reset_idx >= 0) {
 		/* Put IP in reset */
@@ -239,6 +244,9 @@ static int aspeed_clk_enable(struct clk_hw *hw)
 
 		/* Take IP out of reset */
 		regmap_update_bits(gate->map, ASPEED_RESET_CTRL, rst, 0);
+
+		if (is_critical)
+			pr_info("  Reset deasserted (delay=10ms)\n");
 	}
 
 	spin_unlock_irqrestore(gate->lock, flags);
