@@ -343,6 +343,7 @@ static int aspeed_ast2600_init(struct platform_device *pdev)
 	u32 pcie_config_ctl = SCU_PCIE_CONF_BMC_DEV_EN_IRQ |
 			      SCU_PCIE_CONF_BMC_DEV_EN_MMIO | SCU_PCIE_CONF_BMC_DEV_EN;
 	u32 scu_id;
+	u32 old_c20, new_c20;
 
 	bmc_device->scu = syscon_regmap_lookup_by_phandle(dev->of_node, "aspeed,scu");
 	if (IS_ERR(bmc_device->scu)) {
@@ -350,12 +351,34 @@ static int aspeed_ast2600_init(struct platform_device *pdev)
 		return PTR_ERR(bmc_device->scu);
 	}
 
+	/* Initial SCU state dump */
+	regmap_read(bmc_device->scu, ASPEED_SCU_PCIE_CONF_CTRL, &old_c20);
+	regmap_read(bmc_device->scu, ASPEED_SCUC24, &scu_id);
+	pr_info("aspeed-bmc-dev: === Initial SCU State ===\n");
+	pr_info("  SCU_0xC20 = 0x%08x\n", old_c20);
+	pr_info("    DEV_EN=%d, MMIO=%d, MSI=%d, IRQ=%d, DMA=%d, E2L=%d, LPC_DEC=%d\n",
+		(old_c20 >> 8) & 1, (old_c20 >> 9) & 1, (old_c20 >> 11) & 1,
+		(old_c20 >> 13) & 1, (old_c20 >> 14) & 1, (old_c20 >> 15) & 1,
+		(old_c20 >> 21) & 1);
+	pr_info("  SCU_0xC24 = 0x%08x\n", scu_id);
+
 	if (bmc_device->pcie2lpc)
 		pcie_config_ctl |= SCU_PCIE_CONF_BMC_DEV_EN_E2L |
 				   SCU_PCIE_CONF_BMC_DEV_EN_LPC_DECODE;
 
 	regmap_update_bits(bmc_device->scu, ASPEED_SCU_PCIE_CONF_CTRL,
 			   pcie_config_ctl, pcie_config_ctl);
+
+	regmap_read(bmc_device->scu, ASPEED_SCU_PCIE_CONF_CTRL, &new_c20);
+	pr_info("aspeed-bmc-dev: SCU 0xC20: 0x%08x -> 0x%08x\n", old_c20, new_c20);
+	pr_info("  Bits set: %s%s%s%s%s%s%s\n",
+		(new_c20 & BIT(8)) ? "DEV_EN " : "",
+		(new_c20 & BIT(9)) ? "MMIO " : "",
+		(new_c20 & BIT(11)) ? "MSI " : "",
+		(new_c20 & BIT(13)) ? "IRQ " : "",
+		(new_c20 & BIT(14)) ? "DMA " : "",
+		(new_c20 & BIT(15)) ? "E2L " : "",
+		(new_c20 & BIT(21)) ? "LPC_DECODE" : "");
 
 	/* update class code to others as it is a MFD device */
 	regmap_write(bmc_device->scu, ASPEED_SCU_BMC_DEV_CLASS, 0xff000000);
