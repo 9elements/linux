@@ -191,41 +191,47 @@ static irqreturn_t aspeed_host_irq_handler(int irq, void *data)
 	struct aspeed_gfx *priv = to_aspeed_gfx(drm);
 	u32 reg;
 
+	pr_info("aspeed_gfx: PERST# IRQ handler called (irq=%d)\n", irq);
+
 	regmap_read(priv->scu, priv->pcie_int_reg, &reg);
+	pr_info("  SCU_0x%03x = 0x%08x\n", priv->pcie_int_reg, reg);
 
 	if (reg & priv->pcie_int_mask) {
 		if (reg & priv->pcie_int_l_to_h) {
-			dev_dbg(drm->dev, "pcie active.\n");
+			pr_info("  PERST# LO->HI: PCIe link active\n");
 			/*Change the DP back to host*/
 			if (priv->dp_support) {
 				/*Change the DP back to host*/
 				regmap_update_bits(priv->dp, DP_SOURCE, DP_CONTROL_FROM_SOC, 0);
-				dev_dbg(drm->dev, "dp set at 0 int L_T_H.\n");
 				regmap_update_bits(priv->scu, priv->dac_reg, priv->soc_dp_bit, 0);
+				pr_info("  DP set to HOST\n");
 			}
 
 			/*Change the CRT back to host*/
 			regmap_update_bits(priv->scu, priv->dac_reg, priv->soc_crt_bit, 0);
+			pr_info("  CRT set to HOST (DAC bit cleared)\n");
 			if ((priv->flags & CLK_MASK) == CLK_G7)
 				regmap_update_bits(priv->scu1, 0xD0, BIT(10), 0);
 		} else if (reg & priv->pcie_int_h_to_l) {
-			dev_dbg(drm->dev, "pcie de-active.\n");
+			pr_info("  PERST# HI->LO: PCIe link inactive\n");
 			/*Change the DP into host*/
 			if (priv->dp_support) {
 				/*Change the DP back to soc*/
 				regmap_update_bits(priv->dp, DP_SOURCE, DP_CONTROL_FROM_SOC, DP_CONTROL_FROM_SOC);
-				dev_dbg(drm->dev, "dp set at 11 int H_T_L.\n");
 				regmap_update_bits(priv->scu, priv->dac_reg, priv->soc_dp_bit, priv->soc_dp_bit);
+				pr_info("  DP set to BMC\n");
 			}
 
 			/*Change the CRT into soc*/
 			regmap_update_bits(priv->scu, priv->dac_reg, priv->soc_crt_bit, priv->soc_crt_bit);
+			pr_info("  CRT set to BMC (DAC bit set)\n");
 			if ((priv->flags & CLK_MASK) == CLK_G7)
 				regmap_update_bits(priv->scu1, 0xD0, BIT(10), BIT(10));
 		}
 		return IRQ_HANDLED;
 	}
 
+	pr_info("  No matching interrupt bits\n");
 	return IRQ_NONE;
 }
 
@@ -251,6 +257,8 @@ static int aspeed_pcie_active_detect(struct drm_device *drm)
 	struct aspeed_gfx *priv = to_aspeed_gfx(drm);
 	u32 reg = 0;
 
+	pr_info("aspeed_gfx: PCIe link detection\n");
+
 	/* map pcie ep resource */
 	priv->pcie_ep = syscon_regmap_lookup_by_compatible("aspeed,ast2500-pcie-ep");
 	if (IS_ERR(priv->pcie_ep)) {
@@ -266,6 +274,8 @@ static int aspeed_pcie_active_detect(struct drm_device *drm)
 
 	/* check pcie rst status */
 	regmap_read(priv->pcie_ep, priv->pcie_link_reg, &reg);
+	pr_info("  pcie_link_reg=0x%x, value=0x%08x, pcie_link_bit=%d\n",
+		priv->pcie_link_reg, reg, priv->pcie_link_bit);
 
 	/* host vga is on or not */
 	if (reg & priv->pcie_link_bit)
@@ -273,7 +283,7 @@ static int aspeed_pcie_active_detect(struct drm_device *drm)
 	else
 		priv->pcie_active = 0x0;
 
-	dev_dbg(drm->dev, "pcie_active %x\n", priv->pcie_active);
+	pr_info("  Result: pcie_active=%d\n", priv->pcie_active);
 
 	return 0;
 }
@@ -457,6 +467,24 @@ static int aspeed_gfx_load(struct drm_device *drm)
 				}
 			}
 		}
+	}
+
+	/* Initial state dump for debugging */
+	{
+		u32 dac_val, scu_c20, scu_560;
+		regmap_read(priv->scu, priv->dac_reg, &dac_val);
+		regmap_read(priv->scu, 0xC20, &scu_c20);
+		regmap_read(priv->scu, 0x560, &scu_560);
+		pr_info("aspeed_gfx: === Initial State Dump ===\n");
+		pr_info("  DAC(0x%03x)           = 0x%08x (CRT_BIT=%d, DP_BIT=%d)\n",
+			priv->dac_reg, dac_val, (dac_val >> 16) & 1, (dac_val >> 18) & 1);
+		pr_info("  SCU_0xC20             = 0x%08x (BMC_DEV_EN=%d, MMIO=%d, MSI=%d)\n",
+			scu_c20, (scu_c20 >> 8) & 1, (scu_c20 >> 9) & 1, (scu_c20 >> 11) & 1);
+		pr_info("  SCU_0x560             = 0x%08x\n", scu_560);
+		pr_info("  pcie_advance          = %d\n", priv->pcie_advance);
+		pr_info("  pcie_active           = %d\n", priv->pcie_active);
+		pr_info("  flags                 = 0x%08x (CLK=%d, RESET=%d)\n",
+			priv->flags, priv->flags & CLK_MASK, priv->flags & RESET_MASK);
 	}
 
 	ret = of_reserved_mem_device_init(drm->dev);

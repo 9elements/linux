@@ -33,6 +33,9 @@ static void aspeed_gfx_set_g4_clock(struct aspeed_gfx *priv)
 
 static void aspeed_gfx_set_g6_clock_source(struct aspeed_gfx *priv, int mode_width)
 {
+	u32 old_val, new_val;
+
+	regmap_read(priv->scu, G6_CLK_SOURCE, &old_val);
 	regmap_update_bits(priv->scu, G6_CLK_SOURCE, G6_CLK_SOURCE_MASK, 0x0);
 	regmap_update_bits(priv->scu, G6_CLK_SEL3, G6_CLK_DIV_MASK, 0x0);
 
@@ -41,13 +44,18 @@ static void aspeed_gfx_set_g6_clock_source(struct aspeed_gfx *priv, int mode_wid
 		/* hpll div 16 = 75Mhz */
 		regmap_update_bits(priv->scu, G6_CLK_SOURCE, G6_CLK_SOURCE_MASK, G6_CLK_SOURCE_HPLL);
 		regmap_update_bits(priv->scu, G6_CLK_SEL3, G6_CLK_DIV_MASK, G6_CLK_DIV_16);
+		pr_info("aspeed_gfx: Clock set: mode_width=%d, source=HPLL_DIV16 (75MHz)\n", mode_width);
 		break;
 	case 800:
 	default:
 		/* usb 40Mhz */
 		regmap_update_bits(priv->scu, G6_CLK_SOURCE, G6_CLK_SOURCE_MASK, G6_CLK_SOURCE_USB);
+		pr_info("aspeed_gfx: Clock set: mode_width=%d, source=USB (40MHz)\n", mode_width);
 		break;
 	}
+
+	regmap_read(priv->scu, G6_CLK_SOURCE, &new_val);
+	pr_info("  SCU_CLK_SOURCE(0x28): 0x%08x -> 0x%08x\n", old_val, new_val);
 }
 
 static void aspeed_gfx_set_g7_clock(struct aspeed_gfx *priv)
@@ -96,12 +104,25 @@ static void aspeed_gfx_enable_controller(struct aspeed_gfx *priv)
 {
 	u32 ctrl1 = readl(priv->base + CRT_CTRL1);
 	u32 ctrl2 = readl(priv->base + CRT_CTRL2);
+	u32 old_val, new_val;
+
+	pr_info("aspeed_gfx: CRT controller ENABLED\n");
+	pr_info("  pcie_advance=%d, pcie_active=%d\n", priv->pcie_advance, priv->pcie_active);
 
 	/* change the display source is coming from soc display */
 	if (!priv->pcie_advance || !priv->pcie_active) {
+		regmap_read(priv->scu, priv->dac_reg, &old_val);
 		regmap_update_bits(priv->scu, priv->dac_reg, priv->soc_crt_bit, priv->soc_crt_bit);
-		if (priv->dp_support)
+		regmap_read(priv->scu, priv->dac_reg, &new_val);
+		pr_info("  DAC ownership: setting to BMC\n");
+		pr_info("  DAC(0x%03x): 0x%08x -> 0x%08x (bit %d set)\n",
+			priv->dac_reg, old_val, new_val, __ffs(priv->soc_crt_bit));
+		if (priv->dp_support) {
 			regmap_update_bits(priv->scu, priv->dac_reg, priv->soc_dp_bit, priv->soc_dp_bit);
+			pr_info("  DP also set to BMC\n");
+		}
+	} else {
+		pr_info("  DAC ownership: leaving with HOST (pcie_active=1)\n");
 	}
 
     /* remove the cursor and osd usage */
@@ -119,12 +140,20 @@ static void aspeed_gfx_disable_controller(struct aspeed_gfx *priv)
 {
 	u32 ctrl1 = readl(priv->base + CRT_CTRL1);
 	u32 ctrl2 = readl(priv->base + CRT_CTRL2);
+	u32 old_val, new_val;
+
+	pr_info("aspeed_gfx: CRT controller DISABLED\n");
 
 	writel(ctrl1 & ~CRT_CTRL_EN, priv->base + CRT_CTRL1);
 	writel(ctrl2 & ~CRT_CTRL_DAC_EN, priv->base + CRT_CTRL2);
 
 	/* Set display source for display output to pcie host display */
+	regmap_read(priv->scu, priv->dac_reg, &old_val);
 	regmap_update_bits(priv->scu, priv->dac_reg, priv->soc_crt_bit, 0);
+	regmap_read(priv->scu, priv->dac_reg, &new_val);
+	pr_info("  DAC ownership: setting to HOST\n");
+	pr_info("  DAC(0x%03x): 0x%08x -> 0x%08x (bit %d cleared)\n",
+		priv->dac_reg, old_val, new_val, __ffs(priv->soc_crt_bit));
 	if (priv->dp_support)
 		regmap_update_bits(priv->scu, priv->dac_reg, priv->soc_dp_bit, 0);
 }
