@@ -4,6 +4,15 @@ if ARCH_ASPEED || COMPILE_TEST
 
 menu "ASPEED SoC drivers"
 
+config ASPEED_ESPI_TRACE
+	tristate "ASPEED eSPI/PCIe/KCS boot trace"
+	help
+	  Debug module that polls SCU, eSPI, and LPC/KCS registers at
+	  high frequency (default 1ms) and logs every state change with
+	  timestamps.  Load on both a working and broken build, then
+	  diff the dmesg output to identify timing-sensitive init
+	  failures.  Has no DT dependency; safe to load on any AST2600.
+
 config ASPEED_BMC_DEV
 	tristate "ASPEED BMC Device"
 
