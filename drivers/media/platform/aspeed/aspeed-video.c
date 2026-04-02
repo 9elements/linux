@@ -2385,6 +2385,34 @@ static void aspeed_video_resolution_work(struct work_struct *work)
 
 	aspeed_video_update_regs(video);
 
+	/* debugging: log VE hw state before every 30th mode-detection attempt */
+	{
+		static unsigned int dbg_cycle;
+		u32 ve_ctrl     = aspeed_video_read(video, VE_CTRL);
+		u32 ve_mds      = aspeed_video_read(video, VE_MODE_DETECT_STATUS);
+		u32 ve_edge     = aspeed_video_read(video, 0x090); /* VE_SRC_LR_EDGE_DET */
+
+		dbg_cycle++;
+		if (dbg_cycle % 30 == 1) {
+			pr_info("aspeed-video: cycle %u (every 30th shown)\n",
+				dbg_cycle);
+			pr_info("  VE_CTRL(0x008)              = 0x%08x"
+				" SOURCE=%s DIRECT=%d\n",
+				ve_ctrl,
+				(ve_ctrl & VE_CTRL_SOURCE) ? "external(DVI)" : "internal(PCIe-VGA)",
+				!!(ve_ctrl & VE_CTRL_DIRECT_FETCH));
+			pr_info("  VE_MODE_DETECT_STATUS(0x098)= 0x%08x"
+				" H_STABLE=%d V_STABLE=%d HSYNC=%d VSYNC=%d\n",
+				ve_mds,
+				!!(ve_mds & VE_MODE_DETECT_H_STABLE),
+				!!(ve_mds & VE_MODE_DETECT_V_STABLE),
+				!!(ve_mds & VE_MODE_DETECT_STATUS_HSYNC),
+				!!(ve_mds & VE_MODE_DETECT_STATUS_VSYNC));
+			pr_info("  VE_SRC_LR_EDGE_DET(0x090)  = 0x%08x"
+				" (non-zero = edges detected)\n", ve_edge);
+		}
+	}
+
 	aspeed_video_get_resolution(video);
 
 	if (video->v4l2_input_status)
