@@ -483,8 +483,8 @@ static int aspeed_gfx_load(struct drm_device *drm)
 		pr_info("  SCU_0x560             = 0x%08x\n", scu_560);
 		pr_info("  pcie_advance          = %d\n", priv->pcie_advance);
 		pr_info("  pcie_active           = %d\n", priv->pcie_active);
-		pr_info("  flags                 = 0x%08x (CLK=%d, RESET=%d)\n",
-			priv->flags, priv->flags & CLK_MASK, priv->flags & RESET_MASK);
+		pr_info("  flags                 = 0x%08x (CLK=%u, RESET=%u)\n",
+			priv->flags, (u32)(priv->flags & CLK_MASK), (u32)(priv->flags & RESET_MASK));
 	}
 
 	ret = of_reserved_mem_device_init(drm->dev);
