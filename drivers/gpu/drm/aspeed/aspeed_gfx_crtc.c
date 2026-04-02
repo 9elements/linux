@@ -115,7 +115,7 @@ static void aspeed_gfx_enable_controller(struct aspeed_gfx *priv)
 		regmap_update_bits(priv->scu, priv->dac_reg, priv->soc_crt_bit, priv->soc_crt_bit);
 		regmap_read(priv->scu, priv->dac_reg, &new_val);
 		pr_info("  DAC ownership: setting to BMC\n");
-		pr_info("  DAC(0x%03x): 0x%08x -> 0x%08x (bit %d set)\n",
+		pr_info("  DAC(0x%03x): 0x%08x -> 0x%08x (bit %lu set)\n",
 			priv->dac_reg, old_val, new_val, __ffs(priv->soc_crt_bit));
 		if (priv->dp_support) {
 			regmap_update_bits(priv->scu, priv->dac_reg, priv->soc_dp_bit, priv->soc_dp_bit);
@@ -152,7 +152,7 @@ static void aspeed_gfx_disable_controller(struct aspeed_gfx *priv)
 	regmap_update_bits(priv->scu, priv->dac_reg, priv->soc_crt_bit, 0);
 	regmap_read(priv->scu, priv->dac_reg, &new_val);
 	pr_info("  DAC ownership: setting to HOST\n");
-	pr_info("  DAC(0x%03x): 0x%08x -> 0x%08x (bit %d cleared)\n",
+	pr_info("  DAC(0x%03x): 0x%08x -> 0x%08x (bit %lu cleared)\n",
 		priv->dac_reg, old_val, new_val, __ffs(priv->soc_crt_bit));
 	if (priv->dp_support)
 		regmap_update_bits(priv->scu, priv->dac_reg, priv->soc_dp_bit, 0);
