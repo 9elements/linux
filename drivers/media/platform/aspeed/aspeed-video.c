@@ -787,7 +787,7 @@ static int aspeed_video_start_frame(struct aspeed_video *video)
 	    !(seq_ctrl & VE_SEQ_CTRL_CAP_BUSY)) {
 		v4l2_dbg(1, debug, &video->v4l2_dev, "Engine busy; don't start frame\n");
 		pr_info("aspeed-video: Frame %d: ENGINE BUSY (seq_ctrl=0x%08x)\n",
-			video->frame_cnt, seq_ctrl);
+			video->sequence, seq_ctrl);
 		return -EBUSY;
 	}
 
@@ -807,7 +807,7 @@ static int aspeed_video_start_frame(struct aspeed_video *video)
 	if (!buf) {
 		spin_unlock_irqrestore(&video->lock, flags);
 		v4l2_dbg(1, debug, &video->v4l2_dev, "No buffers; don't start frame\n");
-		pr_info("aspeed_video: Frame %d: NO BUFFERS\n", video->frame_cnt);
+		pr_info("aspeed_video: Frame %d: NO BUFFERS\n", video->sequence);
 		return -EPROTO;
 	}
 
@@ -822,7 +822,7 @@ static int aspeed_video_start_frame(struct aspeed_video *video)
 	aspeed_video_update(video, VE_INTERRUPT_CTRL, 0,
 			    VE_INTERRUPT_COMP_COMPLETE);
 
-	pr_info("aspeed_video: Frame %d: START capture\n", video->frame_cnt);
+	pr_info("aspeed_video: Frame %d: START capture\n", video->sequence);
 	pr_info("  src_addr=0x%08x, dst_addr=0x%08x\n",
 		video->input == VIDEO_INPUT_GFX ?
 		aspeed_video_read(video, VE_TGS_0) : 0, _make_addr(addr));
@@ -1217,7 +1217,7 @@ static irqreturn_t aspeed_video_irq(int irq, void *arg)
 	if (sts & VE_INTERRUPT_COMP_COMPLETE) {
 		bool frame_done = false;
 
-		pr_info("aspeed_video: Frame %d: COMPLETE\n", video->frame_cnt);
+		pr_info("aspeed_video: Frame %d: COMPLETE\n", video->sequence);
 		pr_info("  VE_COMP_SIZE_READ_BACK=0x%08x\n",
 			aspeed_video_read(video, video->comp_size_read));
 
