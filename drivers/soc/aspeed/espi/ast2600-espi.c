@@ -904,8 +904,22 @@ static void ast2600_espi_vw_reset(struct aspeed_espi *espi)
 
 	vw->gpio.val0 = readl(espi->regs + ESPI_VW_GPIO_VAL);
 
-	reg = readl(espi->regs + ESPI_CTRL2) & ~(ESPI_CTRL2_VW_TX_SORT);
-	writel(reg, espi->regs + ESPI_CTRL2);
+	/*
+	 * Do NOT clear ESPI_CTRL2_VW_TX_SORT (bit 30).
+	 *
+	 * When this bit is set (hardware/U-Boot default), the AST2600 sorts VW
+	 * channel transmissions before sending them to the host.  The AMD
+	 * platform controller depends on receiving VW messages (SLV_BOOT_STS /
+	 * SLV_BOOT_DONE) in a well-defined order.  Clearing this bit causes
+	 * the AMD BIOS to silently skip PCIe enumeration — it never deasserts
+	 * PCIe PERST#, so the AST2600 VGA endpoint is never enumerated and KVM
+	 * cannot work.  The old 5.10-era openbmc-linux eSPI driver never
+	 * touched this bit; preserving it is required for correct operation.
+	 *
+	 * Confirmed by comparison with working openbmc-linux build:
+	 *   openbmc-linux: ESPI_CTRL2 = 0x40100ff7  (bit 30 preserved)
+	 *   linux-9e (broken): ESPI_CTRL2 0x40000f57 -> 0x00000357  (bit 30 cleared here)
+	 */
 
 	writel(ESPI_INT_EN_VW_GPIO, espi->regs + ESPI_INT_EN);
 
